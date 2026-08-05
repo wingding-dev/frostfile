@@ -17,7 +17,12 @@ from concurrent.futures import ThreadPoolExecutor
 
 import httpx
 
-USER_AGENT = "Mozilla/5.0 (compatible; Identilock link check)"
+# A plain browser-like agent — no product name, so a link check does not
+# announce to each agency that a tool like this is being used.
+USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/125.0 Safari/537.36"
+)
 TIMEOUT = httpx.Timeout(10.0)
 MAX_WORKERS = 8
 

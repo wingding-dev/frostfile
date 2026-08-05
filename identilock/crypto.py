@@ -25,6 +25,7 @@ from __future__ import annotations
 import hmac
 import os
 import secrets
+import unicodedata
 from dataclasses import dataclass
 
 from argon2.low_level import Type, hash_secret_raw
@@ -67,6 +68,10 @@ class KdfParams:
 
 
 def derive_key(passphrase: str, params: KdfParams) -> bytes:
+    # Normalize to NFC so an accented passphrase typed on macOS (NFD) and on
+    # Windows (NFC) derives the same key — the app encourages moving the vault
+    # between machines, and a normalization mismatch would be a silent lockout.
+    passphrase = unicodedata.normalize("NFC", passphrase)
     return hash_secret_raw(
         secret=passphrase.encode("utf-8"),
         salt=params.salt,
