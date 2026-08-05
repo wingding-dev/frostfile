@@ -56,10 +56,12 @@ def reminder_create(
     csrf_token: str = Form(""),
     session: Session = Depends(get_session),
     conn: sqlite3.Connection = Depends(get_conn),
+    vault: Vault = Depends(get_vault),
 ):
     verify_csrf(session, csrf_token)
     create_reminder(
         conn,
+        vault,
         title=title.strip(),
         due_date=due_date.strip(),
         detail=detail.strip(),

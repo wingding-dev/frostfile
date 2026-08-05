@@ -308,6 +308,11 @@ def unlock_submit(
             {"error": "That passphrase did not open the vault.", "next": _safe_next(next)},
         )
 
+    # Seal any pre-0.3 plaintext reminder/report fields now that we hold the key.
+    try:
+        db.migrate_plaintext_fields(conn, vault)
+    except Exception:
+        pass
     _maybe_auto_backup(request, conn)
 
     session = request.app.state.sessions.create(vault)
