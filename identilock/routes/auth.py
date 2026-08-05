@@ -220,11 +220,12 @@ def recover_submit(
 
     from ..crypto import Vault
 
-    # Re-encrypt everything under the new passphrase, then burn the used code
-    # by issuing a fresh one — a recovery code is single-use by design.
-    new_vault = db.change_passphrase(conn, Vault(data_key), new_passphrase)
+    # Re-encrypt everything under the new passphrase and, in the same
+    # transaction, issue a fresh code — burning the used one (single-use by
+    # design) with no window where no valid code exists.
+    new_vault, recovery_code = db.change_passphrase(conn, Vault(data_key), new_passphrase)
     session = request.app.state.sessions.create(new_vault)
-    session.pending_recovery_code = db.set_recovery(conn, new_vault.key)
+    session.pending_recovery_code = recovery_code
     response = redirect("/recovery-code")
     set_session_cookie(response, session.token)
     return response

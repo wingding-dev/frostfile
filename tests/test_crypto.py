@@ -94,7 +94,12 @@ def test_change_passphrase_rewraps_every_field(tmp_path):
         conn, vault, display_name="Test Person", kind="adult", ssn="123456789"
     )
 
-    new_vault = db.change_passphrase(conn, vault, "new passphrase here")
+    new_vault, recovery_code = db.change_passphrase(conn, vault, "new passphrase here")
+
+    # A fresh recovery code is issued in the same transaction, and it opens the
+    # re-wrapped vault.
+    assert recovery_code
+    assert db.recover_data_key(conn, recovery_code) == new_vault.key
 
     # Readable under the new key...
     person = get_person(conn, new_vault, person_id)
