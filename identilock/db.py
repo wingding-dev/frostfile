@@ -47,8 +47,8 @@ ENCRYPTED_FIELDS: dict[str, tuple[str, ...]] = {
         "notes_enc",
     ),
     "freeze_records": ("confirmation_enc", "pin_enc", "notes_enc"),
-    "reminders": ("notes_enc",),
-    "reports": ("text_enc", "extracted_enc"),
+    "reminders": ("title_enc", "detail_enc", "notes_enc"),
+    "reports": ("source_name_enc", "text_enc", "extracted_enc"),
     "breach_checks": ("email_enc", "result_enc"),
     "app_settings": ("value_enc",),
 }
@@ -132,8 +132,10 @@ CREATE TABLE IF NOT EXISTS reminders (
     person_id      INTEGER REFERENCES people(id) ON DELETE CASCADE,
     agency_id      INTEGER REFERENCES agencies(id) ON DELETE SET NULL,
     kind           TEXT NOT NULL DEFAULT 'custom',
-    title          TEXT NOT NULL,
+    title          TEXT NOT NULL DEFAULT '',
     detail         TEXT NOT NULL DEFAULT '',
+    title_enc      BLOB,
+    detail_enc     BLOB,
     due_date       TEXT NOT NULL,
     recurrence     TEXT NOT NULL DEFAULT 'none',
     last_completed TEXT,
@@ -148,6 +150,7 @@ CREATE TABLE IF NOT EXISTS reports (
     bureau        TEXT NOT NULL,
     pulled_on     TEXT NOT NULL,
     source_name   TEXT NOT NULL DEFAULT '',
+    source_name_enc BLOB,
     text_enc      BLOB,
     extracted_enc BLOB,
     created_at    TEXT NOT NULL
@@ -192,6 +195,9 @@ def connect(path: Path) -> sqlite3.Connection:
     # a complete backup — which is the instruction most people will follow.
     conn.execute("PRAGMA journal_mode = DELETE")
     conn.execute("PRAGMA synchronous = FULL")
+    # Overwrite freed content instead of leaving it in freelist pages, so a
+    # deleted SSN or a migrated-away plaintext value does not linger in the file.
+    conn.execute("PRAGMA secure_delete = ON")
     return conn
 
 
@@ -235,7 +241,42 @@ def create_schema(conn: sqlite3.Connection) -> None:
     _ensure_column(conn, "agencies", "action_note", "TEXT NOT NULL DEFAULT ''")
     _ensure_column(conn, "agencies", "protects", "TEXT NOT NULL DEFAULT ''")
     _ensure_column(conn, "agencies", "impact", "INTEGER NOT NULL DEFAULT 0")
+    _ensure_column(conn, "reminders", "title_enc", "BLOB")
+    _ensure_column(conn, "reminders", "detail_enc", "BLOB")
+    _ensure_column(conn, "reports", "source_name_enc", "BLOB")
     conn.commit()
+
+
+# Plaintext columns kept only to satisfy legacy NOT NULL and to hold pre-0.3
+# data until it is migrated into the matching _enc column. New writes put ''
+# here and the real value in the encrypted column.
+_PLAINTEXT_TO_ENC = (
+    ("reminders", "title", "title_enc"),
+    ("reminders", "detail", "detail_enc"),
+    ("reports", "source_name", "source_name_enc"),
+)
+
+
+def migrate_plaintext_fields(conn: sqlite3.Connection, vault: Vault) -> int:
+    """Seal any pre-0.3 plaintext title/detail/source_name into its _enc column
+    and blank the cleartext (secure_delete overwrites the freed bytes). Runs at
+    unlock; idempotent — only touches rows whose _enc is still NULL."""
+    moved = 0
+    for table, plain, enc in _PLAINTEXT_TO_ENC:
+        rows = conn.execute(
+            f"SELECT id, {plain} AS val FROM {table} "
+            f"WHERE {enc} IS NULL AND {plain} IS NOT NULL AND {plain} != ''"
+        ).fetchall()
+        for row in rows:
+            sealed = vault.encrypt(context_for(table, enc), row["val"])
+            conn.execute(
+                f"UPDATE {table} SET {enc} = ?, {plain} = '' WHERE id = ?",
+                (sealed, row["id"]),
+            )
+            moved += 1
+    if moved:
+        conn.commit()
+    return moved
 
 
 def initialize_vault(conn: sqlite3.Connection, passphrase: str) -> Vault:

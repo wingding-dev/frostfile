@@ -132,7 +132,7 @@ def create_person(conn: sqlite3.Connection, vault: Vault, **values: Any) -> int:
     conn.commit()
 
     ensure_freeze_records(conn, person_id)
-    seed_reminders_for(conn, person_id, values.get("kind", "adult"))
+    seed_reminders_for(conn, vault, person_id, values.get("kind", "adult"))
     return person_id
 
 
@@ -507,7 +507,9 @@ class Reminder:
 _RECURRENCE_DAYS = {"yearly": 365, "quarterly": 91, "monthly": 30, "weekly": 7}
 
 
-def seed_reminders_for(conn: sqlite3.Connection, person_id: int, kind: str) -> None:
+def seed_reminders_for(
+    conn: sqlite3.Connection, vault: Vault, person_id: int, kind: str
+) -> None:
     today = date.today()
     for template in REMINDER_TEMPLATES:
         if template.get("adults_only") and kind != "adult":
@@ -522,13 +524,15 @@ def seed_reminders_for(conn: sqlite3.Connection, person_id: int, kind: str) -> N
             continue
         due = today + timedelta(days=int(template["offset_days"]))
         conn.execute(
-            "INSERT INTO reminders (person_id, kind, title, detail, due_date, "
-            "recurrence, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO reminders (person_id, kind, title_enc, detail_enc, "
+            "due_date, recurrence, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
             (
                 person_id,
                 template["kind"],
-                template["title"],
-                template["detail"],
+                vault.encrypt(context_for("reminders", "title_enc"), template["title"]),
+                vault.encrypt(
+                    context_for("reminders", "detail_enc"), template["detail"]
+                ),
                 due.isoformat(),
                 template["recurrence"],
                 utcnow(),
@@ -547,8 +551,14 @@ def list_reminders(
         Reminder(
             id=row["id"],
             person_id=row["person_id"],
-            title=row["title"],
-            detail=row["detail"],
+            title=vault.decrypt(context_for("reminders", "title_enc"), row["title_enc"])
+            or row["title"]
+            or "",
+            detail=vault.decrypt(
+                context_for("reminders", "detail_enc"), row["detail_enc"]
+            )
+            or row["detail"]
+            or "",
             due_date=row["due_date"],
             recurrence=row["recurrence"],
             kind=row["kind"],
@@ -562,6 +572,7 @@ def list_reminders(
 
 def create_reminder(
     conn: sqlite3.Connection,
+    vault: Vault,
     *,
     title: str,
     due_date: str,
@@ -570,9 +581,16 @@ def create_reminder(
     person_id: int | None = None,
 ) -> int:
     cursor = conn.execute(
-        "INSERT INTO reminders (person_id, kind, title, detail, due_date, "
+        "INSERT INTO reminders (person_id, kind, title_enc, detail_enc, due_date, "
         "recurrence, created_at) VALUES (?, 'custom', ?, ?, ?, ?, ?)",
-        (person_id, title, detail, due_date, recurrence, utcnow()),
+        (
+            person_id,
+            vault.encrypt(context_for("reminders", "title_enc"), title),
+            vault.encrypt(context_for("reminders", "detail_enc"), detail),
+            due_date,
+            recurrence,
+            utcnow(),
+        ),
     )
     conn.commit()
     return int(cursor.lastrowid)
@@ -632,13 +650,13 @@ def save_report(
     extracted: dict[str, Any],
 ) -> int:
     cursor = conn.execute(
-        "INSERT INTO reports (person_id, bureau, pulled_on, source_name, text_enc, "
-        "extracted_enc, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO reports (person_id, bureau, pulled_on, source_name_enc, "
+        "text_enc, extracted_enc, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
         (
             person_id,
             bureau,
             pulled_on,
-            source_name,
+            vault.encrypt(context_for("reports", "source_name_enc"), source_name),
             vault.encrypt(context_for("reports", "text_enc"), text),
             vault.encrypt(
                 context_for("reports", "extracted_enc"), json.dumps(extracted)
@@ -657,7 +675,11 @@ def _row_to_report(vault: Vault, row: sqlite3.Row, with_text: bool) -> StoredRep
         person_id=row["person_id"],
         bureau=row["bureau"],
         pulled_on=row["pulled_on"],
-        source_name=row["source_name"],
+        source_name=vault.decrypt(
+            context_for("reports", "source_name_enc"), row["source_name_enc"]
+        )
+        or row["source_name"]
+        or "",
         text=(
             vault.decrypt(context_for("reports", "text_enc"), row["text_enc"])
             if with_text
