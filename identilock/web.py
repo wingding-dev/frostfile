@@ -6,8 +6,9 @@ import sqlite3
 from pathlib import Path
 from typing import Any, Iterator
 
+import starlette.formparsers
 from fastapi import Depends, FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -54,6 +55,18 @@ def get_vault(session: Session = Depends(get_session)) -> Vault:
     return session.vault
 
 
+# Largest multipart body we will accept (credit-report upload, move-file import).
+# The upload cap is 25 MB of decoded content; allow headroom for encoding.
+MAX_UPLOAD_BODY_BYTES = 30 * 1024 * 1024
+_UPLOAD_PATHS = {"/reports", "/setup/import"}
+
+# Keep accepted uploads entirely in memory. Starlette otherwise spools any file
+# part over 1 MB to a cleartext OS temp file — which for a credit-report PDF is
+# a plaintext SSN written to disk. Raising the threshold above the body cap
+# means an accepted upload never rolls to disk; the middleware below bounds RAM.
+starlette.formparsers.MultiPartParser.spool_max_size = MAX_UPLOAD_BODY_BYTES + (1 << 20)
+
+
 def create_app(settings: Settings) -> FastAPI:
     ensure_data_dir(settings)
 
@@ -97,6 +110,20 @@ def create_app(settings: Settings) -> FastAPI:
             backfill_all_freeze_records(conn)
     finally:
         conn.close()
+
+    @app.middleware("http")
+    async def limit_upload_body(request: Request, call_next):
+        # Reject an oversized upload before the body is read or spooled, so a
+        # huge file never touches disk or RAM.
+        if request.method == "POST" and request.url.path in _UPLOAD_PATHS:
+            length = request.headers.get("content-length")
+            if length and length.isdigit() and int(length) > MAX_UPLOAD_BODY_BYTES:
+                if request.url.path == "/reports":
+                    return RedirectResponse(
+                        "/reports?error=That+file+is+too+large.", status_code=303
+                    )
+                return PlainTextResponse("That file is too large.", status_code=413)
+        return await call_next(request)
 
     @app.middleware("http")
     async def security_headers(request: Request, call_next):
