@@ -16,6 +16,7 @@ fix is to encrypt the whole file at the disk level too.
 
 from __future__ import annotations
 
+import os
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
@@ -426,12 +427,26 @@ def recover_data_key(conn: sqlite3.Connection, code: str) -> bytes | None:
 
 
 def backup_to(conn: sqlite3.Connection, destination: Path) -> Path:
-    """Consistent copy of the database, safe to take while the app is running."""
+    """Consistent copy of the database, safe to take while the app is running.
+
+    Written to a temp file, integrity-checked, then renamed onto the final name,
+    so a disk-full or interrupted copy never leaves a truncated file at the
+    destination — which a later restore or the auto-backup freshness check would
+    otherwise mistake for a good backup.
+    """
     destination.parent.mkdir(parents=True, exist_ok=True)
-    target = sqlite3.connect(destination)
+    tmp = destination.parent / (destination.name + ".tmp")
+    tmp.unlink(missing_ok=True)
+    target = sqlite3.connect(tmp)
     try:
         with target:
             conn.backup(target)
-    finally:
+        if target.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+            raise sqlite3.DatabaseError("backup failed its integrity check")
         target.close()
+    except BaseException:
+        target.close()
+        tmp.unlink(missing_ok=True)
+        raise
+    os.replace(tmp, destination)
     return destination

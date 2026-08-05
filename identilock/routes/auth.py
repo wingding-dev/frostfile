@@ -45,7 +45,9 @@ def _maybe_auto_backup(request: Request, conn: sqlite3.Connection) -> None:
         automatic = sorted(settings.backup_dir.glob("identilock-auto-*.db"))
         for old in automatic[:-AUTO_BACKUP_KEEP]:
             old.unlink()
-    except OSError:
+    except (OSError, sqlite3.Error):
+        # A backup failure (full disk, etc.) must never block unlocking. With
+        # the atomic backup_to, no partial file is left behind to poison the set.
         pass
 
 

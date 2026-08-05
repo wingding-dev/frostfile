@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import dataclasses
+import os
 import sqlite3
 from datetime import datetime
 from pathlib import Path
@@ -253,7 +254,8 @@ def make_move_kit(
     target = target_dir / f"Identilock-move-{stamp}.db"
     try:
         db.backup_to(conn, target)
-    except OSError as exc:
+        os.chmod(target, 0o600)
+    except (OSError, sqlite3.Error) as exc:
         return _page(request, conn, vault, error=f"Could not write the move file: {exc}")
     return _page(
         request,
@@ -282,7 +284,18 @@ def make_backup(
     settings = request.app.state.settings
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     target = settings.backup_dir / f"identilock-{stamp}.db"
-    db.backup_to(conn, target)
+    try:
+        db.backup_to(conn, target)
+    except (OSError, sqlite3.Error) as exc:
+        return _page(
+            request,
+            conn,
+            vault,
+            error=(
+                "Could not write the backup — the disk may be full or the "
+                f"folder unwritable. Nothing was changed. ({exc})"
+            ),
+        )
     return _page(
         request,
         conn,
