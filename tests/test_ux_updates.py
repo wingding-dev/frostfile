@@ -78,6 +78,7 @@ def test_lock_timeout_is_adjustable_from_settings(unlocked, settings):
 
 
 def test_data_dir_move_copies_db_and_leaves_pointer(unlocked, settings, tmp_path):
+    old_dir = settings.data_dir
     target = tmp_path / "new-home"
     response = unlocked.post(
         "/settings/data-dir",
@@ -86,21 +87,36 @@ def test_data_dir_move_copies_db_and_leaves_pointer(unlocked, settings, tmp_path
     assert response.status_code == 200, response.text
     assert (target / "identilock.db").exists()
 
-    # The pointer must be left in THIS instance's data folder — never in the
-    # machine-wide default folder, which would hijack a real install's data
-    # (exactly what an earlier version of this feature did to the author).
-    pointer = (settings.data_dir / "prefs.json").read_text()
-    assert str(target) in pointer
+    # A pointer is left in the OLD folder (never the machine-wide default), and
+    # the NEW folder carries no onward pointer that would bounce resolution out.
+    assert str(target) in (old_dir / "prefs.json").read_text()
+    import json
+
+    assert "data_dir" not in json.loads((target / "prefs.json").read_text())
 
     from identilock.config import load_settings
 
     # Explicit data_dir wins: pointers are not followed for overridden launches.
-    resolved = load_settings(data_dir=settings.data_dir, host="127.0.0.1", port=8899)
-    assert resolved.data_dir == settings.data_dir
+    resolved = load_settings(data_dir=old_dir, host="127.0.0.1", port=8899)
+    assert resolved.data_dir == old_dir
 
-    # Refuses to overwrite an existing database at the destination.
+    # The live app now uses the new folder, so a person added here lands there,
+    # not in the stale old copy.
+    add_person(unlocked, "After Move Person")
+    assert (target / "identilock.db").stat().st_size > 0
+    from identilock import db
+
+    conn = db.connect(target / "identilock.db")
+    try:
+        vault = db.unlock(conn, "correct horse battery staple")
+        from identilock.repo import list_people
+
+        assert any(p.display_name == "After Move Person" for p in list_people(conn, vault))
+    finally:
+        conn.close()
+    # And re-posting the same (now-current) folder is a no-op, not a clobber.
     again = unlocked.post(
         "/settings/data-dir",
         data={"folder": str(target), "csrf_token": csrf_token(unlocked)},
     )
-    assert "already contains" in again.text
+    assert "Already using that folder" in again.text
