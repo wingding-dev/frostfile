@@ -83,7 +83,7 @@ def test_move_kit_export_and_import_round_trip(
         data_dir=tmp_path / "new-pc", host="127.0.0.1", port=8898
     )
     new_app = create_app(new_settings)
-    with TestClient(new_app, follow_redirects=False) as new_client:
+    with TestClient(new_app, base_url="http://127.0.0.1", follow_redirects=False) as new_client:
         imported = new_client.post(
             "/setup/import",
             files={"upload": ("move.db", kits[0].read_bytes(), "application/octet-stream")},

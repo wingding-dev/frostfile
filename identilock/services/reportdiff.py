@@ -153,7 +153,16 @@ def _extract_pdf(data: bytes) -> str:
             raise ValueError(
                 "That PDF is password-protected. Save an unprotected copy and retry."
             ) from exc
-    return "\n".join(page.extract_text() or "" for page in reader.pages)
+    # Bound total extracted text: a small "compression bomb" PDF can expand to
+    # enormous text and exhaust memory even under the 25 MB upload cap.
+    parts: list[str] = []
+    budget = 20 * 1024 * 1024  # 20M chars is far more than any real report
+    for page in reader.pages:
+        parts.append(page.extract_text() or "")
+        budget -= len(parts[-1])
+        if budget <= 0:
+            break
+    return "\n".join(parts)
 
 
 # A real report line is short; anything longer is minified/one-line HTML or

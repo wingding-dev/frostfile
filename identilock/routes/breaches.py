@@ -18,6 +18,15 @@ router = APIRouter()
 HIBP_KEY_SETTING = "hibp_api_key"
 
 
+def _safe_int(value: str) -> int | None:
+    """Parse an optional numeric form field without ever raising — str.isdigit()
+    accepts characters (superscripts, other-script digits) that int() rejects."""
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def _page(
     request: Request,
     conn: sqlite3.Connection,
@@ -73,7 +82,7 @@ def breaches_check_email(
     save_breach_check(
         conn,
         vault,
-        person_id=int(person_id) if person_id.isdigit() else None,
+        person_id=_safe_int(person_id),
         email=email.strip(),
         source="hibp",
         result={"breaches": [b.as_dict() for b in breaches]},

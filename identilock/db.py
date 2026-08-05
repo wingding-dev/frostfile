@@ -299,15 +299,29 @@ def initialize_vault(conn: sqlite3.Connection, passphrase: str) -> Vault:
     return Vault(key)
 
 
+def _clamped_int(raw: bytes | None, default: int, lo: int, hi: int) -> int:
+    """Parse a meta integer, clamped to a sane range. A tampered file could
+    otherwise set kdf_memory_cost to gigabytes and turn every unlock into an
+    out-of-memory crash."""
+    try:
+        value = int((raw or str(default).encode()).decode())
+    except (ValueError, UnicodeDecodeError):
+        return default
+    return max(lo, min(hi, value))
+
+
 def load_kdf_params(conn: sqlite3.Connection) -> KdfParams:
     salt = _get_meta(conn, "kdf_salt")
     if salt is None:
         raise RuntimeError("vault is not initialized")
     return KdfParams(
         salt=salt,
-        time_cost=int((_get_meta(conn, "kdf_time_cost") or b"3").decode()),
-        memory_cost=int((_get_meta(conn, "kdf_memory_cost") or b"65536").decode()),
-        parallelism=int((_get_meta(conn, "kdf_parallelism") or b"4").decode()),
+        time_cost=_clamped_int(_get_meta(conn, "kdf_time_cost"), 3, 1, 20),
+        # 8 MiB .. 2 GiB (Argon2 memory_cost is in KiB).
+        memory_cost=_clamped_int(
+            _get_meta(conn, "kdf_memory_cost"), 65536, 8 * 1024, 2 * 1024 * 1024
+        ),
+        parallelism=_clamped_int(_get_meta(conn, "kdf_parallelism"), 4, 1, 16),
     )
 
 
@@ -424,9 +438,11 @@ def recover_data_key(conn: sqlite3.Connection, code: str) -> bytes | None:
         return None
     params = KdfParams(
         salt=salt,
-        time_cost=int((_get_meta(conn, "recovery_time_cost") or b"3").decode()),
-        memory_cost=int((_get_meta(conn, "recovery_memory_cost") or b"65536").decode()),
-        parallelism=int((_get_meta(conn, "recovery_parallelism") or b"4").decode()),
+        time_cost=_clamped_int(_get_meta(conn, "recovery_time_cost"), 3, 1, 20),
+        memory_cost=_clamped_int(
+            _get_meta(conn, "recovery_memory_cost"), 65536, 8 * 1024, 2 * 1024 * 1024
+        ),
+        parallelism=_clamped_int(_get_meta(conn, "recovery_parallelism"), 4, 1, 16),
     )
     recovery_key = derive_key(normalize_recovery_code(code), params)
     try:

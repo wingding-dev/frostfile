@@ -142,7 +142,17 @@ def recovery_code_save(request: Request, csrf_token: str = Form(default="")):
         "copy of the data file itself.\n"
     )
     try:
-        target.write_text(contents, encoding="utf-8")
+        # Create owner-only, then write, so the code is never briefly
+        # world-readable on a shared machine.
+        import os
+
+        fd = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(contents)
+        try:
+            os.chmod(target, 0o600)  # tighten if the file pre-existed
+        except OSError:
+            pass
     except OSError as exc:
         return render(
             request,

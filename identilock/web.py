@@ -64,6 +64,16 @@ def get_vault(session: Session = Depends(get_session)) -> Vault:
 MAX_UPLOAD_BODY_BYTES = 30 * 1024 * 1024
 _UPLOAD_PATHS = {"/reports", "/setup/import"}
 
+# Host names this loopback server will answer to. Anything else is a rebinding
+# attempt or a misconfiguration. (The test client uses 127.0.0.1.)
+_ALLOWED_HOSTS = {"localhost", "127.0.0.1", "::1", ""}
+
+# Pre-auth mutating endpoints have no session to carry a CSRF token, so they are
+# guarded by rejecting cross-site requests via the Sec-Fetch-Site header that
+# every modern browser sends. A malicious page's form POST arrives as
+# "cross-site"; a legitimate navigation is "same-origin" or "none".
+_ORIGIN_GUARDED = {"/setup", "/setup/import"}
+
 # Keep accepted uploads entirely in memory. Starlette otherwise spools any file
 # part over 1 MB to a cleartext OS temp file — which for a credit-report PDF is
 # a plaintext SSN written to disk. Raising the threshold above the body cap
@@ -121,6 +131,21 @@ def create_app(settings: Settings) -> FastAPI:
     finally:
         if conn is not None:
             conn.close()
+
+    @app.middleware("http")
+    async def check_host(request: Request, call_next):
+        # DNS-rebinding defense: a remote page can resolve its own name to
+        # 127.0.0.1 and reach this server, but the browser sends that foreign
+        # name in the Host header. Only serve requests whose Host is a local
+        # name, so a rebound origin gets nothing.
+        host = (request.headers.get("host") or "").rsplit(":", 1)[0].strip("[]").lower()
+        if host and host not in _ALLOWED_HOSTS:
+            return PlainTextResponse("Bad Host header.", status_code=400)
+        if request.method == "POST" and request.url.path in _ORIGIN_GUARDED:
+            fetch_site = request.headers.get("sec-fetch-site")
+            if fetch_site and fetch_site not in {"same-origin", "none"}:
+                return PlainTextResponse("Cross-site request refused.", status_code=403)
+        return await call_next(request)
 
     @app.middleware("http")
     async def limit_upload_body(request: Request, call_next):

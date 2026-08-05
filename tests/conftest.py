@@ -17,7 +17,10 @@ def settings(tmp_path):
 @pytest.fixture
 def client(settings):
     app = create_app(settings)
-    with TestClient(app, follow_redirects=False) as test_client:
+    # base_url host is 127.0.0.1 so requests pass the Host-header check.
+    with TestClient(
+        app, base_url="http://127.0.0.1", follow_redirects=False
+    ) as test_client:
         yield test_client
 
 

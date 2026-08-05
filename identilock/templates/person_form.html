@@ -157,7 +157,7 @@
 
 {% if person %}
 <form method="post" action="/people/{{ person.id }}/delete" class="card"
-      onsubmit="return confirm('Delete {{ person.display_name }} and every freeze record, reminder, and stored report for them? This cannot be undone.')">
+      onsubmit='return confirm({{ ("Delete " + person.display_name + " and every freeze record, reminder, and stored report for them? This cannot be undone.") | tojson }})'>
   <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
   <h3 style="margin-top:0">Delete</h3>
   <p class="small muted">Removes this person and everything recorded about them.</p>

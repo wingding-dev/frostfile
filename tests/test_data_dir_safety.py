@@ -41,7 +41,7 @@ def test_dangling_pointer_flags_unreachable_not_fresh_setup(tmp_path):
 
     # The app comes up warning, never offering a fresh setup, and creates no file.
     app = create_app(s)
-    with TestClient(app, follow_redirects=True) as client:
+    with TestClient(app, base_url="http://127.0.0.1", follow_redirects=True) as client:
         page = client.get("/setup")
         assert page.status_code == 503
         assert "Can't Find Your Data" in page.text

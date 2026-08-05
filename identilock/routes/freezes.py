@@ -119,6 +119,10 @@ def freeze_save(
     verify_csrf(session, csrf_token)
     if status not in STATUS_ORDER:
         raise HTTPException(status_code=400, detail="Unrecognized status.")
+    # A stale or forged id would otherwise hit a FOREIGN KEY violation and 500;
+    # reject it cleanly as a 404 instead.
+    if get_person(conn, vault, person_id) is None or get_agency(conn, agency_id) is None:
+        raise HTTPException(status_code=404, detail="No such person or agency.")
     update_freeze_record(
         conn,
         vault,
