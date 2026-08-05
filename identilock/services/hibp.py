@@ -1,7 +1,7 @@
 """Have I Been Pwned lookups.
 
-This is the only part of Identilock that touches the network, and it only does
-so when you press a button.
+One of two places Identilock touches the network (the other is the Sources
+link checker in services/linkcheck.py); both act only when you press a button.
 
 Two very different endpoints live here:
 

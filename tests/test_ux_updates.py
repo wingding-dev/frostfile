@@ -60,6 +60,14 @@ def test_fyi_agencies_do_not_count_toward_progress(unlocked):
     assert "0 of 22 controls in place" in page
 
 
+def test_family_page_count_matches_dashboard_denominator(unlocked):
+    add_person(unlocked, "Counted Person")
+    # The Family page must use the same 22 (FYI excluded), not len(all agencies).
+    family = unlocked.get("/people").text
+    assert "0 / 22" in family
+    assert "0 / 24" not in family
+
+
 def test_lock_timeout_is_adjustable_from_settings(unlocked, settings):
     response = unlocked.post(
         "/settings/lock",

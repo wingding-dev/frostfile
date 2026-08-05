@@ -6,8 +6,8 @@ Security enrollments, mailing packets for children's freezes, and breach
 exposure checks.
 
 It runs on your computer. It has no accounts, no cloud, no subscription, and no
-telemetry. The only time it touches the network is when you press a button on
-the breach page.
+telemetry. It touches the network only when you press a button — a breach
+lookup, or the Sources page's agency-link checker — never on its own.
 
 ---
 
@@ -41,8 +41,8 @@ credit, you have replaced the most expensive part of what those services sell.
 - **Reminders** — IP PIN retrieval, SSA earnings review, report pulls, broker
   opt-outs, freeze re-verification. Exports to `.ics`.
 - **Report comparison** — save each credit report pull; see what's new.
-- **Breach checks** — password checking free and offline-safe; email checking if
-  you supply your own Have I Been Pwned key.
+- **Breach checks** — password checking is free and sends only a scrambled
+  prefix (never the password); email checking needs your own Have I Been Pwned key.
 
 ### What it can't do
 
@@ -88,7 +88,8 @@ pipx install .        # or: uv tool install .
 identilock
 ```
 
-Your browser opens automatically. If it doesn't, go to <http://localhost:8731>.
+Identilock opens in its own window (or your browser, if the window backend
+isn't available). If nothing appears, go to <http://localhost:8731>.
 
 `pip install .` works too, but `pipx`/`uv tool` keep the dependencies out of
 your system Python, which is what you want for something you hand to someone else.
@@ -98,10 +99,10 @@ your system Python, which is what you want for something you hand to someone els
 Build a wheel once and send them the single file:
 
 ```bash
-uv build --wheel          # produces dist/identilock-0.1.0-py3-none-any.whl
+uv build --wheel          # produces dist/identilock-0.2.0-py3-none-any.whl
 ```
 
-They run `pipx install identilock-0.1.0-py3-none-any.whl` and then `identilock`.
+They run `pipx install identilock-0.2.0-py3-none-any.whl` and then `identilock`.
 No repository, no toolchain, no build step.
 
 ### Without installing anything permanently
@@ -143,10 +144,13 @@ mailing packets. Leave it off and packets print a blank line you fill in by hand
 
 **Network.** Binds to `127.0.0.1` only, and refuses any other interface unless
 you set `IDENTILOCK_ALLOW_REMOTE=1` — there's no TLS and no multi-user access
-control, so exposing it would be a mistake. Outbound: nothing at all, except the
-two breach lookups. Password checks use HIBP's k-anonymity range API, so the
-password itself never leaves your machine. Email checks do send the address,
-which is why they require your own key and are off until you configure one.
+control, so exposing it would be a mistake. Outbound traffic happens only on a
+button press: the two breach lookups, the one-off API-key validation, and the
+Sources page's link checker (which fetches the agency pages to see if they're
+alive, sending nothing about you). Password checks use HIBP's k-anonymity range
+API, so the password itself never leaves your machine. Email checks do send the
+address, which is why they require your own key and are off until you configure
+one.
 
 **Auto-lock** after 15 minutes idle (`IDENTILOCK_LOCK_MINUTES` to change). The
 key lives only in the server process's memory; locking drops it. Restarting
@@ -201,7 +205,7 @@ carries to everyone.
 
 ```
 identilock --help        # all flags
-identilock --where       # print the data directory
+identilock --where       # print the data directory and database path
 identilock --no-browser  # don't open a browser
 ```
 

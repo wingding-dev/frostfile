@@ -3,15 +3,15 @@
 What is encrypted and what is not
 ---------------------------------
 Encrypted: names, dates of birth, SSNs, emails, phones, addresses, freeze
-confirmation numbers, freeze PINs, free-text notes, stored credit report text,
-breach results, and the HIBP API key.
+confirmation numbers, freeze PINs, free-text notes, reminder titles and details,
+stored credit report text and filenames, breach results, and the HIBP API key.
 
 Left in the clear: row ids, whether a person is an adult or a minor, freeze
-statuses, and action dates. These stay queryable so the app can sort and filter
-in SQL. Someone who steals the database learns "this household has two adults
-and three minors, frozen at these agencies on these dates" but learns no
-identities. That trade is deliberate; if you would rather not make it, the
-fix is to encrypt the whole file at the disk level too.
+statuses, the freeze "method" field, and action/due dates. These stay queryable
+so the app can sort and filter in SQL. Someone who steals the database learns
+"this household has two adults and three minors, frozen at these agencies on
+these dates" but learns no identities. That trade is deliberate; if you would
+rather not make it, the fix is to encrypt the whole file at the disk level too.
 """
 
 from __future__ import annotations
