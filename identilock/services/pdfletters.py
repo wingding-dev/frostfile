@@ -192,6 +192,26 @@ def build_packet_pdf(person, agency, guardian, today: str) -> bytes:
                   Spacer(1, 14)]
     story += [_p("Mail to:", _BOLD), Spacer(1, 4), _p(agency.mail_address)]
 
+    # Carry the app's citation honesty onto the mailed page: name the sources
+    # behind the address and document list, and flag anything not confirmed at
+    # a primary source (the same "?" signal the on-screen packet shows).
+    story += [Spacer(1, 18), _p("Where these details came from", _BOLD), Spacer(1, 4)]
+    for label, field in (("Mailing address", "mail_address"),
+                         ("Required documents", "minor_requirements")):
+        sources = agency.cite(field)
+        if sources:
+            for src in sources:
+                mark = f"read {src.retrieved}" if src.is_primary else "listing only — not captured"
+                story.append(_p(f"{label}: {src.publisher} — {src.title} ({mark})", _SMALL))
+        else:
+            story.append(
+                _p(
+                    f"⚠ {label}: not confirmed at a primary source — verify it "
+                    f"on {agency.name}'s own website before relying on it.",
+                    _SMALL,
+                )
+            )
+
     doc.build(story)
     return buffer.getvalue()
 

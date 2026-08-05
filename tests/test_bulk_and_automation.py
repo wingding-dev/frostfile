@@ -57,6 +57,37 @@ def test_pdf_zip_contains_one_named_pdf_per_packet(unlocked):
         assert archive.read(name)[:5] == b"%PDF-"
 
 
+def test_pdf_packet_carries_source_provenance(unlocked):
+    from identilock import db
+    from identilock.repo import get_agency, get_person, list_people
+    from identilock.services import pdfletters
+
+    add_person(unlocked, "Dana Guardian", address="1 A St\nTown, TX 75001")
+    child = add_person(unlocked, "Robin Child", kind="minor")
+    equifax = _agency_id(unlocked, "Equifax")
+
+    # Build the PDF directly and read its text back to confirm provenance shows.
+    import pypdf
+
+    from conftest import PASSPHRASE  # noqa
+
+    import io
+
+    # Pull objects via a fresh connection using the test's unlocked vault path.
+    # Simpler: hit the route and extract text from the returned PDF.
+    resp = unlocked.get(f"/letters/{child}/{equifax}")
+    assert resp.status_code == 200
+    # And the downloadable zip PDF must contain the provenance block.
+    import zipfile
+
+    zresp = unlocked.get("/letters/all.zip")
+    archive = zipfile.ZipFile(io.BytesIO(zresp.content))
+    name = next(n for n in archive.namelist() if "Equifax" in n and "Robin" in n)
+    reader = pypdf.PdfReader(io.BytesIO(archive.read(name)))
+    text = "".join(page.extract_text() for page in reader.pages)
+    assert "Where these details came from" in text
+
+
 def test_pdf_zip_without_children_redirects(unlocked):
     add_person(unlocked, "Only Adult")
     response = unlocked.get("/letters/all.zip")
