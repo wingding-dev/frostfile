@@ -149,6 +149,18 @@ class Vault:
             # or partially restored from a backup made under another passphrase.
             return None
 
+    def readable(self, context: str, blob: bytes | None) -> bool:
+        """True if the blob is absent (nothing to lose) or decrypts cleanly;
+        False for a present-but-corrupt blob. Used to avoid overwriting
+        recoverable ciphertext that merely failed to decrypt this session."""
+        if blob is None:
+            return True
+        try:
+            open_sealed(self._key, context, blob)
+            return True
+        except (InvalidTag, ValueError):
+            return False
+
 
 # Recovery codes: a second credential that can open the vault when the
 # passphrase is forgotten. The code never leaves this machine — it is shown
