@@ -10,7 +10,7 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, Form, Request
 
 from .. import db
-from ..config import write_prefs
+from ..config import ensure_data_dir, write_prefs
 from ..crypto import Vault, WrongPassphrase, passphrase_problems
 from ..repo import get_setting, set_setting
 from ..security import Session, set_session_cookie, verify_csrf
@@ -125,30 +125,42 @@ def move_data_dir(
                 "empty folder, or move that file out of the way first."
             ),
         )
+    old_dir = settings.data_dir
     try:
         target.mkdir(parents=True, exist_ok=True)
         db.backup_to(conn, new_db)
-    except OSError as exc:
+    except (OSError, sqlite3.Error) as exc:
+        # Leave no half-written database behind for a later launch to open.
+        new_db.unlink(missing_ok=True)
         return _page(
             request, conn, vault, error=f"Could not write to that folder: {exc}"
         )
 
-    # The new location keeps the current preferences, and the folder this
-    # instance is actually running from gets a pointer so the next launch
-    # follows the move. Never the machine-wide default folder: this instance
-    # may be a test or a --data-dir install that has no business redirecting
-    # someone else's data.
-    write_prefs(target, lock_minutes=settings.lock_timeout_minutes)
-    write_prefs(settings.data_dir, data_dir=str(target))
+    new_settings = dataclasses.replace(settings, data_dir=target)
+    ensure_data_dir(new_settings)  # applies the 0700 mode to the new folders
+
+    # The new folder keeps the current preferences and carries NO onward pointer
+    # (clear any stale one so resolution never bounces back out of it), and the
+    # folder this instance was running from gets a pointer so a future launch
+    # that starts there follows the move. Never touch the machine-wide default:
+    # a --data-dir or test instance must not redirect someone else's data.
+    write_prefs(target, lock_minutes=settings.lock_timeout_minutes, data_dir=None)
+    write_prefs(old_dir, data_dir=str(target))
+
+    # Switch the LIVE app to the new folder so every subsequent request in this
+    # session writes there — otherwise edits made after the move would land in
+    # the old database and vanish at next launch.
+    request.app.state.settings = new_settings
+
     return _page(
         request,
         conn,
         vault,
         message=(
-            f"Your data was copied to {target} and will be used the next time "
-            "you start Identilock. Until then this session keeps using the "
-            f"current folder. The old copy stays at {settings.data_dir} — "
-            "delete it yourself once you have confirmed the new location works."
+            f"Done — your data now lives in {target}, and Identilock is already "
+            "using it (anything you change from here on is saved there). The old "
+            f"copy at {old_dir} is now a stale snapshot; delete it once you have "
+            "confirmed everything looks right in the new location."
         ),
     )
 
