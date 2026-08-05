@@ -136,6 +136,39 @@ def create_person(conn: sqlite3.Connection, vault: Vault, **values: Any) -> int:
     return person_id
 
 
+def _preserve_unreadable(
+    conn: sqlite3.Connection,
+    vault: Vault,
+    table: str,
+    where_sql: str,
+    where_params: tuple,
+    payload: dict[str, Any],
+) -> None:
+    """Guard against silent data loss: if an update would write NULL over a
+    stored ciphertext that merely failed to decrypt this session (corruption,
+    a partial cross-passphrase restore), keep the old bytes instead. Overwriting
+    would destroy the only copy that a good backup or repair could recover.
+
+    Only encrypted (`*_enc`) columns are considered, so clearing a plaintext
+    field (a date, a status) still works normally."""
+    columns = [
+        c for c, v in payload.items() if v is None and c.endswith("_enc")
+    ]
+    if not columns:
+        return
+    row = conn.execute(
+        f"SELECT {', '.join(columns)} FROM {table} WHERE {where_sql}", where_params
+    ).fetchone()
+    if row is None:
+        return
+    for column in columns:
+        existing = row[column]
+        if existing is not None and not vault.readable(
+            context_for(table, column), existing
+        ):
+            payload[column] = existing
+
+
 def update_person(
     conn: sqlite3.Connection, vault: Vault, person_id: int, **values: Any
 ) -> None:
@@ -163,6 +196,7 @@ def update_person(
             context_for("people", "notes_enc"), values.get("notes")
         ),
     }
+    _preserve_unreadable(conn, vault, "people", "id = ?", (person_id,), payload)
     assignments = ", ".join(f"{c} = ?" for c in payload)
     conn.execute(
         f"UPDATE people SET kind = ?, {assignments}, updated_at = ? WHERE id = ?",
@@ -442,6 +476,14 @@ def update_freeze_record(
             context_for("freeze_records", "notes_enc"), values.get("notes")
         ),
     }
+    _preserve_unreadable(
+        conn,
+        vault,
+        "freeze_records",
+        "person_id = ? AND agency_id = ?",
+        (person_id, agency_id),
+        payload,
+    )
     assignments = ", ".join(f"{c} = ?" for c in payload)
     conn.execute(
         f"UPDATE freeze_records SET {assignments}, updated_at = ? "
