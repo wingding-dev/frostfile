@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cite, cite_field %}
+{# The title doubles as the browser's suggested filename for "Save as PDF". #}
+{% block title %}{{ agency.name }} freeze packet - {{ person.display_name }}{% endblock %}
+
+{% block content %}
+<div class="no-print">
+  <p class="small muted"><a href="/letters">← Mailing packets</a></p>
+  <div class="card-head">
+    <h1>{{ agency.name }} packet for {{ person.display_name }}</h1>
+    <button class="btn" onclick="window.print()">Print</button>
+  </div>
+  <p class="small muted">
+    The Print button works for paper or for a file: in the print window, choose
+    your printer for paper, or choose &ldquo;Save as PDF&rdquo; to get a file.
+    The file will already be named
+    &ldquo;{{ agency.name }} freeze packet - {{ person.display_name }}&rdquo;.
+  </p>
+
+  {% if guardians|length > 1 %}
+  <form method="get" class="card" style="padding:.7rem 1rem">
+    <label for="guardian">Send as</label>
+    <select id="guardian" name="guardian" onchange="this.form.submit()">
+      {% for adult in guardians %}
+        <option value="{{ adult.id }}" {{ 'selected' if guardian and adult.id == guardian.id }}>{{ adult.display_name }}</option>
+      {% endfor %}
+    </select>
+  </form>
+  {% endif %}
+
+  {% if not guardian %}
+  <div class="notice notice-warn">
+    No adult is on file, so the letter has blanks where your details go. Add
+    yourself under <a href="/people/new">Family</a> to fill them in.
+  </div>
+  {% endif %}
+
+  <div class="notice notice-warn">
+    <p><strong>&#9888; Double-check the address yourself — every time, no exceptions.</strong></p>
+    <p>
+      This envelope will hold a birth certificate and a Social Security card.
+      Agencies move their PO boxes without telling anyone, and mailing this
+      packet to a stale address is like handing it to whoever now collects mail
+      at the parking lot where the PO box used to be — worse than not mailing
+      it at all.
+    </p>
+    <p>
+      So before sealing anything: open the agency's
+      {% if agency.freeze_url %}<a href="{{ agency.freeze_url }}" target="_blank" rel="noopener noreferrer">official page</a>{% else %}official page{% endif %}
+      and compare its mailing address to the one printed here, line by line.
+      The green checkmarks in this app mean &ldquo;verified at some
+      point&rdquo;{{ cite_field(citer, agency, 'mail_address') }} — they never
+      mean &ldquo;skip checking today.&rdquo;
+    </p>
+    <p style="margin-bottom:0">
+      Also: send <em>copies</em>, never originals, use certified mail so you
+      have proof of delivery, and record the confirmation here when it comes
+      back.
+    </p>
+  </div>
+</div>
+
+{% include "_letter_body.html" %}
+
+<div class="btn-row no-print">
+  <form method="post" action="/letters/{{ person.id }}/{{ agency.id }}/mailed">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit" class="btn">I mailed this today</button>
+  </form>
+  <a class="btn btn-quiet" href="/freeze/{{ person.id }}/{{ agency.id }}">Record details by hand</a>
+</div>
+<p class="small muted no-print">
+  &ldquo;I mailed this today&rdquo; fills in the record for you: status
+  &ldquo;In progress&rdquo;, sent by mail, dated today.
+</p>
+{% endblock %}
