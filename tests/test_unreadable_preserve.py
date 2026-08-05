@@ -76,6 +76,47 @@ def test_corrupt_pin_is_preserved_not_destroyed_on_save(unlocked, settings):
     assert after["notes_enc"] is not None  # the real edit still applied
 
 
+def test_one_corrupt_field_does_not_block_passphrase_change(unlocked, settings):
+    from identilock import db
+
+    person = add_person(unlocked, "Survivor", ssn="123456789", store_full_ssn="1")
+    agency = _agency_id(unlocked)
+    unlocked.post(
+        f"/freeze/{person}/{agency}",
+        data={"status": "active", "pin": "GOODPIN", "csrf_token": csrf_token(unlocked)},
+    )
+
+    # Corrupt one field.
+    conn = db.connect(settings.db_path)
+    try:
+        row = conn.execute(
+            "SELECT pin_enc FROM freeze_records WHERE person_id=? AND agency_id=?",
+            (person, agency),
+        ).fetchone()
+        bad = bytes(b ^ 0xFF for b in row["pin_enc"][:8]) + row["pin_enc"][8:]
+        conn.execute(
+            "UPDATE freeze_records SET pin_enc=? WHERE person_id=? AND agency_id=?",
+            (bad, person, agency),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+    # Passphrase change must still succeed for everything else.
+    resp = unlocked.post(
+        "/settings/passphrase",
+        data={
+            "current": "correct horse battery staple",
+            "new_passphrase": "a brand new passphrase here",
+            "confirm": "a brand new passphrase here",
+            "csrf_token": csrf_token(unlocked),
+        },
+    )
+    assert resp.status_code == 303
+    # The readable data migrated and opens under the new passphrase.
+    assert "Survivor" in unlocked.get("/people").text
+
+
 def test_blank_field_still_clears_when_readable(unlocked, settings):
     # Ensure the guard doesn't block legitimate clearing of a readable field.
     person = add_person(unlocked, "Clearable")
