@@ -37,7 +37,11 @@ def get_conn(request: Request) -> Iterator[sqlite3.Connection]:
     handlers in a threadpool. Opening per request is cheap here and avoids
     needing a lock around every query.
     """
-    conn = db.connect(request.app.state.settings.db_path)
+    settings = request.app.state.settings
+    if settings.data_unreachable:
+        # Do not open (and thereby create) a database at the dangling path.
+        raise HTTPException(status_code=503, detail="data_unreachable")
+    conn = db.connect(settings.db_path)
     try:
         yield conn
     finally:
@@ -68,7 +72,12 @@ starlette.formparsers.MultiPartParser.spool_max_size = MAX_UPLOAD_BODY_BYTES + (
 
 
 def create_app(settings: Settings) -> FastAPI:
-    ensure_data_dir(settings)
+    # When the real data folder is unreachable (a moved-data pointer to an
+    # unplugged drive), do NOT create directories or a database at the dangling
+    # path — that would mask the problem behind a fresh empty vault. The app
+    # comes up in a warn-only state (see the setup route).
+    if not settings.data_unreachable:
+        ensure_data_dir(settings)
 
     app = FastAPI(
         title="Identilock",
@@ -98,10 +107,11 @@ def create_app(settings: Settings) -> FastAPI:
     # An existing vault gets its schema brought up to date and its built-in
     # agency rows refreshed, so a corrected address reaches installs that were
     # set up before the fix. A brand-new database is left alone until setup
-    # establishes a passphrase.
-    conn = db.connect(settings.db_path)
+    # establishes a passphrase. Skipped entirely when the data folder is
+    # unreachable, so db.connect never creates an empty file at the dead path.
+    conn = None if settings.data_unreachable else db.connect(settings.db_path)
     try:
-        if db.is_initialized(conn):
+        if conn is not None and db.is_initialized(conn):
             from .repo import backfill_all_freeze_records
             from .seeds import seed_agencies
 
@@ -109,7 +119,8 @@ def create_app(settings: Settings) -> FastAPI:
             seed_agencies(conn)
             backfill_all_freeze_records(conn)
     finally:
-        conn.close()
+        if conn is not None:
+            conn.close()
 
     @app.middleware("http")
     async def limit_upload_body(request: Request, call_next):
@@ -153,6 +164,13 @@ def create_app(settings: Settings) -> FastAPI:
             return RedirectResponse(f"/unlock?next={target}", status_code=303)
         if exc.status_code == 303 and "Location" in (exc.headers or {}):
             return RedirectResponse(exc.headers["Location"], status_code=303)
+        if exc.status_code == 503 and exc.detail == "data_unreachable":
+            return app.state.templates.TemplateResponse(
+                request,
+                "data_unreachable.html",
+                {"data_dir": str(app.state.settings.data_dir)},
+                status_code=503,
+            )
         return app.state.templates.TemplateResponse(
             request,
             "error.html",

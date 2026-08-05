@@ -40,9 +40,16 @@ def write_prefs(directory: Path, **updates) -> None:
     prefs = read_prefs(directory)
     prefs.update(updates)
     prefs = {k: v for k, v in prefs.items() if v is not None}
-    (directory / PREFS_FILE).write_text(
-        json.dumps(prefs, indent=2), encoding="utf-8"
-    )
+    data = json.dumps(prefs, indent=2)
+    # Atomic write: a crash mid-write must not truncate the file and silently
+    # drop the moved-data pointer, which would send the next launch to a stale
+    # copy. Write a temp file, fsync, then rename over the target.
+    tmp = directory / (PREFS_FILE + ".tmp")
+    with open(tmp, "w", encoding="utf-8") as handle:
+        handle.write(data)
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(tmp, directory / PREFS_FILE)
 
 
 def default_data_dir() -> Path:
@@ -67,6 +74,10 @@ class Settings:
     host: str
     port: int
     lock_timeout_minutes: int
+    # True when a moved-data pointer led to a folder that has no database (an
+    # unplugged drive, a deleted/renamed folder). The app must warn rather than
+    # silently offer a fresh setup screen over the user's real, absent data.
+    data_unreachable: bool = False
 
     @property
     def db_path(self) -> Path:
@@ -93,6 +104,7 @@ def load_settings(
     # "Move my data" from the Settings page leaves a pointer behind in the old
     # folder. Followed hop by hop so moving twice still resolves; an explicit
     # --data-dir or env override always wins and skips pointers entirely.
+    followed_pointer = False
     if data_dir is None and not os.environ.get("IDENTILOCK_DATA_DIR"):
         seen = {resolved_dir}
         while True:
@@ -102,7 +114,15 @@ def load_settings(
                 break
             seen.add(candidate)
             resolved_dir = candidate
+            followed_pointer = True
             prefs = {**prefs, **read_prefs(candidate)}
+
+    # A pointer that leads to a folder with no database means the real data is
+    # unreachable (unplugged drive, deleted folder) — flag it so the app warns
+    # instead of quietly recreating an empty vault at the dangling location.
+    data_unreachable = followed_pointer and not (
+        resolved_dir / "identilock.db"
+    ).exists()
 
     resolved_host = host or os.environ.get("IDENTILOCK_HOST", "127.0.0.1")
     resolved_port = port or int(os.environ.get("IDENTILOCK_PORT", "8731"))
@@ -120,6 +140,7 @@ def load_settings(
         host=resolved_host,
         port=resolved_port,
         lock_timeout_minutes=max(1, timeout),
+        data_unreachable=data_unreachable,
     )
 
     # Binding to anything but loopback would expose SSNs and freeze PINs to the
