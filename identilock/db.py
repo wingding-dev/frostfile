@@ -21,6 +21,8 @@ import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 
+from cryptography.exceptions import InvalidTag
+
 from .crypto import (
     KdfParams,
     Vault,
@@ -366,7 +368,13 @@ def change_passphrase(
                     if blob is None:
                         continue
                     ctx = context_for(table, column)
-                    plaintext = open_sealed(current.key, ctx, blob)
+                    try:
+                        plaintext = open_sealed(current.key, ctx, blob)
+                    except (InvalidTag, ValueError):
+                        # One corrupt field must not brick the whole passphrase
+                        # change (and recovery). It is already unreadable; leave
+                        # its bytes untouched and migrate everything else.
+                        continue
                     updates[column] = seal(new_key, ctx, plaintext)
                 if updates:
                     assignments = ", ".join(f"{c} = ?" for c in updates)
