@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <path id="topArc" d="M 51.65 169.26 A 222 222 0 0 1 460.35 169.26"/>
+    <path id="botArc" d="M 56.47 353.32 A 222 222 0 0 0 455.53 353.32"/>
+  </defs>
+  <circle cx="256" cy="256" r="248" fill="#ffffff"/>
+  <circle cx="256" cy="256" r="246" fill="none" stroke="#16324F" stroke-width="7"/>
+  <circle cx="256" cy="256" r="198" fill="none" stroke="#16324F" stroke-width="4"/>
+  <line x1="59.18" y1="210.56" x2="22.15" y2="202.01" stroke="#16324F" stroke-width="7" stroke-linecap="round"/><line x1="54.00" y1="256.00" x2="16.00" y2="256.00" stroke="#16324F" stroke-width="7" stroke-linecap="round"/><line x1="59.18" y1="301.44" x2="22.15" y2="309.99" stroke="#16324F" stroke-width="7" stroke-linecap="round"/><line x1="452.82" y1="301.44" x2="489.85" y2="309.99" stroke="#16324F" stroke-width="7" stroke-linecap="round"/><line x1="458.00" y1="256.00" x2="496.00" y2="256.00" stroke="#16324F" stroke-width="7" stroke-linecap="round"/><line x1="452.82" y1="210.56" x2="489.85" y2="202.01" stroke="#16324F" stroke-width="7" stroke-linecap="round"/>
+  <polygon points="35.0,247.0 44.0,256.0 35.0,265.0 26.0,256.0" fill="#7FB8D8"/><polygon points="477.0,247.0 486.0,256.0 477.0,265.0 468.0,256.0" fill="#7FB8D8"/>
+  <text font-family="Georgia, 'Times New Roman', serif" font-weight="700"
+        font-size="37" letter-spacing="3" fill="#16324F" text-anchor="middle">
+    <textPath href="#topArc" startOffset="50%">FROSTFILE</textPath>
+  </text>
+  <text font-family="Georgia, 'Times New Roman', serif" font-weight="700"
+        font-size="22" letter-spacing="1.5" fill="#16324F" text-anchor="middle">
+    <textPath href="#botArc" startOffset="50%">FAMILY CREDIT FREEZE KIT</textPath>
+  </text>
+  <path d="M 214 226 L 214 182 A 44 44 0 0 1 302 182 L 302 226" fill="none" stroke="#16324F" stroke-width="24" stroke-linecap="round"/>
+  <rect x="186" y="220" width="144" height="142" rx="18" fill="#16324F"/>
+  <g><rect x="262" y="260" width="15" height="80" fill="#7FB8D8"/><rect x="262" y="260" width="52" height="15" fill="#7FB8D8"/><rect x="262" y="293" width="40" height="14" fill="#7FB8D8"/></g><g transform="translate(512,0) scale(-1,1)"><rect x="262" y="260" width="15" height="80" fill="#7FB8D8"/><rect x="262" y="260" width="52" height="15" fill="#7FB8D8"/><rect x="262" y="293" width="40" height="14" fill="#7FB8D8"/></g>
+</svg>
