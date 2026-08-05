@@ -214,12 +214,12 @@ def change_passphrase(
     if errors:
         return _page(request, conn, vault, error=" ".join(errors))
 
-    # Re-wraps every encrypted field in one transaction. That changes the data
-    # key, which makes the old recovery code stale — so a fresh one is issued
-    # and shown, and the old one stops working.
-    new_vault = db.change_passphrase(conn, vault, new_passphrase)
+    # Re-wraps every encrypted field AND issues a fresh recovery code in one
+    # transaction, so the old code stops working and the new one is guaranteed
+    # to match the new key.
+    new_vault, recovery_code = db.change_passphrase(conn, vault, new_passphrase)
     new_session = request.app.state.sessions.create(new_vault)
-    new_session.pending_recovery_code = db.set_recovery(conn, new_vault.key)
+    new_session.pending_recovery_code = recovery_code
 
     response = redirect("/recovery-code")
     set_session_cookie(response, new_session.token)

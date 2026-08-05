@@ -324,8 +324,11 @@ def unlock(conn: sqlite3.Connection, passphrase: str) -> Vault:
 
 def change_passphrase(
     conn: sqlite3.Connection, current: Vault, new_passphrase: str
-) -> Vault:
-    """Re-wrap every ciphertext under a key derived from the new passphrase.
+) -> tuple[Vault, str]:
+    """Re-wrap every ciphertext under a key derived from the new passphrase, and
+    issue a fresh recovery code — all in ONE transaction, so a crash can never
+    leave the vault holding a recovery wrap of the retired key (a code that
+    silently no longer opens anything). Returns (vault, new recovery code).
 
     Done in a single transaction: either every field moves to the new key or
     none does. A half-rewrapped database would be unrecoverable.
@@ -363,12 +366,15 @@ def change_passphrase(
         _set_meta(conn, "kdf_memory_cost", str(params.memory_cost).encode())
         _set_meta(conn, "kdf_parallelism", str(params.parallelism).encode())
         _set_meta(conn, "verifier", make_verifier(new_key))
+        # Reissue the recovery code in the SAME transaction as the re-wrap, so
+        # the stored wrap always matches the current key.
+        recovery_code = _write_recovery(conn, new_key)
         conn.commit()
     except Exception:
         conn.rollback()
         raise
 
-    return Vault(new_key)
+    return Vault(new_key), recovery_code
 
 
 # ------------------------------------------------------------ recovery codes
@@ -382,8 +388,8 @@ def change_passphrase(
 _RECOVERY_CONTEXT = "meta:recovery_wrap"
 
 
-def set_recovery(conn: sqlite3.Connection, data_key: bytes) -> str:
-    """(Re)issue a recovery code for the current data key. Returns the code."""
+def _write_recovery(conn: sqlite3.Connection, data_key: bytes) -> str:
+    """Write a fresh recovery wrap into meta (no commit). Returns the code."""
     from .crypto import derive_key
 
     code = generate_recovery_code()
@@ -394,6 +400,12 @@ def set_recovery(conn: sqlite3.Connection, data_key: bytes) -> str:
     _set_meta(conn, "recovery_memory_cost", str(params.memory_cost).encode())
     _set_meta(conn, "recovery_parallelism", str(params.parallelism).encode())
     _set_meta(conn, "recovery_wrap", seal(recovery_key, _RECOVERY_CONTEXT, data_key))
+    return code
+
+
+def set_recovery(conn: sqlite3.Connection, data_key: bytes) -> str:
+    """(Re)issue a recovery code for the current data key. Returns the code."""
+    code = _write_recovery(conn, data_key)
     conn.commit()
     return code
 
