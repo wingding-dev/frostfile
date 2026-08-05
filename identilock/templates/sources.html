@@ -68,7 +68,7 @@
           {% set check = link_check.get('results', {}).get(source.key) %}
           {% if check %}
             {% if check.status == 'ok' %}
-              <span class="src-tag src-primary" title="The page answered when last checked.">&#10003; alive</span>
+              <span class="src-tag src-alive" title="The page still loads (it exists). This does NOT re-verify what it says — only that the link is not dead.">&#10003; link works</span>
             {% else %}
               <span class="src-tag src-dead" title="The page did not answer when last checked. Double-check this information before relying on it.">&#10007; not answering</span>
             {% endif %}

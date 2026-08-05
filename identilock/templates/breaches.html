@@ -5,10 +5,10 @@
 {% block content %}
 <h1>Breach Exposure</h1>
 <p class="lede">
-  This page is the one part of Identilock that talks to the internet — and only
-  when you press a button. It asks Have I Been Pwned, a well-known free service
-  that keeps a public list of data leaks, whether something of yours has shown
-  up in one. Everything else in this app stays on this computer.
+  This page asks Have I Been Pwned — a well-known service that keeps a public
+  list of data leaks — whether something of yours has shown up in one, and only
+  when you press a button. (The one other place Identilock reaches the internet
+  is the Sources page's link checker; see Settings for the full list.)
 </p>
 
 {% if error %}<div class="notice notice-danger">{{ error }}</div>{% endif %}

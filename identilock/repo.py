@@ -270,7 +270,9 @@ class Agency:
             return "Minutes, online"
         if self.phone:
             return "A phone call"
-        return "A letter in the mail"
+        if self.mail_address:
+            return "A letter in the mail"
+        return "Contact them directly"
 
     def cite(self, field_name: str) -> list[sources.Source]:
         """Sources backing one field, for the superscript links in the UI."""
