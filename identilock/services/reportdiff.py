@@ -97,13 +97,42 @@ class Extraction:
         return sum(len(v) for v in self.as_dict().values())
 
 
+def _strip_script_style(text: str) -> str:
+    """Remove <script>/<style> blocks in a single linear pass.
+
+    A regex like ``<(script|style)[^>]*>.*?</\\1>`` backtracks catastrophically
+    on a crafted upload: an unclosed ``<script`` makes the lazy ``.*?`` scan to
+    end-of-file at every one of O(n) opening tags, which is O(n^2) and hangs the
+    server. This str.find loop is O(n)."""
+    lower = text.lower()
+    out: list[str] = []
+    pos = 0
+    # finditer is a single linear scan for the opening tags; the closing-tag
+    # find()s never overlap because pos always jumps past each block, so the
+    # whole function is O(n). \b keeps it from matching <scripting>, etc.
+    for match in re.finditer(r"<(?:script|style)\b", lower):
+        start = match.start()
+        if start < pos:
+            continue  # opening tag sits inside a block we already dropped
+        out.append(text[pos:start])
+        tag = "script" if lower.startswith("<script", start) else "style"
+        close = lower.find("</" + tag, start)
+        if close == -1:
+            pos = len(text)  # unclosed block: drop to end
+            break
+        gt = lower.find(">", close)
+        pos = gt + 1 if gt != -1 else len(text)
+    out.append(text[pos:])
+    return "".join(out)
+
+
 def extract_text(data: bytes, filename: str) -> str:
     """Get text out of a PDF or a text/HTML file."""
     if filename.lower().endswith(".pdf") or data[:5] == b"%PDF-":
         return _extract_pdf(data)
     text = data.decode("utf-8", errors="replace")
     if "<html" in text[:2000].lower():
-        text = re.sub(r"<(script|style)[^>]*>.*?</\1>", " ", text, flags=re.S | re.I)
+        text = _strip_script_style(text)
         text = re.sub(r"<[^>]+>", "\n", text)
         text = re.sub(r"&nbsp;?", " ", text)
     return text
@@ -127,13 +156,18 @@ def _extract_pdf(data: bytes) -> str:
     return "\n".join(page.extract_text() or "" for page in reader.pages)
 
 
+# A real report line is short; anything longer is minified/one-line HTML or
+# junk. Cap it so the per-line entity regexes cannot be handed a multi-MB string.
+MAX_LINE_CHARS = 2000
+
+
 def normalize(text: str) -> list[str]:
     """Collapse whitespace and drop blank lines, preserving line structure."""
     lines = []
     for raw in text.splitlines():
         line = re.sub(r"[ \t ]+", " ", raw).strip()
         if line:
-            lines.append(line)
+            lines.append(line[:MAX_LINE_CHARS])
     return lines
 
 
