@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cite %}
+{# The title doubles as the browser's suggested filename for "Save as PDF". #}
+{% block title %}Freeze packets - all children - {{ today_iso }}{% endblock %}
+
+{% block content %}
+<div class="no-print">
+  <p class="small muted"><a href="/letters">← Mailing packets</a></p>
+  <div class="card-head">
+    <h1>Every Packet, Ready to Print</h1>
+    <span class="btn-row" style="margin:0">
+      <button class="btn" onclick="window.print()">Print All {{ packets|length }}</button>
+      <a class="btn btn-quiet" href="/letters/all.zip{{ '?guardian=' + guardian.id|string if guardian else '' }}">Download as Separate PDFs</a>
+    </span>
+  </div>
+  <p class="small muted">
+    {{ packets|length }} packet{{ '' if packets|length == 1 else 's' }} —
+    every agency that accepts a mailed child's freeze, for every child, each
+    with its own cover letter and enclosure checklist. One press of Print does
+    the whole stack, to paper or to a single PDF (choose &ldquo;Save as
+    PDF&rdquo; in the print window; the file names itself with today's date).
+    For one packet per file, use the individual Prepare packet buttons instead.
+  </p>
+
+  {% if guardians|length > 1 %}
+  <form method="get" class="card" style="padding:.7rem 1rem">
+    <label for="guardian">Send as</label>
+    <select id="guardian" name="guardian" onchange="this.form.submit()">
+      {% for adult in guardians %}
+        <option value="{{ adult.id }}" {{ 'selected' if guardian and adult.id == guardian.id }}>{{ adult.display_name }}</option>
+      {% endfor %}
+    </select>
+  </form>
+  {% endif %}
+
+  {% if not guardian %}
+  <div class="notice notice-warn">
+    No adult is on file, so the letters have blanks where your details go. Add
+    yourself under <a href="/people/new">Family</a> to fill them in.
+  </div>
+  {% endif %}
+
+  <div class="notice notice-warn">
+    <p><strong>&#9888; Double-check every address yourself before mailing — no exceptions.</strong></p>
+    <p>
+      These envelopes hold birth certificates and Social Security cards.
+      Agencies move their PO boxes without telling anyone, and a packet mailed
+      to a stale address is like handing it to a stranger — worse than not
+      mailing it at all. Before sealing each envelope, open that agency's
+      official page and compare its address to the printed one, line by line.
+      The app's green checkmarks mean &ldquo;verified at some point,&rdquo;
+      never &ldquo;skip checking today.&rdquo;
+    </p>
+    <p style="margin-bottom:0">
+      Send <em>copies</em> of documents, never originals, and use a separate
+      envelope per agency per child — each checklist page says exactly what
+      goes in its envelope and where it is mailed.
+    </p>
+  </div>
+</div>
+
+{% for person, agency in packets %}
+  {% include "_letter_body.html" %}
+  {% if not loop.last %}<div class="page-break"></div>{% endif %}
+{% endfor %}
+
+<div class="btn-row no-print">
+  <form method="post" action="/letters/all/mailed{{ '?guardian=' + guardian.id|string if guardian else '' }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit" class="btn">I mailed all of these today</button>
+  </form>
+</div>
+<p class="small muted no-print">
+  &ldquo;I mailed all of these today&rdquo; fills in every record at once:
+  status &ldquo;In progress&rdquo;, sent by mail, dated today.
+</p>
+{% endblock %}

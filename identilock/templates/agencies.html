@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cite, cite_field, action_pill, impact_pill %}
+{% block title %}Directory — Identilock{% endblock %}
+
+{% block content %}
+<h1>Agency Directory</h1>
+<p class="lede">
+  Everywhere a file about you might live. The Consumer Financial Protection
+  Bureau publishes the authoritative list if you want to go further than
+  this{{ cite(citer, refs('cfpb-crc-list')) }}.
+</p>
+
+<div class="notice notice-info">
+  <p style="margin:0">
+    Not every entry here is a chore. <span class="pill pill-active">something to do</span>
+    means there is a step you can take — a freeze, a lock, a sign-up.
+    <span class="pill pill-in_progress">covered elsewhere</span> means another step on
+    your list already takes care of it — just confirm it.
+    <span class="pill pill-not_applicable">FYI — nothing to do</span> means exactly
+    that: it is listed so you know the file exists, and it never counts against
+    your progress.
+  </p>
+</div>
+
+{% for category, agencies in grouped.items() %}
+<h2>{{ category_labels.get(category, category) }}</h2>
+<div class="card">
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>Agency</th><th>What It Holds</th><th>To Do?</th><th>Contact</th><th>Minors</th></tr></thead>
+    <tbody>
+      {% for agency in agencies %}
+      <tr>
+        <td>
+          <a href="/agencies/{{ agency.id }}">{{ agency.name }}</a>
+          {% if not agency.is_active %}<span class="badge">hidden</span>{% endif %}
+        </td>
+        <td class="small">
+          {{ agency.description }}
+          {% if agency.action_note %}<div class="muted" style="margin-top:.2rem">{{ agency.action_note }}</div>{% endif %}
+        </td>
+        <td>
+          {{ action_pill(agency) }}
+          {% if agency.impact %}<div style="margin-top:.25rem">{{ impact_pill(agency) }}</div>{% endif %}
+          {% if agency.effort_label %}<div class="small muted" style="margin-top:.2rem">{{ agency.effort_label }}</div>{% endif %}
+        </td>
+        <td class="small">
+          {% if agency.freeze_url %}
+            <a href="{{ agency.freeze_url }}" target="_blank" rel="noopener noreferrer">Official page</a>{{ cite_field(citer, agency, 'freeze_url') }}<br>
+          {% endif %}
+          {% if agency.phone %}<span class="mono">{{ agency.phone }}</span>{{ cite_field(citer, agency, 'phone') }}{% endif %}
+        </td>
+        <td class="small">
+          {% if agency.can_generate_letter %}
+            <span class="pill pill-active">packet available</span>
+          {% elif agency.supports_minor %}
+            <span class="pill pill-in_progress">by mail — address unconfirmed</span>
+          {% else %}
+            <span class="muted">—</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}

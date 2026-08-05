@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Your Recovery Code — Identilock{% endblock %}
+{% block main_class %}wrap-narrow{% endblock %}
+
+{% block content %}
+<h1>Your Recovery Code</h1>
+<p class="lede">
+  If you ever forget your passphrase, this code is the <strong>only</strong>
+  way back into your data. Print it or write it down now, and keep it
+  somewhere physically safe — with your passport, in the gun safe, wherever
+  things that matter live.
+</p>
+
+<div class="card" style="text-align:center">
+  <div class="mono" style="font-size:1.5rem; letter-spacing:.08em; padding:1rem 0">{{ code }}</div>
+  <div class="btn-row no-print" style="justify-content:center">
+    <button class="btn" onclick="window.print()">Print This Page</button>
+    <form method="post" action="/recovery-code/save" style="display:inline">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button type="submit" class="btn btn-quiet">Save as a File on the Desktop</button>
+    </form>
+  </div>
+  <p class="small muted no-print" style="margin-bottom:0">
+    The file option is for keeping a copy in <em>your own</em> iCloud Drive,
+    Google Drive, or OneDrive folder — your account, your custody. Just don't
+    store your Identilock data file in the same account, or one stolen login
+    gets both halves.
+  </p>
+</div>
+
+{% if save_message %}<div class="notice notice-ok no-print">{{ save_message }}</div>{% endif %}
+
+<div class="notice notice-warn no-print">
+  <p><strong>Three things to know.</strong></p>
+  <p>
+    This code is shown once. It is not saved anywhere in readable form — not
+    on this computer, not with us (there is no &ldquo;us&rdquo;), nowhere.
+  </p>
+  <p>
+    It stops working and is replaced with a new one whenever the passphrase
+    changes — including when you use it. So after using it, save the new one.
+  </p>
+  <p style="margin-bottom:0">
+    Lose both the passphrase <em>and</em> this code, and the data is
+    unrecoverable by anyone. That is the price of nobody else being able to
+    read it.
+  </p>
+</div>
+
+<form method="post" action="/recovery-code/ack" class="no-print">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <button type="submit" class="btn">I Saved It — Continue</button>
+</form>
+{% endblock %}

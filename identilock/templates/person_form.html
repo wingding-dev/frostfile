@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if person else 'Add' }} person — Identilock{% endblock %}
+{% block main_class %}wrap-narrow{% endblock %}
+
+{% block content %}
+<h1>{{ 'Edit ' + person.display_name if person else 'Add a Person' }}</h1>
+<p class="lede">
+  Everything on this form stays in one scrambled (encrypted) file on this
+  computer — the same way a photo you save stays where you put it. Nothing is
+  sent to any website or company, and every box except the name is optional.
+</p>
+
+{% if errors %}
+<div class="notice notice-danger">
+  <ul style="margin:0; padding-left:1.1rem;">{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+<form method="post" action="{{ '/people/' + person.id|string if person else '/people' }}" class="card">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+  <div class="form-row">
+    <label for="display_name">Name</label>
+    <input type="text" id="display_name" name="display_name" required autofocus
+           autocomplete="name"
+           value="{{ person.display_name if person else '' }}">
+  </div>
+
+  <div class="form-grid">
+    <div class="form-row">
+      <label for="kind">Adult or child</label>
+      <select id="kind" name="kind">
+        <option value="adult" {{ 'selected' if person and not person.is_minor }}>Adult</option>
+        <option value="minor" {{ 'selected' if person and person.is_minor }}>Child (minor)</option>
+      </select>
+      <p class="hint">Children get the mail-only protected-consumer workflow.</p>
+    </div>
+
+    <div class="form-row">
+      <label for="birth_date">Date of birth</label>
+      <input type="date" id="birth_date" name="birth_date" value="{{ person.birth_date or '' if person else '' }}">
+    </div>
+
+    <div class="form-row">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" autocomplete="email"
+             value="{{ person.email or '' if person else '' }}">
+      <p class="hint">Used for breach checks, if you run them.</p>
+    </div>
+
+    <div class="form-row">
+      <label for="phone">Phone</label>
+      <input type="text" id="phone" name="phone" autocomplete="tel"
+             value="{{ person.phone or '' if person else '' }}">
+    </div>
+  </div>
+
+  <fieldset class="subsection">
+    <legend>Mailing Address</legend>
+    <p class="hint" style="margin:0 0 .7rem">Used to fill in mailing packets.</p>
+    <div class="form-row">
+      <label for="address_street">Street address</label>
+      <input type="text" id="address_street" name="address_street" autocomplete="address-line1"
+             value="{{ address_parts.street }}">
+    </div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label for="address_city">City</label>
+        <input type="text" id="address_city" name="address_city" autocomplete="address-level2"
+               value="{{ address_parts.city }}">
+      </div>
+      <div class="form-row">
+        <label for="address_state">State</label>
+        <input type="text" id="address_state" name="address_state" autocomplete="address-level1"
+               maxlength="2" placeholder="TX" value="{{ address_parts.state }}">
+      </div>
+      <div class="form-row">
+        <label for="address_zip">ZIP</label>
+        <input type="text" id="address_zip" name="address_zip" autocomplete="postal-code"
+               inputmode="numeric" maxlength="10" value="{{ address_parts.zip }}">
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset class="subsection">
+    <legend>Social Security Number</legend>
+
+    <div class="notice notice-info" style="margin-bottom:.9rem">
+      <p><strong>&ldquo;Why would I type the number that just got leaked into yet another program?&rdquo;</strong></p>
+      <p>
+        Fair question, and the answer is: you don't have to. Both boxes below
+        can stay empty and everything in Identilock still works.
+      </p>
+      <p>
+        If you do fill them in, the number is not <em>given</em> to anyone.
+        Identilock is not a website and there is no company on the other end —
+        what you type is scrambled (encrypted) into a file on this computer,
+        and it never leaves this machine.
+      </p>
+      <p style="margin-bottom:.2rem"><strong>Here is everything this software does with it:</strong></p>
+      <ul style="margin:0; padding-left:1.2rem">
+        <li><strong>Last 4 digits</strong> — shown on screen next to the name,
+          so you can tell whose record is whose. That is the entire use.</li>
+        <li style="margin-top:.3rem"><strong>Full number</strong> — printed
+          into the freeze request letters this app generates for you (the
+          agencies require it on the letter). Skip it and the letters print a
+          blank line to fill in by pen. That is the entire use.</li>
+      </ul>
+    </div>
+
+    <div class="form-row">
+      <label for="ssn_last4">Last 4 digits <span class="muted">(optional)</span></label>
+      <input type="text" id="ssn_last4" name="ssn_last4" class="mono" maxlength="4" inputmode="numeric"
+             autocomplete="off" style="max-width:8rem"
+             value="{{ person.ssn_last4 or '' if person else '' }}">
+      <p class="hint">Just enough to tell whose record is whose. Not enough to do damage with.</p>
+    </div>
+
+    <details class="form-row">
+      <summary style="cursor:pointer; font-weight:550; font-size:.85rem">Store the full number (off by default, on purpose)</summary>
+      <div class="notice notice-warn" style="margin-top:.7rem">
+        <p>
+          The full number is only useful for one thing: printing mailing forms
+          with it already filled in. If you skip it, printed forms leave a blank
+          line and you write the number in with a pen — which is a perfectly
+          good way to do it, and keeps the most sensitive number you own out of
+          the file entirely.
+        </p>
+        <p style="margin-bottom:0">
+          If you do store it, it is scrambled with your passphrase like
+          everything else. Just think about whether this computer's files get
+          copied anywhere you would not want them.
+        </p>
+      </div>
+      <label class="check">
+        <input type="checkbox" name="store_full_ssn" value="1" {{ 'checked' if person and person.has_full_ssn }}>
+        <span>Store the full SSN in this vault</span>
+      </label>
+      <div class="form-row" style="margin-top:.7rem">
+        <label for="ssn">Full SSN</label>
+        <input type="text" id="ssn" name="ssn" class="mono" autocomplete="off"
+               placeholder="{{ 'Stored — leave blank to keep it unchanged' if person and person.has_full_ssn else '000-00-0000' }}">
+      </div>
+    </details>
+  </fieldset>
+
+  <div class="form-row">
+    <label for="notes">Notes</label>
+    <textarea id="notes" name="notes">{{ person.notes or '' if person else '' }}</textarea>
+  </div>
+
+  <div class="btn-row">
+    <button type="submit" class="btn">Save</button>
+    {% if person %}<a class="btn btn-quiet" href="/people/{{ person.id }}">Cancel</a>{% endif %}
+  </div>
+</form>
+
+{% if person %}
+<form method="post" action="/people/{{ person.id }}/delete" class="card"
+      onsubmit="return confirm('Delete {{ person.display_name }} and every freeze record, reminder, and stored report for them? This cannot be undone.')">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <h3 style="margin-top:0">Delete</h3>
+  <p class="small muted">Removes this person and everything recorded about them.</p>
+  <button type="submit" class="btn btn-danger btn-small">Delete {{ person.display_name }}</button>
+</form>
+{% endif %}
+{% endblock %}
