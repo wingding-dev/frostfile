@@ -59,6 +59,35 @@ def test_report_filename_is_encrypted_on_disk(unlocked, settings):
     assert b"MarcusRiveraJr" not in settings.db_path.read_bytes()
 
 
+def test_oversized_upload_rejected_before_parsing(unlocked):
+    person = add_person(unlocked, "Big Upload")
+    # Declare a body far over the cap; the middleware rejects on Content-Length
+    # before the multipart parser could spool anything to disk.
+    response = unlocked.post(
+        "/reports",
+        data={
+            "person_id": str(person),
+            "bureau": "Equifax",
+            "pulled_on": "2026-03-01",
+            "csrf_token": csrf_token(unlocked),
+        },
+        files={"upload": ("big.txt", b"x", "text/plain")},
+        headers={"content-length": str(40 * 1024 * 1024)},
+    )
+    assert response.status_code == 303
+    assert "too+large" in response.headers["location"]
+
+
+def test_multipart_spool_threshold_exceeds_cap(unlocked):
+    # The guarantee behind "never written to a temp file": Starlette only
+    # spools to disk past this threshold, which must sit above the accept cap.
+    import starlette.formparsers
+
+    from identilock.routes.reports import MAX_UPLOAD_BYTES
+
+    assert starlette.formparsers.MultiPartParser.spool_max_size > MAX_UPLOAD_BYTES
+
+
 def test_legacy_plaintext_reminder_is_migrated_on_unlock(unlocked, settings):
     from identilock import db
 

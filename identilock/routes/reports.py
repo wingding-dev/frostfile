@@ -87,8 +87,9 @@ async def report_upload(
             "/reports?error=No+text+found.+If+the+PDF+is+a+scan,+it+has+no+text+layer."
         )
 
-    # The uploaded file itself is never written to disk — only its extracted
-    # text, encrypted, inside the database.
+    # The uploaded file is held in memory only (web.py raises the multipart
+    # spool threshold above the size cap so it never rolls to a temp file);
+    # only its extracted text is persisted, encrypted, inside the database.
     extraction = extract_entities(text)
     report_id = save_report(
         conn,
