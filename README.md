@@ -1,4 +1,4 @@
-# Identilock
+# FrostFile
 
 A local-only tracker for the identity controls you place yourself: credit
 freezes across the bureaus most people have never heard of, IRS and Social
@@ -18,7 +18,7 @@ real-time alerts from your credit file — comes from direct contracts with
 Equifax, Experian, and TransUnion. There is no consumer or developer tier at any
 price: the Fair Credit Reporting Act restricts furnishing consumer reports to
 enumerated "permissible purposes," and obtaining one under false pretenses is a
-criminal offense, not a terms-of-service violation. **Identilock cannot and does
+criminal offense, not a terms-of-service violation. **FrostFile cannot and does
 not replicate that, and neither can anything else you could build.**
 
 The second thing they sell is knowing which of the fifteen-odd places that hold
@@ -36,7 +36,7 @@ credit, you have replaced the most expensive part of what those services sell.
   status, dates, confirmation numbers, and freeze PINs (encrypted).
 - **Agency directory** — where each file lives, why it matters, how to freeze
   it, how to lift it, and what it costs (almost always nothing).
-- **Mailing packets** — children's freezes are free but mail-only. Identilock
+- **Mailing packets** — children's freezes are free but mail-only. FrostFile
   prints the cover letter and the per-agency document checklist.
 - **Reminders** — IP PIN retrieval, SSA earnings review, report pulls, broker
   opt-outs, freeze re-verification. Exports to `.ics`.
@@ -65,12 +65,12 @@ Sources come in two confidence levels, and the difference is enforced in code:
 | <sup>1</sup> linked to a page tagged **not captured** | The organization's own page for the topic, linked so you can check — but its contents weren't recorded. |
 | <sup>?</sup> | No source at all. Verify before relying on it. |
 
-**Identilock will not print a mailing packet for an agency whose address didn't
+**FrostFile will not print a mailing packet for an agency whose address didn't
 meet the first bar.** A minor-freeze packet contains a birth certificate and a
 Social Security card; mailing one to a stale address is worse than not mailing
 it. Those agencies link out to their own page instead.
 
-The full list is on the Sources page in the app, and in `identilock/sources.py`.
+The full list is on the Sources page in the app, and in `frostfile/sources.py`.
 Directory compiled 2026-08-03 — agencies move, so re-check before a big mailing.
 
 ---
@@ -83,12 +83,12 @@ from the folder or from a built wheel.
 ### From a copy of this folder
 
 ```bash
-cd Identilock
+cd FrostFile
 pipx install .        # or: uv tool install .
-identilock
+frostfile
 ```
 
-Identilock opens in its own window (or your browser, if the window backend
+FrostFile opens in its own window (or your browser, if the window backend
 isn't available). If nothing appears, go to <http://localhost:8731>.
 
 `pip install .` works too, but `pipx`/`uv tool` keep the dependencies out of
@@ -99,16 +99,16 @@ your system Python, which is what you want for something you hand to someone els
 Build a wheel once and send them the single file:
 
 ```bash
-uv build --wheel          # produces dist/identilock-0.2.0-py3-none-any.whl
+uv build --wheel          # produces dist/frostfile-0.3.0-py3-none-any.whl
 ```
 
-They run `pipx install identilock-0.2.0-py3-none-any.whl` and then `identilock`.
+They run `pipx install frostfile-0.3.0-py3-none-any.whl` and then `frostfile`.
 No repository, no toolchain, no build step.
 
 ### Without installing anything permanently
 
 ```bash
-uvx --from . identilock
+uvx --from . frostfile
 ```
 
 ### First run
@@ -143,7 +143,7 @@ that trade isn't acceptable to you, use full-disk encryption underneath.
 mailing packets. Leave it off and packets print a blank line you fill in by hand.
 
 **Network.** Binds to `127.0.0.1` only, and refuses any other interface unless
-you set `IDENTILOCK_ALLOW_REMOTE=1` — there's no TLS and no multi-user access
+you set `FROSTFILE_ALLOW_REMOTE=1` — there's no TLS and no multi-user access
 control, so exposing it would be a mistake. Outbound traffic happens only on a
 button press: the two breach lookups, the one-off API-key validation, and the
 Sources page's link checker (which fetches the agency pages to see if they're
@@ -152,7 +152,7 @@ API, so the password itself never leaves your machine. Email checks do send the
 address, which is why they require your own key and are off until you configure
 one.
 
-**Auto-lock** after 15 minutes idle (`IDENTILOCK_LOCK_MINUTES` to change). The
+**Auto-lock** after 15 minutes idle (`FROSTFILE_LOCK_MINUTES` to change). The
 key lives only in the server process's memory; locking drops it. Restarting
 locks the vault.
 
@@ -160,11 +160,11 @@ locks the vault.
 
 ## Backups
 
-Everything lives in one folder. `identilock --where` prints it.
+Everything lives in one folder. `frostfile --where` prints it.
 
-- macOS: `~/Library/Application Support/Identilock`
-- Linux: `~/.local/share/identilock`
-- Windows: `%LOCALAPPDATA%\Identilock`
+- macOS: `~/Library/Application Support/FrostFile`
+- Linux: `~/.local/share/frostfile`
+- Windows: `%LOCALAPPDATA%\FrostFile`
 
 Settings → **Make a backup now** writes a consistent copy while the app is
 running. Backups are encrypted with the same passphrase, so they're safe to put
@@ -187,8 +187,8 @@ Two things worth saying to whoever you give it to:
    after you hand this over, they should click through the citations first.
    That's what they're there for.
 
-If you correct an address or a link, update both `identilock/seeds.py` and
-`identilock/sources.py` — the value *and* the source backing it — so the fix
+If you correct an address or a link, update both `frostfile/seeds.py` and
+`frostfile/sources.py` — the value *and* the source backing it — so the fix
 carries to everyone.
 
 ---
@@ -197,16 +197,16 @@ carries to everyone.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `IDENTILOCK_DATA_DIR` | OS app data dir | Where the database lives |
-| `IDENTILOCK_PORT` | `8731` | Listening port |
-| `IDENTILOCK_HOST` | `127.0.0.1` | Interface to bind |
-| `IDENTILOCK_LOCK_MINUTES` | `15` | Idle auto-lock timeout |
-| `IDENTILOCK_ALLOW_REMOTE` | unset | Required to bind non-loopback |
+| `FROSTFILE_DATA_DIR` | OS app data dir | Where the database lives |
+| `FROSTFILE_PORT` | `8731` | Listening port |
+| `FROSTFILE_HOST` | `127.0.0.1` | Interface to bind |
+| `FROSTFILE_LOCK_MINUTES` | `15` | Idle auto-lock timeout |
+| `FROSTFILE_ALLOW_REMOTE` | unset | Required to bind non-loopback |
 
 ```
-identilock --help        # all flags
-identilock --where       # print the data directory and database path
-identilock --no-browser  # don't open a browser
+frostfile --help        # all flags
+frostfile --where       # print the data directory and database path
+frostfile --no-browser  # don't open a browser
 ```
 
 ---

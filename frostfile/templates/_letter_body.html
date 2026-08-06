@@ -1,0 +1,100 @@
+{# One complete mailing packet: cover letter, then its enclosure checklist.
+   Expects person, agency, guardian, today (and the page's citer) in context. #}
+{% from "_macros.html" import cite_field %}
+
+<article class="letter">
+  <div class="letter-head">
+    <address>
+      {%- if guardian -%}
+      {{ guardian.display_name }}
+      {%- if guardian.address %}
+{{ guardian.address }}{% endif %}
+      {%- if guardian.phone %}
+{{ guardian.phone }}{% endif %}
+      {%- else -%}
+      _______________________________
+_______________________________
+_______________________________
+      {%- endif -%}
+    </address>
+    <div>{{ today }}</div>
+  </div>
+
+  <address style="margin-bottom:1.6rem">{{ agency.mail_address }}</address>
+
+  <p><strong>Re: Request for a protected consumer security freeze for a minor</strong></p>
+
+  <p>To whom it may concern,</p>
+
+  <p>
+    I am the parent or legal guardian of {{ person.display_name }}, a minor. I am
+    writing to request that you place a security freeze on any consumer report
+    you maintain for this child, and that you create one for the sole purpose of
+    placing a freeze if none currently exists.
+  </p>
+
+  <table style="margin:1.2rem 0; width:100%">
+    <tbody>
+      <tr><td style="width:38%"><strong>Minor's full name</strong></td><td>{{ person.display_name }}</td></tr>
+      <tr><td><strong>Minor's date of birth</strong></td><td>{{ person.birth_date or '__________________' }}</td></tr>
+      <tr><td><strong>Minor's Social Security number</strong></td><td class="mono">{{ person.ssn or '_______ - _____ - __________' }}</td></tr>
+      <tr><td><strong>Minor's address</strong></td><td style="white-space:pre-line">{{ person.address or guardian.address if guardian else '__________________' }}</td></tr>
+      <tr><td><strong>Parent or guardian</strong></td><td>{{ guardian.display_name if guardian else '__________________' }}</td></tr>
+      <tr><td><strong>Guardian's date of birth</strong></td><td>{{ guardian.birth_date if guardian and guardian.birth_date else '__________________' }}</td></tr>
+      <tr><td><strong>Guardian's Social Security number</strong></td><td class="mono">{{ guardian.ssn if guardian and guardian.ssn else '_______ - _____ - __________' }}</td></tr>
+    </tbody>
+  </table>
+
+  <p>
+    Copies of the documents establishing my identity, the minor's identity, and
+    my authority to act on the minor's behalf are enclosed, as listed overleaf.
+    Please confirm in writing once the freeze is in place.
+  </p>
+
+  <p style="margin-top:2.5rem">Sincerely,</p>
+  <p style="margin-top:2.5rem">_________________________________________<br>
+    {{ guardian.display_name if guardian else '' }}</p>
+</article>
+
+<div class="page-break"></div>
+
+<article class="letter">
+  <h2 style="margin-top:0">Enclosure Checklist</h2>
+  <p class="small">
+    {{ agency.name }} — freeze for {{ person.display_name }}.
+    Send photocopies only.{{ cite_field(citer, agency, 'minor_requirements') }}
+  </p>
+
+  {% if agency.minor_requirements.guardian %}
+    <h3>From the Parent or Guardian</h3>
+    <ul class="checklist">
+      {% for item in agency.minor_requirements.guardian %}<li>{{ item }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if agency.minor_requirements.minor %}
+    <h3>For the Minor</h3>
+    <ul class="checklist">
+      {% for item in agency.minor_requirements.minor %}<li>{{ item }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+
+  <h3>Before Mailing</h3>
+  <ul class="checklist">
+    <li>Mailing address compared, line by line, against {{ agency.name }}'s own website — today, by you</li>
+    <li>Every enclosure is a copy, not an original</li>
+    <li>The cover letter is signed</li>
+    <li>Sent with tracking or certified mail</li>
+    <li>Date mailed recorded in FrostFile</li>
+  </ul>
+
+  {% if agency.notes %}
+    <h3>Agency Notes</h3>
+    <p class="small">{{ agency.notes }}</p>
+  {% endif %}
+
+  <p class="small" style="margin-top:2rem">
+    Mail to:<br>
+    <span style="white-space:pre-line">{{ agency.mail_address }}</span>
+  </p>
+</article>

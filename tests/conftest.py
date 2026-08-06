@@ -3,8 +3,8 @@ from __future__ import annotations
 import pytest
 from fastapi.testclient import TestClient
 
-from identilock.config import load_settings
-from identilock.web import create_app
+from frostfile.config import load_settings
+from frostfile.web import create_app
 
 PASSPHRASE = "correct horse battery staple"
 

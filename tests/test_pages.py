@@ -78,7 +78,7 @@ PAGES = [
 def test_page_renders(populated, path):
     response = populated["client"].get(path)
     assert response.status_code == 200, f"{path} -> {response.status_code}"
-    assert "Identilock" in response.text
+    assert "FrostFile" in response.text
 
 
 def test_person_and_freeze_pages_render(populated):
@@ -124,20 +124,20 @@ def test_missing_records_return_404_not_a_crash(populated):
 
 
 def test_backup_writes_an_openable_database(populated, settings):
-    from identilock import db
+    from frostfile import db
 
     response = populated["client"].post(
         "/settings/backup", data={"csrf_token": csrf_token(populated["client"])}
     )
     assert response.status_code == 200
-    backups = list(settings.backup_dir.glob("identilock-*.db"))
+    backups = list(settings.backup_dir.glob("frostfile-*.db"))
     assert backups
 
     conn = db.connect(backups[0])
     try:
         assert db.is_initialized(conn)
         vault = db.unlock(conn, "correct horse battery staple")
-        from identilock.repo import list_people
+        from frostfile.repo import list_people
 
         assert any(p.display_name == "Dana Guardian" for p in list_people(conn, vault))
     finally:

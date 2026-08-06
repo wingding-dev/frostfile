@@ -1,4 +1,4 @@
-# Identilock — Cryptography & Data Confidentiality Audit (raw finder output, pre-verification)
+# FrostFile — Cryptography & Data Confidentiality Audit (raw finder output, pre-verification)
 
 Baseline: commit 99b6967 (v0.2.0). This is the unverified finder report; the workflow's
 adversarial verification pass filters/adjusts these. Kept verbatim for fix detail.
@@ -9,14 +9,14 @@ adversarial verification pass filters/adjusts these. Kept verbatim for fix detai
 db.py:332-338, routes/auth.py:28-49, templates/recovery_code.html:39-42
 Recovery codes are single-use only w.r.t. the LIVE db; each weekly auto-backup carries its own
 recovery_wrap for the code current when taken. A code the UI says "stops working" keeps opening
-~10 weeks of snapshots (backups/identilock-auto-*.db), each with SSNs + PINs. Fix: reword the
+~10 weeks of snapshots (backups/frostfile-auto-*.db), each with SSNs + PINs. Fix: reword the
 "stops working" claim to note old backups still open with the code current when made (mirror the
 existing correct caveat about old passphrases/old backups).
 
 ### H2 — Recovery code AND full vault both written unprotected to the Desktop (a cloud-sync root)
 routes/auth.py:113-161 (127-128,143), routes/settings_routes.py:229-258 (238-243)
-recovery_code_save writes plaintext code to ~/Desktop/Identilock-Recovery-Code.txt; make_move_kit
-writes a full vault copy to ~/Desktop/Identilock-move-<date>.db. Both default perms (0644), same dir.
+recovery_code_save writes plaintext code to ~/Desktop/FrostFile-Recovery-Code.txt; make_move_kit
+writes a full vault copy to ~/Desktop/FrostFile-move-<date>.db. Both default perms (0644), same dir.
 (a) OneDrive KFM / iCloud Desktop sync => code + vault auto-upload to same account; one phished
 password = both halves. (b) Shared Linux box w/ 0755 home => other local user reads both. Note
 config.py:140-146 deliberately chmods the data dir 0700 — these Desktop writes get no chmod.

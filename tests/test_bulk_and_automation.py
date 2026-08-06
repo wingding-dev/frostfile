@@ -58,9 +58,9 @@ def test_pdf_zip_contains_one_named_pdf_per_packet(unlocked):
 
 
 def test_pdf_packet_carries_source_provenance(unlocked):
-    from identilock import db
-    from identilock.repo import get_agency, get_person, list_people
-    from identilock.services import pdfletters
+    from frostfile import db
+    from frostfile.repo import get_agency, get_person, list_people
+    from frostfile.services import pdfletters
 
     add_person(unlocked, "Dana Guardian", address="1 A St\nTown, TX 75001")
     child = add_person(unlocked, "Robin Child", kind="minor")
@@ -130,13 +130,13 @@ def test_unlock_makes_a_weekly_auto_backup(unlocked, settings):
     unlocked.post("/lock", data={"csrf_token": csrf_token(unlocked)})
 
     unlocked.post("/unlock", data={"passphrase": PASSPHRASE, "next": "/"})
-    autos = list(settings.backup_dir.glob("identilock-auto-*.db"))
+    autos = list(settings.backup_dir.glob("frostfile-auto-*.db"))
     assert len(autos) == 1
 
     # A second unlock inside the week does not stack up more copies.
     unlocked.post("/lock", data={"csrf_token": csrf_token(unlocked)})
     unlocked.post("/unlock", data={"passphrase": PASSPHRASE, "next": "/"})
-    assert len(list(settings.backup_dir.glob("identilock-auto-*.db"))) == 1
+    assert len(list(settings.backup_dir.glob("frostfile-auto-*.db"))) == 1
 
 
 def test_check_everyone_without_emails_or_key_explains_itself(unlocked):

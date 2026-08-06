@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cite, cite_field, status_pill, person_badge, action_pill, impact_pill %}
+{% block title %}{{ agency.name }} — FrostFile{% endblock %}
+
+{% block content %}
+<p class="small muted"><a href="/agencies">← Directory</a></p>
+<h1>{{ agency.name }} {{ action_pill(agency) }}</h1>
+<p class="lede">
+  {{ agency.description }} · {{ category_labels.get(agency.category, agency.category) }}
+  {% if agency.protects %}<br><strong>{{ agency.protects }}</strong>{% endif %}
+</p>
+
+{% if agency.action_kind != 'act' and agency.action_note %}
+<div class="notice notice-info">
+  <p style="margin:0"><strong>{{ 'Already covered.' if agency.action_kind == 'covered' else 'Nothing for you to do here.' }}</strong> {{ agency.action_note }}</p>
+</div>
+{% endif %}
+
+{% if agency.why_it_matters %}
+<div class="card">
+  <h3 style="margin-top:0">Why It Matters</h3>
+  <p style="margin-bottom:0">{{ agency.why_it_matters }}{{ cite_field(citer, agency, 'why_it_matters') }}</p>
+</div>
+{% endif %}
+
+{% if agency.action_kind == 'act' %}
+<div class="card">
+  <h3 style="margin-top:0">The Effort, Honestly</h3>
+  <div class="field">
+    <div class="field-label">To set up</div>
+    <div class="field-value">{{ agency.effort_label }}{% if agency.supports_minor and agency.minor_mail_only %} <span class="small muted">(for a child: by mail, with document copies)</span>{% endif %}</div>
+  </div>
+  <div class="field">
+    <div class="field-label">Payoff</div>
+    <div class="field-value">{{ impact_pill(agency) }} {% if agency.protects %}<span class="small">{{ agency.protects }}</span>{% endif %}</div>
+  </div>
+  {% if agency.thaw_procedure %}
+  <div class="field">
+    <div class="field-label">To undo</div>
+    <div class="field-value">{{ agency.thaw_procedure }}{{ cite_field(citer, agency, 'thaw_procedure') }}</div>
+  </div>
+  {% endif %}
+  <p class="small muted" style="margin-bottom:0">
+    A freeze is not a commitment. You lift it only when you're actually
+    applying for something, then put it back — and you can undo any of this
+    whenever you want.
+  </p>
+</div>
+{% endif %}
+
+<div class="card">
+  <h3 style="margin-top:0">How to Reach Them</h3>
+
+  {% if agency.freeze_url %}
+  <div class="field">
+    <div class="field-label">Official page</div>
+    <div class="field-value"><a href="{{ agency.freeze_url }}" target="_blank" rel="noopener noreferrer">{{ agency.freeze_url }}</a>{{ cite_field(citer, agency, 'freeze_url') }}</div>
+  </div>
+  {% endif %}
+
+  {% if agency.phone %}
+  <div class="field">
+    <div class="field-label">Phone</div>
+    <div class="field-value mono">{{ agency.phone }}{{ cite_field(citer, agency, 'phone') }}</div>
+  </div>
+  {% endif %}
+
+  {% if agency.mail_address %}
+  <div class="field">
+    <div class="field-label">Mailing address</div>
+    <div class="field-value">{{ agency.mail_address }}{{ cite_field(citer, agency, 'mail_address') }}
+      {% if agency.address_verified %}
+        <div class="small" style="margin-top:.4rem">
+          <span class="src-tag src-primary">&#10003; verified at a primary source</span>
+          <span class="muted">— still compare it with the agency's own site before mailing anything; agencies move.</span>
+        </div>
+      {% else %}
+        <div class="notice notice-warn small" style="margin-top:.5rem">
+          Nobody has double-checked this address at the source. Look it up on
+          the official page before mailing anything.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if agency.notes %}
+  <div class="field">
+    <div class="field-label">Notes</div>
+    <div class="field-value">{{ agency.notes }}{{ cite_field(citer, agency, 'notes') }}</div>
+  </div>
+  {% endif %}
+
+  {% if agency.expires_after_days %}
+  <div class="field">
+    <div class="field-label">Renewal</div>
+    <div class="field-value">Needs attention roughly every {{ agency.expires_after_days }} days.</div>
+  </div>
+  {% endif %}
+</div>
+
+{% if agency.minor_requirements %}
+<div class="card">
+  <h3 style="margin-top:0">Documents Required for a Child's Freeze{{ cite_field(citer, agency, 'minor_requirements') }}</h3>
+  {% if agency.minor_requirements.guardian %}
+    <h4 class="small" style="margin-bottom:.2rem">From You, the Parent or Guardian</h4>
+    <ul class="small">{% for item in agency.minor_requirements.guardian %}<li>{{ item }}</li>{% endfor %}</ul>
+  {% endif %}
+  {% if agency.minor_requirements.minor %}
+    <h4 class="small" style="margin-bottom:.2rem">For the Child</h4>
+    <ul class="small">{% for item in agency.minor_requirements.minor %}<li>{{ item }}</li>{% endfor %}</ul>
+  {% endif %}
+  <p class="small muted">Send copies. Never mail original documents.</p>
+</div>
+{% endif %}
+
+{% if not agency.is_fyi %}
+<h2>Status by Person</h2>
+<div class="card">
+  <table>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td>{{ row.person.display_name }} {{ person_badge(row.person) }}</td>
+        <td>{{ status_pill(row.record, agency) }}</td>
+        <td style="text-align:right">
+          <a class="btn btn-quiet btn-small" href="/freeze/{{ row.person.id }}/{{ agency.id }}">Record</a>
+          {% if row.person.is_minor and agency.can_generate_letter %}
+            <a class="btn btn-quiet btn-small" href="/letters/{{ row.person.id }}/{{ agency.id }}">Packet</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td class="empty">No people added yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

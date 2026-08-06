@@ -1,4 +1,4 @@
-# Identilock — Audit Remediation Summary
+# FrostFile — Audit Remediation Summary
 
 Baseline: commit 99b6967 (v0.2.0). All 36 verified findings addressed across
 three commit passes. Test suite grew from 101 → 128 (27 new tests, all green).

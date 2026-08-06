@@ -83,13 +83,13 @@ def test_multipart_spool_threshold_exceeds_cap(unlocked):
     # spools to disk past this threshold, which must sit above the accept cap.
     import starlette.formparsers
 
-    from identilock.routes.reports import MAX_UPLOAD_BYTES
+    from frostfile.routes.reports import MAX_UPLOAD_BYTES
 
     assert starlette.formparsers.MultiPartParser.spool_max_size > MAX_UPLOAD_BYTES
 
 
 def test_legacy_plaintext_reminder_is_migrated_on_unlock(unlocked, settings):
-    from identilock import db
+    from frostfile import db
 
     add_person(unlocked, "Legacy Owner")
     conn = db.connect(settings.db_path)

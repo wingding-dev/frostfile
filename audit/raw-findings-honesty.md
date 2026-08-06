@@ -1,4 +1,4 @@
-# Identilock — Honesty of Claims Audit (raw finder output, pre-verification)
+# FrostFile — Honesty of Claims Audit (raw finder output, pre-verification)
 
 Baseline: commit 99b6967 (v0.2.0). Unverified finder report.
 
@@ -46,7 +46,7 @@ But reminders.title/.detail plaintext (db.py:130-143, reminders.py:61-68) and re
 - L7 Editorial one-liners (description, protects, action_note) render w/ NO citation and NO "?" marker despite _macros.html:5-8 and seeds.py:5-7 saying everything passes through cite. agencies.html:38-45, matrix.html:38, dashboard.html:114, agency_detail.html:9-10
 - L8 README:60 "the difference is enforced in code" — letter gating checks address_verified boolean (repo.py:220-222), not that citations['mail_address'] contains a fetched source. Consistent today by convention on the data, not mechanically.
 - L9 breaches "password checking free and offline-safe" — requires internet (range API); "offline-safe" misleads.
-- L10 auto-backup skips weekly if ANY identilock-*.db (incl. manual) <7 days old — "about once a week" defensible but frequent manual backups silently disable auto.
+- L10 auto-backup skips weekly if ANY frostfile-*.db (incl. manual) <7 days old — "about once a week" defensible but frequent manual backups silently disable auto.
 
 ## Verified TRUE (finder's explicit confirmations)
 Password check (local SHA1, 5-char prefix only, padded, never stored/logged/echoed, not persisted);

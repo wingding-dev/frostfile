@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Reminders — FrostFile{% endblock %}
+
+{% macro reminder_table(items, empty_text) %}
+  {% if items %}
+  <table>
+    <tbody>
+      {% for reminder in items %}
+      <tr>
+        <td>
+          {{ reminder.title }}
+          {% if reminder.person_name %}<span class="badge">{{ reminder.person_name }}</span>{% endif %}
+          {% if reminder.detail %}<div class="small muted">{{ reminder.detail }}</div>{% endif %}
+        </td>
+        <td class="small">{{ reminder.due_date }}</td>
+        <td class="small muted">{{ reminder.recurrence if reminder.recurrence != 'none' else 'one-off' }}</td>
+        <td style="text-align:right; white-space:nowrap">
+          <form method="post" action="/reminders/{{ reminder.id }}/complete" style="display:inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="btn btn-quiet btn-small">Done</button>
+          </form>
+          <form method="post" action="/reminders/{{ reminder.id }}/delete" style="display:inline"
+                onsubmit="return confirm('Delete this reminder?')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="btn btn-quiet btn-small">×</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <div class="empty">{{ empty_text }}</div>
+  {% endif %}
+{% endmacro %}
+
+{% block content %}
+<div class="card-head">
+  <h1>Reminders</h1>
+  <a class="btn btn-quiet" href="/reminders.ics">Export to Calendar</a>
+</div>
+<p class="lede">
+  Identity work is annual, and a year is long enough to forget. Marking a
+  recurring item done rolls it forward automatically.
+</p>
+
+<div class="notice notice-info small">
+  The calendar export contains reminder titles, which include family members'
+  names. Treat the downloaded <span class="mono">.ics</span> the way you would
+  treat the rest of this data — a shared work calendar is probably the wrong home for it.
+</div>
+
+{% if overdue %}
+<h2>Overdue</h2>
+<div class="card">{{ reminder_table(overdue, '') }}</div>
+{% endif %}
+
+<h2>Next 30 Days</h2>
+<div class="card">{{ reminder_table(soon, 'Nothing due in the next month.') }}</div>
+
+<h2>Later</h2>
+<div class="card">{{ reminder_table(later, 'Nothing scheduled.') }}</div>
+
+<h2>Add a Reminder</h2>
+<form method="post" action="/reminders" class="card">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <div class="form-grid">
+    <div class="form-row">
+      <label for="title">What</label>
+      <input type="text" id="title" name="title" required>
+    </div>
+    <div class="form-row">
+      <label for="due_date">When</label>
+      <input type="date" id="due_date" name="due_date" value="{{ today }}" required>
+    </div>
+    <div class="form-row">
+      <label for="recurrence">Repeat</label>
+      <select id="recurrence" name="recurrence">
+        <option value="none">Once</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="quarterly">Quarterly</option>
+        <option value="yearly">Yearly</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label for="person_id">Who</label>
+      <select id="person_id" name="person_id">
+        <option value="">Whole household</option>
+        {% for person in people %}<option value="{{ person.id }}">{{ person.display_name }}</option>{% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="form-row">
+    <label for="detail">Detail</label>
+    <input type="text" id="detail" name="detail">
+  </div>
+  <button type="submit" class="btn">Add</button>
+</form>
+{% endblock %}

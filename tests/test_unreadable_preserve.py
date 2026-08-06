@@ -16,7 +16,7 @@ def _agency_id(client, name="Equifax"):
 
 
 def test_corrupt_pin_is_preserved_not_destroyed_on_save(unlocked, settings):
-    from identilock import db
+    from frostfile import db
 
     person = add_person(unlocked, "PIN Owner")
     agency = _agency_id(unlocked)
@@ -77,7 +77,7 @@ def test_corrupt_pin_is_preserved_not_destroyed_on_save(unlocked, settings):
 
 
 def test_one_corrupt_field_does_not_block_passphrase_change(unlocked, settings):
-    from identilock import db
+    from frostfile import db
 
     person = add_person(unlocked, "Survivor", ssn="123456789", store_full_ssn="1")
     agency = _agency_id(unlocked)

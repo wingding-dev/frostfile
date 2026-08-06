@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}Help & FAQ — FrostFile{% endblock %}
+{% block main_class %}wrap-narrow{% endblock %}
+
+{% block content %}
+<h1>Help &amp; FAQ</h1>
+<p class="lede">
+  Straight answers to the questions everyone asks. Click a question to open it.
+</p>
+
+<div class="card">
+  <details class="faq">
+    <summary>Is my information being sent anywhere?</summary>
+    <p>
+      Not on its own, ever. FrostFile is a program on this computer, not a
+      website or a service, and the sensitive things you type — names, Social
+      Security numbers, freeze PINs, reminders — are saved into one scrambled
+      (encrypted) file on this machine. It reaches the internet only when you
+      press specific buttons: checking a password sends only a scrambled
+      fragment (never the password); checking an email <em>does</em> send that
+      address to the leak-checking service; saving an API key sends the key once
+      to confirm it; and &ldquo;Check All Links Now&rdquo; on the Sources page
+      visits agency websites, sending nothing about you. Nothing else leaves the
+      machine.
+    </p>
+  </details>
+
+  <details class="faq">
+    <summary>What does it do with the Social Security numbers?</summary>
+    <p>
+      Two things, and only two. The last-4 digits are shown next to names so
+      you can tell whose record is whose. The full number — which you don't
+      have to enter at all — is printed into the freeze request letters the app
+      generates, because the agencies require it on the letter. Skip it and
+      letters print a blank line to fill in by pen.
+    </p>
+  </details>
+
+  <details class="faq">
+    <summary>What if I forget my passphrase?</summary>
+    <p>
+      Use your <strong>recovery code</strong> — the XXXXX-XXXXX-XXXXX-XXXXX
+      code you were shown and asked to print when the vault was created. On the
+      unlock screen, click &ldquo;Forgot your passphrase?&rdquo;, enter the
+      code, and pick a new passphrase. Each code works once; you'll be handed a
+      fresh one to save.
+    </p>
+    <p>
+      There is no reset <em>without</em> that code — nobody can look your
+      passphrase up or override it, which is exactly why nobody can read your
+      data either. Lose both the passphrase and the code, and the data is gone.
+      (No code saved? Settings &rarr; Recovery Code issues one while unlocked.)
+    </p>
+  </details>
+
+  <details class="faq">
+    <summary>Doesn't a freeze lock ME out too? What does it take to undo?</summary>
+    <p>
+      Undoing is the easy part, and it's free. For the major agencies you lift
+      a freeze online or by phone in minutes — temporarily, for just long
+      enough to apply for the loan or open the account — then it goes back on.
+      You are not signing up for a commitment; you're putting a deadbolt on a
+      door you rarely use. Each agency's page in the Directory has its exact
+      &ldquo;to undo&rdquo; steps.
+    </p>
+  </details>
+
+  <details class="faq">
+    <summary>I'm getting a new computer. How do I move FrostFile?</summary>
+    <p>
+      One file. On the old computer: Settings &rarr; &ldquo;Package Everything
+      for the Move&rdquo; — that puts a single file on your Desktop. Carry it
+      over on a USB stick, install FrostFile on the new computer, and choose
+      &ldquo;Moving from another computer?&rdquo; on its first screen. Same
+      passphrase as before. Old backups can stay behind; the new computer
+      starts making its own.
+    </p>
+    <p>
+      Copying the file is fine — nothing ties it to one machine. And if the USB
+      stick gets lost, every sensitive thing in it — names, Social Security
+      numbers, dates of birth, freeze PINs, reminders, report contents — is
+      scrambled and unreadable without your passphrase, and guessing passphrases
+      against it is deliberately slow math that makes brute force impractical
+      against a real one. (Someone could still tell <em>how many</em> adults and
+      children you track and which freezes are done — but not who they are.)
+    </p>
+  </details>
+
+  <details class="faq">
+    <summary>What if this computer dies?</summary>
+    <p>
+      FrostFile backs itself up about once a week (Settings shows where).
+      Those backups live on this same computer, though — so for real disaster
+      protection, use &ldquo;Package Everything for the Move&rdquo; every few
+      months and keep that file on a USB stick in a drawer. It's scrambled, so
+      the drawer doesn't need to be Fort Knox.
+    </p>
+  </details>
+
+  <details class="faq">
+    <summary>Why do some things say &ldquo;FYI — nothing to do&rdquo;?</summary>
+    <p>
+      Because being honest beats looking busy. Some companies keep files about
+      you but offer no step a person can take. They're listed so you know they
+      exist, kept off your to-do grid, and never counted against your progress.
+    </p>
+  </details>
+
+  <details class="faq">
+    <summary>Where do the addresses and phone numbers come from? Can they go stale?</summary>
+    <p>
+      Every fact points at a source page you can click (the little numbers, and
+      the Sources page). Green means a person actually read that page on the
+      date shown; yellow means it's a pointer to check yourself. Agencies do
+      move their PO boxes — the &ldquo;Check All Links Now&rdquo; button on the
+      Sources page tells you if any source page has gone dead, which is your
+      cue to double-check before mailing anything. Directory corrections
+      arrive with app updates.
+    </p>
+  </details>
+
+  <details class="faq">
+    <summary>Why is this free? What's the catch?</summary>
+    <p>
+      No catch. It was built for one family after a breach and shared onward.
+      There's no company, no account, no data collection — which you can
+      verify, because there's no network activity to collect it with.
+    </p>
+  </details>
+
+  <details class="faq">
+    <summary>Something looks wrong — a dead link, a changed address.</summary>
+    <p>
+      Don't mail anything to an address you doubt — check the agency's own
+      site, and tell whoever gave you this app so the fix reaches everyone.
+    </p>
+  </details>
+</div>
+{% endblock %}

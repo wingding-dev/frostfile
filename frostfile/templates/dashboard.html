@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cite, cite_field, status_pill, person_badge %}
+{% block title %}Dashboard — FrostFile{% endblock %}
+
+{% block content %}
+<h1>Household Status</h1>
+
+{% if not people %}
+  <div class="notice notice-info">
+    <p>Nobody added yet. Start by adding the people whose identities you are protecting.</p>
+    <p><a class="btn" href="/people/new">Add the first person</a></p>
+  </div>
+{% else %}
+
+<div class="grid-2">
+  <div class="card">
+    <div class="stat">
+      <span class="stat-big">{{ progress.percent }}%</span>
+      <span class="stat-label">{{ progress.done }} of {{ progress.total }} controls in place</span>
+    </div>
+    <div class="meter"><span style="width: {{ progress.percent }}%"></span></div>
+    <p class="small muted">
+      Across {{ people|length }} {{ 'person' if people|length == 1 else 'people' }}
+      and {{ agencies|length }} agencies and controls.
+      <a href="/matrix">Open the full grid</a>.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">What This App Does — and Doesn't</h3>
+    <table class="small">
+      <tbody>
+        <tr>
+          <td><span class="tick">&#10003;</span>Tracks every freeze, PIN, and confirmation</td>
+          <td><span class="cross">&#10007;</span>Doesn't watch your credit for you</td>
+        </tr>
+        <tr>
+          <td><span class="tick">&#10003;</span>Prints the mail packets for kids' freezes</td>
+          <td><span class="cross">&#10007;</span>Doesn't connect to the bureaus{{ cite(citer, refs('ftc-fcra')) }}</td>
+        </tr>
+        <tr>
+          <td><span class="tick">&#10003;</span>Reminds you when tasks come due</td>
+          <td><span class="cross">&#10007;</span>Doesn't fix fraud that already happened</td>
+        </tr>
+        <tr>
+          <td><span class="tick">&#10003;</span>Spots new items between report copies</td>
+          <td><span class="cross">&#10007;</span>Doesn't phone home or track you</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% if minors_at_risk %}
+<div class="notice notice-danger">
+  <p><strong>Children without a full set of bureau freezes:
+    {% for child in minors_at_risk %}{{ child.display_name }}{{ ", " if not loop.last }}{% endfor %}.</strong></p>
+  <p>
+    A stolen child's SSN typically goes unnoticed for years, because nobody
+    checks a nine-year-old's credit. Freezing all three bureaus is free but
+    mail-only, and requires a birth certificate and Social Security card.
+    <a href="/letters">Generate the mailing packets</a>.
+  </p>
+</div>
+{% endif %}
+
+{% if overdue %}
+<div class="notice notice-warn">
+  <p><strong>{{ overdue|length }} overdue reminder{{ '' if overdue|length == 1 else 's' }}.</strong></p>
+  <ul style="margin:.4rem 0 0; padding-left:1.1rem;">
+    {% for reminder in overdue[:4] %}
+      <li>{{ reminder.title }}{% if reminder.person_name %} — {{ reminder.person_name }}{% endif %}
+        <span class="muted small">(due {{ reminder.due_date }})</span></li>
+    {% endfor %}
+  </ul>
+  <p style="margin-bottom:0"><a href="/reminders">Review reminders</a></p>
+</div>
+{% endif %}
+
+{% if expiring %}
+<div class="notice notice-warn">
+  <p><strong>Expiring soon.</strong> These freezes or enrollments have an end date within 45 days.</p>
+  <ul style="margin:.4rem 0 0; padding-left:1.1rem;">
+    {% for item in expiring %}
+      <li><a href="/freeze/{{ item.person.id }}/{{ item.agency.id }}">{{ item.agency.name }} — {{ item.person.display_name }}</a>
+        <span class="muted small">(expires {{ item.record.expires_on }})</span></li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<h2>Do These Next</h2>
+<p class="small muted">
+  Worried a freeze locks you in? It doesn't. For the major agencies, lifting
+  one is free and takes minutes online — you only lift it when you're actually
+  applying for something, then put it back. Each agency's page has the exact
+  &ldquo;undo&rdquo; steps.
+</p>
+{% if next_actions %}
+<div class="card">
+  <div class="table-scroll">
+  <table>
+    <thead>
+      <tr><th>Agency or Control</th><th>What It Gets You</th><th>Person</th><th>Status</th><th>Where</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for item in next_actions %}
+      <tr>
+        <td>
+          <a href="/agencies/{{ item.agency.id }}">{{ item.agency.name }}</a>
+          <div class="small muted">{{ category_labels.get(item.agency.category, item.agency.category) }}</div>
+        </td>
+        <td class="small">
+          {{ item.agency.protects }}
+          {% if item.agency.impact or item.agency.effort_label %}
+            <div class="muted" style="margin-top:.15rem">
+              {{ {3:'High impact',2:'Worth doing',1:'Nice to have'}.get(item.agency.impact, '') }}{% if item.agency.impact and item.agency.effort_label %} · {% endif %}{{ item.agency.effort_label }}
+            </div>
+          {% endif %}
+        </td>
+        <td>{{ item.person.display_name }} {{ person_badge(item.person) }}</td>
+        <td>{{ status_pill(item.record, item.agency) }}</td>
+        <td>
+          {% if item.agency.freeze_url %}
+            <a href="{{ item.agency.freeze_url }}" target="_blank" rel="noopener noreferrer">Official page</a>{{ cite_field(citer, item.agency, 'freeze_url') }}
+          {% else %}
+            <span class="muted small">Call your provider</span>
+          {% endif %}
+        </td>
+        <td><a class="btn btn-quiet btn-small" href="/freeze/{{ item.person.id }}/{{ item.agency.id }}">Record</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% else %}
+<div class="notice notice-ok">
+  Everything on the list is done or marked not applicable. Set a reminder to
+  re-verify in a year — freezes have been known to quietly come off.
+</div>
+{% endif %}
+
+{% endif %}
+{% endblock %}

@@ -93,7 +93,7 @@ def test_data_dir_move_copies_db_and_leaves_pointer(unlocked, settings, tmp_path
         data={"folder": str(target), "csrf_token": csrf_token(unlocked)},
     )
     assert response.status_code == 200, response.text
-    assert (target / "identilock.db").exists()
+    assert (target / "frostfile.db").exists()
 
     # A pointer is left in the OLD folder (never the machine-wide default), and
     # the NEW folder carries no onward pointer that would bounce resolution out.
@@ -102,7 +102,7 @@ def test_data_dir_move_copies_db_and_leaves_pointer(unlocked, settings, tmp_path
 
     assert "data_dir" not in json.loads((target / "prefs.json").read_text())
 
-    from identilock.config import load_settings
+    from frostfile.config import load_settings
 
     # Explicit data_dir wins: pointers are not followed for overridden launches.
     resolved = load_settings(data_dir=old_dir, host="127.0.0.1", port=8899)
@@ -111,13 +111,13 @@ def test_data_dir_move_copies_db_and_leaves_pointer(unlocked, settings, tmp_path
     # The live app now uses the new folder, so a person added here lands there,
     # not in the stale old copy.
     add_person(unlocked, "After Move Person")
-    assert (target / "identilock.db").stat().st_size > 0
-    from identilock import db
+    assert (target / "frostfile.db").stat().st_size > 0
+    from frostfile import db
 
-    conn = db.connect(target / "identilock.db")
+    conn = db.connect(target / "frostfile.db")
     try:
         vault = db.unlock(conn, "correct horse battery staple")
-        from identilock.repo import list_people
+        from frostfile.repo import list_people
 
         assert any(p.display_name == "After Move Person" for p in list_people(conn, vault))
     finally:

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import time
 
-from identilock.services.reportdiff import _strip_script_style, extract_text, normalize
+from frostfile.services.reportdiff import _strip_script_style, extract_text, normalize
 
 
 def test_unclosed_script_does_not_blow_up():
