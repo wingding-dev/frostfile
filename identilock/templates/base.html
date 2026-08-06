@@ -10,6 +10,22 @@
 </head>
 <body class="{% block body_class %}{% endblock %}">
 
+<div id="splash" aria-hidden="true"></div>
+<script>
+  // Fade the launch splash in, hold, then out — once per app-window session.
+  (function () {
+    var s = document.getElementById("splash");
+    if (!s) return;
+    try {
+      if (sessionStorage.getItem("ff_splashed")) { s.parentNode.removeChild(s); return; }
+      sessionStorage.setItem("ff_splashed", "1");
+    } catch (e) { /* private mode: just show it once */ }
+    s.className = "show";
+    setTimeout(function () { s.className = "hide"; }, 1300);
+    setTimeout(function () { if (s.parentNode) s.parentNode.removeChild(s); }, 2100);
+  })();
+</script>
+
 {% if session %}
 <header class="topbar">
   <nav class="nav-history" aria-label="History">

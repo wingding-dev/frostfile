@@ -41,6 +41,23 @@
 
 * { box-sizing: border-box; }
 
+/* ---------------------------------------------------------------- splash */
+/* Shown once per app launch (JS-gated via sessionStorage), fading in then out.
+   Hidden entirely without JS, so it can never trap a no-script page. */
+#splash {
+  position: fixed; inset: 0; z-index: 9999; display: none; opacity: 0;
+  background: #14202b url("/static/splash.jpg") center / cover no-repeat;
+  pointer-events: none;
+}
+#splash.show { display: block; animation: splash-in .55s ease forwards; }
+#splash.hide { display: block; animation: splash-out .75s ease forwards; }
+@keyframes splash-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes splash-out { from { opacity: 1; } to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  /* Respect the OS "reduce motion" setting: no splash at all. */
+  #splash { display: none !important; }
+}
+
 body {
   margin: 0;
   background: var(--bg);
