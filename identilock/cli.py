@@ -126,18 +126,59 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
+def _gui_backend_available() -> bool:
+    """Whether a usable native-window toolkit is present.
+
+    Critically, the Qt backend calls abort() at the C level when it cannot load
+    its platform plugin (e.g. libxcb-cursor0 missing on Linux) — a crash Python
+    cannot catch, which would take the whole app down instead of falling back to
+    the browser. So we probe Qt in a throwaway subprocess: if it aborts, only
+    the probe dies and we return False.
+    """
+    import os
+
+    if os.name != "nt" and not (
+        os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY")
+    ):
+        return False  # headless: no window possible
+
+    # GTK/WebKit backend — its failures are catchable Python ImportErrors.
+    try:
+        import gi  # noqa: F401
+
+        gi.require_version("Gtk", "3.0")
+        return True
+    except Exception:
+        pass
+
+    # Qt backend — probe in isolation because it can hard-abort.
+    import subprocess
+
+    probe = "from PyQt6.QtWidgets import QApplication; QApplication([])"
+    try:
+        result = subprocess.run(
+            [sys.executable, "-c", probe], capture_output=True, timeout=20
+        )
+        return result.returncode == 0
+    except Exception:
+        return False
+
+
 def _run_app_window(server, url: str) -> bool:
     """Open Identilock in its own window instead of a browser tab.
 
     Uses pywebview, which wraps the operating system's built-in page renderer
     (WebView2 on Windows, WebKit on macOS) — the app looks and behaves like a
     normal program, and closing the window shuts the whole thing down. Returns
-    False when that is not possible (pywebview or its OS backend missing, as on
-    a bare Linux box), and the caller falls back to the browser.
+    False when that is not possible (no window toolkit, as on a bare Linux box),
+    and the caller falls back to the browser.
     """
     try:
         import webview
     except ImportError:
+        return False
+
+    if not _gui_backend_available():
         return False
 
     # Without this, the "Download as Separate PDFs" zip silently no-ops in the
