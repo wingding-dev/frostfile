@@ -1,11 +1,11 @@
 [project]
-name = "identilock"
-version = "0.2.0"
+name = "frostfile"
+version = "0.3.0"
 description = "Local-only tracker for credit freezes, identity controls, and breach exposure across a family."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "AGPL-3.0-or-later" }
-authors = [{ name = "Identilock contributors" }]
+authors = [{ name = "FrostFile contributors" }]
 keywords = ["credit-freeze", "identity-theft", "privacy", "security"]
 classifiers = [
     "Environment :: Web Environment",
@@ -32,17 +32,17 @@ dependencies = [
 dev = ["pytest>=8.0", "pytest-asyncio>=0.23"]
 
 [project.scripts]
-identilock = "identilock.cli:main"
+frostfile = "frostfile.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/yourname/identilock"
+Homepage = "https://github.com/yourname/frostfile"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["identilock"]
+packages = ["frostfile"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

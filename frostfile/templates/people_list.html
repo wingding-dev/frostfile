@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "_macros.html" import person_badge %}
+{% block title %}Family — FrostFile{% endblock %}
+
+{% block content %}
+<div class="card-head">
+  <h1>Family</h1>
+  <a class="btn" href="/people/new">Add a Person</a>
+</div>
+<p class="lede">
+  Everyone whose identity you are tracking. Children matter most here: a stolen
+  minor's SSN is usually not discovered until they first apply for credit.
+</p>
+
+{% if not rows %}
+  <div class="empty">Nobody added yet.</div>
+{% else %}
+<div class="card">
+  <table>
+    <thead><tr><th>Name</th><th>Type</th><th>SSN</th><th class="num">Controls in Place</th><th></th></tr></thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td><a href="/people/{{ row.person.id }}">{{ row.person.display_name }}</a></td>
+        <td>{{ person_badge(row.person) }}</td>
+        <td class="mono">{{ row.person.masked_ssn }}</td>
+        <td class="num">{{ row.done }} / {{ row.total }}</td>
+        <td><a class="btn btn-quiet btn-small" href="/people/{{ row.person.id }}/edit">Edit</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

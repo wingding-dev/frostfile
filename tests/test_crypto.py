@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from identilock import db
-from identilock.crypto import (
+from frostfile import db
+from frostfile.crypto import (
     KdfParams,
     Vault,
     WrongPassphrase,
@@ -83,8 +83,8 @@ def test_unlock_rejects_bad_passphrase(tmp_path):
 
 
 def test_change_passphrase_rewraps_every_field(tmp_path):
-    from identilock.repo import create_person, get_person
-    from identilock.seeds import seed_agencies
+    from frostfile.repo import create_person, get_person
+    from frostfile.seeds import seed_agencies
 
     conn = db.connect(tmp_path / "t.db")
     vault = db.initialize_vault(conn, "old passphrase here")

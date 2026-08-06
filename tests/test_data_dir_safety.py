@@ -6,12 +6,12 @@ import json
 
 from fastapi.testclient import TestClient
 
-from identilock.config import load_settings
-from identilock.web import create_app
+from frostfile.config import load_settings
+from frostfile.web import create_app
 
 
 def test_atomic_prefs_write_leaves_no_partial(tmp_path):
-    from identilock.config import read_prefs, write_prefs
+    from frostfile.config import read_prefs, write_prefs
 
     write_prefs(tmp_path, lock_minutes=30, data_dir=str(tmp_path / "x"))
     assert not (tmp_path / "prefs.json.tmp").exists()
@@ -22,12 +22,12 @@ def test_dangling_pointer_flags_unreachable_not_fresh_setup(tmp_path):
     # An old default dir points at a target that does not exist (unplugged USB).
     home = tmp_path / "home"
     home.mkdir()
-    missing = tmp_path / "usb" / "Identilock"  # never created
+    missing = tmp_path / "usb" / "FrostFile"  # never created
     (home / "prefs.json").write_text(json.dumps({"data_dir": str(missing)}))
 
     # A default launch (no explicit data_dir) resolves from the default dir and
     # follows the pointer; point the default at `home` for the test.
-    from identilock import config
+    from frostfile import config
 
     orig = config.default_data_dir
     config.default_data_dir = lambda: home
@@ -37,7 +37,7 @@ def test_dangling_pointer_flags_unreachable_not_fresh_setup(tmp_path):
         config.default_data_dir = orig
 
     assert s.data_unreachable is True
-    assert not (missing / "identilock.db").exists()  # nothing created at dead path
+    assert not (missing / "frostfile.db").exists()  # nothing created at dead path
 
     # The app comes up warning, never offering a fresh setup, and creates no file.
     app = create_app(s)
@@ -45,4 +45,4 @@ def test_dangling_pointer_flags_unreachable_not_fresh_setup(tmp_path):
         page = client.get("/setup")
         assert page.status_code == 503
         assert "Can't Find Your Data" in page.text
-    assert not (missing / "identilock.db").exists()
+    assert not (missing / "frostfile.db").exists()

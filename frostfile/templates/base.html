@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>{% block title %}FrostFile{% endblock %}</title>
+  <link rel="stylesheet" href="/static/app.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>&#128274;</text></svg>">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+
+<div id="splash" aria-hidden="true"></div>
+<script>
+  // Fade the launch splash in, hold, then out — once per app-window session.
+  (function () {
+    var s = document.getElementById("splash");
+    if (!s) return;
+    try {
+      if (sessionStorage.getItem("ff_splashed")) { s.parentNode.removeChild(s); return; }
+      sessionStorage.setItem("ff_splashed", "1");
+    } catch (e) { /* private mode: just show it once */ }
+    s.className = "show";
+    setTimeout(function () { s.className = "hide"; }, 3000);
+    setTimeout(function () { if (s.parentNode) s.parentNode.removeChild(s); }, 3800);
+  })();
+</script>
+
+{% if session %}
+<header class="topbar">
+  <nav class="nav-history" aria-label="History">
+    <button type="button" onclick="history.back()" title="Back to the page you were just on">&#8592;</button>
+    <button type="button" onclick="history.forward()" title="Forward">&#8594;</button>
+  </nav>
+  <a class="brand" href="/">FrostFile</a>
+  <nav>
+    <a href="/" class="{{ 'active' if active == 'dashboard' }}">Dashboard</a>
+    <a href="/matrix" class="{{ 'active' if active == 'matrix' }}">Freezes</a>
+    <a href="/people" class="{{ 'active' if active == 'people' }}">Family</a>
+    <a href="/letters" class="{{ 'active' if active == 'letters' }}">Letters</a>
+    <a href="/reminders" class="{{ 'active' if active == 'reminders' }}">Reminders</a>
+    <a href="/reports" class="{{ 'active' if active == 'reports' }}">Reports</a>
+    <a href="/breaches" class="{{ 'active' if active == 'breaches' }}">Breaches</a>
+    <a href="/agencies" class="{{ 'active' if active == 'agencies' }}">Directory</a>
+  </nav>
+  <form method="post" action="/lock" class="lock-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <a href="/help" class="link-quiet {{ 'active' if active == 'help' }}">Help</a>
+    <a href="/settings" class="link-quiet">Settings</a>
+    <button type="submit" class="btn btn-quiet" title="Locks immediately. Auto-locks after {{ lock_minutes }} minutes idle.">Lock</button>
+  </form>
+</header>
+{% endif %}
+
+<main class="{% block main_class %}wrap{% endblock %}">
+  {% block content %}{% endblock %}
+</main>
+
+{% if citer and citer.used %}
+<footer class="sources">
+  <h2>Sources on this page</h2>
+  <ol>
+    {% for n, s in citer.entries %}
+    <li id="source-{{ n }}">
+      <a href="{{ s.url }}" target="_blank" rel="noopener noreferrer">{{ s.title }}</a>
+      <span class="src-pub">{{ s.publisher }}</span>
+      {% if s.is_primary %}
+        <span class="src-tag src-primary" title="A person opened and read this page on {{ s.retrieved }} and copied the fact straight from it.">&#10003; read {{ s.retrieved }}</span>
+      {% else %}
+        <span class="src-tag src-listed" title="The organization's own page for this topic, but what it says was not recorded. Open it and check before relying on it.">link only &mdash; go check</span>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+  <p class="sources-note">
+    A <span class="cite cite-missing-inline">?</span> marker means no source page is
+    on file for that piece of information &mdash; check the organization&rsquo;s own
+    website before counting on it.
+    <a href="/sources">See all sources</a>.
+  </p>
+</footer>
+{% endif %}
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

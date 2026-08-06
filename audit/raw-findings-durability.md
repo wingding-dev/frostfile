@@ -1,4 +1,4 @@
-# Identilock — Data Durability Audit (raw finder output, pre-verification)
+# FrostFile — Data Durability Audit (raw finder output, pre-verification)
 
 Baseline: commit 99b6967 (v0.2.0). Unverified finder report.
 
@@ -36,7 +36,7 @@ config.py:96-105, config.py:140-146, web.py:89-99, routes/auth.py:61-65
 Pointer target missing (unmounted USB, renamed folder, unsynced cloud path) => resolves to missing
 dir w/ no existence check => ensure_data_dir recreates empty => is_initialized False => setup screen.
 Non-technical user concludes data gone or creates a divergent second vault. Fix: if a pointer exists
-but <target>/identilock.db absent, refuse setup; show "data folder not reachable."
+but <target>/frostfile.db absent, refuse setup; show "data folder not reachable."
 
 ### H3 — Pointer-chain cycle after round-trip move resolves to STALE directory
 config.py:97-105 (loop breaks on cycle leaving resolved_dir at intermediate hop), settings_routes.py:141-153
@@ -48,7 +48,7 @@ own data_dir key; prefer last hop before a cycle.
 routes/auth.py:28-49 (except OSError only), auth.py:311, db.py:387-396
 backup_to raises sqlite3.OperationalError/DatabaseError (not OSError) on disk-full => propagates =>
 aborts unlock w/ 500. Docstring promise ("full disk must not stop the vault opening") broken. Bonus:
-partial identilock-auto-*.db left w/ fresh mtime => freshness check skips real backups 7 more days,
+partial frostfile-auto-*.db left w/ fresh mtime => freshness check skips real backups 7 more days,
 and newest backup is garbage. Fix: except (OSError, sqlite3.Error); delete partial target on failure.
 
 ### H5 — prefs.json written non-atomically; corruption silently drops the moved-data pointer
@@ -59,7 +59,7 @@ Fix: write prefs.json.tmp + fsync + os.replace.
 
 ## MEDIUM
 - M1 Disk-full during manual backup/move-kit/data-dir move: raw 500 + poisonous partial file; retry hits exists() guard telling user to "move it out of the way." settings_routes.py:128-134,242-245,273
-- M2 Failed/partial MANUAL backup suppresses auto-backups 7 days (freshness glob matches all identilock-*.db by mtime). auth.py:38-41
+- M2 Failed/partial MANUAL backup suppresses auto-backups 7 days (freshness glob matches all frostfile-*.db by mtime). auth.py:38-41
 - M3 setup_import replace: other in-flight conns hold handles => Windows os.replace PermissionError => 500 + stranded .import-tmp (full vault image); async TOCTOU between is_initialized and replace. auth.py:274-275,242
 - M4 setup_import never fsyncs scratch/dir around replace => power loss => torn db. auth.py:251,275
 - M5 Move-data-dir under --data-dir/env writes a pointer never followed => UI says "will be used next start" but override wins forever; user edits stale copy, later deletes CURRENT dir. settings_routes.py:141-142, config.py:96
@@ -77,4 +77,4 @@ recover_data_key stale-wrap rejected via verifier (no wrong-key-decrypts-garbage
 uses sqlite backup API (consistent snapshots); ensure_freeze_records single INSERT...WHERE NOT EXISTS
 + UNIQUE (no dup race); ordinary two-tab writes serialized by 5s busy timeout, conns closed in finally;
 setup crash between initialize_vault and seed_agencies self-heals on restart; AEAD contexts stable;
-auto-prune only touches identilock-auto-*, keeps 10, never deletes manual/last; foreign keys on.
+auto-prune only touches frostfile-auto-*, keeps 10, never deletes manual/last; foreign keys on.

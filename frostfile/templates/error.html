@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ status_code }} — FrostFile{% endblock %}
+{% block main_class %}wrap-narrow{% endblock %}
+
+{% block content %}
+<h1>{{ status_code }}</h1>
+<div class="notice notice-warn">{{ detail }}</div>
+<p><a href="/">Back to the dashboard</a></p>
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cite, cite_field, person_badge %}
+{% block title %}{{ agency.name }} — {{ person.display_name }}{% endblock %}
+
+{% block content %}
+<p class="small muted"><a href="/matrix">← Freeze Grid</a></p>
+<h1>{{ agency.name }}</h1>
+<p class="lede">
+  For {{ person.display_name }} {{ person_badge(person) }} ·
+  {{ category_labels.get(agency.category, agency.category) }}
+  {% if agency.protects %}<br><strong>{{ agency.protects }}</strong>{% endif %}
+</p>
+
+<div class="grid-2">
+  <div class="card">
+    <h3 style="margin-top:0">Record</h3>
+    <form method="post" action="/freeze/{{ person.id }}/{{ agency.id }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+      <div class="form-row">
+        <label for="status">Status</label>
+        <select id="status" name="status">
+          {% for status in status_order %}
+            <option value="{{ status }}" {{ 'selected' if record and record.status == status else '' }}>
+              {{ status_label(status, agency.category) }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-row">
+          <label for="method">How you did it</label>
+          <input type="text" id="method" name="method" value="{{ record.method if record else '' }}" placeholder="online, phone, mail">
+          <p class="hint">Keep this short (online / phone / mail). For anything sensitive, use Notes below — that field is encrypted.</p>
+        </div>
+        <div class="form-row">
+          <label for="date_requested">Requested</label>
+          <input type="date" id="date_requested" name="date_requested" value="{{ record.date_requested or '' if record else '' }}">
+        </div>
+        <div class="form-row">
+          <label for="date_confirmed">Confirmed</label>
+          <input type="date" id="date_confirmed" name="date_confirmed" value="{{ record.date_confirmed or '' if record else '' }}">
+        </div>
+        <div class="form-row">
+          <label for="last_verified">Last verified</label>
+          <input type="date" id="last_verified" name="last_verified" value="{{ record.last_verified or '' if record else '' }}">
+        </div>
+        <div class="form-row">
+          <label for="expires_on">Expires</label>
+          <input type="date" id="expires_on" name="expires_on" value="{{ record.expires_on or '' if record else '' }}">
+          <p class="hint">Leave blank if it does not expire.</p>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label for="confirmation">Confirmation number</label>
+        <input type="text" id="confirmation" name="confirmation" class="mono" value="{{ record.confirmation or '' if record else '' }}">
+      </div>
+
+      <div class="form-row">
+        <label for="pin">Freeze PIN or passphrase</label>
+        <input type="text" id="pin" name="pin" class="mono" value="{{ record.pin or '' if record else '' }}">
+        <p class="hint">
+          Encrypted with your master passphrase. You will need this to lift the
+          freeze — losing it means a phone call and an identity check.
+        </p>
+      </div>
+
+      <div class="form-row">
+        <label for="notes">Notes</label>
+        <textarea id="notes" name="notes">{{ record.notes or '' if record else '' }}</textarea>
+      </div>
+
+      <button type="submit" class="btn">Save</button>
+    </form>
+  </div>
+
+  <div>
+    <div class="card">
+      <h3 style="margin-top:0">How to Do It</h3>
+      {% if agency.why_it_matters %}
+        <p class="small">{{ agency.why_it_matters }}{{ cite_field(citer, agency, 'why_it_matters') }}</p>
+      {% endif %}
+
+      {% if agency.freeze_url %}
+      <div class="field">
+        <div class="field-label">Online</div>
+        <div class="field-value">
+          <a href="{{ agency.freeze_url }}" target="_blank" rel="noopener noreferrer">{{ agency.freeze_url }}</a>{{ cite_field(citer, agency, 'freeze_url') }}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if agency.phone %}
+      <div class="field">
+        <div class="field-label">Phone</div>
+        <div class="field-value">{{ agency.phone }}{{ cite_field(citer, agency, 'phone') }}</div>
+      </div>
+      {% endif %}
+
+      {% if agency.mail_address %}
+      <div class="field">
+        <div class="field-label">Mail</div>
+        <div class="field-value">{{ agency.mail_address }}{{ cite_field(citer, agency, 'mail_address') }}
+          {% if not agency.address_verified %}
+            <div class="notice notice-warn small" style="margin-top:.5rem">
+              This address was not confirmed at a primary source. Check the
+              official page before mailing anything.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if agency.thaw_procedure %}
+      <div class="field">
+        <div class="field-label">Lifting it</div>
+        <div class="field-value">{{ agency.thaw_procedure }}{{ cite_field(citer, agency, 'thaw_procedure') }}</div>
+      </div>
+      {% endif %}
+
+      {% if agency.notes %}
+      <div class="field">
+        <div class="field-label">Notes</div>
+        <div class="field-value">{{ agency.notes }}{{ cite_field(citer, agency, 'notes') }}</div>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if person.is_minor and agency.can_generate_letter %}
+    <div class="card">
+      <h3 style="margin-top:0">Mailing Packet</h3>
+      <p class="small">
+        This agency accepts a protected-consumer freeze by mail, and its address
+        is confirmed. FrostFile can print the cover letter and document
+        checklist for you.
+      </p>
+      <a class="btn" href="/letters/{{ person.id }}/{{ agency.id }}">Prepare packet</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

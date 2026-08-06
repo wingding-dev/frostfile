@@ -41,7 +41,7 @@ def test_breach_check_with_junk_person_id_does_not_crash(unlocked):
 
 
 def test_kdf_params_are_clamped_against_tampering(unlocked, settings):
-    from identilock import db
+    from frostfile import db
 
     conn = db.connect(settings.db_path)
     try:
@@ -60,7 +60,7 @@ def test_kdf_params_are_clamped_against_tampering(unlocked, settings):
 def test_passphrase_is_nfc_normalized():
     import unicodedata
 
-    from identilock.crypto import KdfParams, derive_key
+    from frostfile.crypto import KdfParams, derive_key
 
     params = KdfParams.generate()
     nfd = unicodedata.normalize("NFD", "café-passphrase-xyz")

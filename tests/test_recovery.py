@@ -65,7 +65,7 @@ def test_recovery_code_saves_to_a_file(unlocked, tmp_path, monkeypatch):
         "/recovery-code/save", data={"csrf_token": csrf_token(unlocked)}
     )
     assert response.status_code == 200
-    saved = (tmp_path / "Identilock-Recovery-Code.txt").read_text()
+    saved = (tmp_path / "FrostFile-Recovery-Code.txt").read_text()
     assert code in saved
     assert "Forgot your passphrase?" in saved
 

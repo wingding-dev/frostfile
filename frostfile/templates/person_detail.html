@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cite_field, status_pill, person_badge %}
+{% block title %}{{ person.display_name }} — FrostFile{% endblock %}
+
+{% block content %}
+<p class="small muted"><a href="/people">← Family</a></p>
+<div class="card-head">
+  <h1>{{ person.display_name }} {{ person_badge(person) }}</h1>
+  <a class="btn btn-quiet" href="/people/{{ person.id }}/edit">Edit</a>
+</div>
+
+<div class="card">
+  <div class="field"><div class="field-label">SSN</div><div class="field-value mono">{{ person.masked_ssn }}{% if person.has_full_ssn %} <span class="badge">full number stored</span>{% endif %}</div></div>
+  {% if person.birth_date %}<div class="field"><div class="field-label">Date of birth</div><div class="field-value">{{ person.birth_date }}</div></div>{% endif %}
+  {% if person.email %}<div class="field"><div class="field-label">Email</div><div class="field-value">{{ person.email }}</div></div>{% endif %}
+  {% if person.phone %}<div class="field"><div class="field-label">Phone</div><div class="field-value">{{ person.phone }}</div></div>{% endif %}
+  {% if person.address %}<div class="field"><div class="field-label">Address</div><div class="field-value">{{ person.address }}</div></div>{% endif %}
+  {% if person.notes %}<div class="field"><div class="field-label">Notes</div><div class="field-value">{{ person.notes }}</div></div>{% endif %}
+</div>
+
+{% if person.is_minor %}
+<div class="notice notice-info">
+  <p style="margin:0">
+    For a child, the goal is that <em>no credit file exists at all</em>. When you
+    request one and the bureau answers &ldquo;no file found&rdquo;, mark the record
+    as <strong>No file exists</strong> — that is the all-clear. A file that does
+    exist means someone has already used this SSN.
+  </p>
+</div>
+{% endif %}
+
+<h2>Freezes and Controls</h2>
+{% for category, entries in grouped.items() %}
+<div class="card">
+  <h3 style="margin-top:0">{{ category_labels.get(category, category) }}</h3>
+  <table>
+    <tbody>
+      {% for entry in entries %}
+      <tr>
+        <td style="width:40%">
+          <a href="/freeze/{{ person.id }}/{{ entry.agency.id }}">{{ entry.agency.name }}</a>
+          {% if entry.agency.freeze_url %}
+            <a class="small" href="{{ entry.agency.freeze_url }}" target="_blank" rel="noopener noreferrer">↗</a>{{ cite_field(citer, entry.agency, 'freeze_url') }}
+          {% endif %}
+          {% if entry.agency.protects %}<div class="small muted">{{ entry.agency.protects }}</div>{% endif %}
+        </td>
+        <td>{{ status_pill(entry.record, entry.agency) }}</td>
+        <td class="small muted">
+          {% if entry.record and entry.record.date_confirmed %}confirmed {{ entry.record.date_confirmed }}{% endif %}
+          {% if entry.record and entry.record.expires_on %} · expires {{ entry.record.expires_on }}{% endif %}
+        </td>
+        <td style="text-align:right">
+          {% if person.is_minor and entry.agency.can_generate_letter %}
+            <a class="btn btn-quiet btn-small" href="/letters/{{ person.id }}/{{ entry.agency.id }}">Packet</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endfor %}
+{% endblock %}

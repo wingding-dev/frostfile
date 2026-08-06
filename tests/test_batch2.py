@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
-from identilock.config import load_settings
-from identilock.web import create_app
+from frostfile.config import load_settings
+from frostfile.web import create_app
 
 from conftest import PASSPHRASE, add_person, csrf_token
 
@@ -75,7 +75,7 @@ def test_move_kit_export_and_import_round_trip(
         "/settings/move-kit", data={"csrf_token": csrf_token(unlocked)}
     )
     assert response.status_code == 200
-    kits = list(tmp_path.glob("Identilock-move-*.db"))
+    kits = list(tmp_path.glob("FrostFile-move-*.db"))
     assert len(kits) == 1
 
     # "New computer": a fresh app with an empty data dir accepts the kit.
@@ -104,7 +104,7 @@ def test_setup_import_rejects_a_non_database_file(client):
         files={"upload": ("junk.db", b"this is not a database", "application/octet-stream")},
     )
     assert response.status_code == 200
-    assert "not an Identilock move file" in response.text
+    assert "not an FrostFile move file" in response.text
 
 
 def test_setup_import_refused_once_a_vault_exists(unlocked):

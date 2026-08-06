@@ -10,7 +10,7 @@ from conftest import PASSPHRASE, add_person, csrf_token
 
 
 def test_backup_is_atomic_no_partial_on_failure(unlocked, settings, monkeypatch):
-    from identilock import db
+    from frostfile import db
 
     add_person(unlocked, "Backup Person")
     conn = db.connect(settings.db_path)
@@ -29,24 +29,24 @@ def test_backup_is_atomic_no_partial_on_failure(unlocked, settings, monkeypatch)
 
     monkeypatch.setattr(db.sqlite3, "connect", fake_connect)
     try:
-        dest = settings.backup_dir / "identilock-auto-fail.db"
+        dest = settings.backup_dir / "frostfile-auto-fail.db"
         with pytest.raises(Exception):
             db.backup_to(conn, dest)
         assert not dest.exists()
-        assert not (settings.backup_dir / "identilock-auto-fail.db.tmp").exists()
+        assert not (settings.backup_dir / "frostfile-auto-fail.db.tmp").exists()
     finally:
         conn.close()
 
 
 def _fail_backup(monkeypatch):
-    from identilock import db
+    from frostfile import db
 
     def boom(conn, destination):
         raise sqlite3.OperationalError("disk full")
 
     # Patch the name each caller actually looks up.
-    monkeypatch.setattr("identilock.routes.auth.db.backup_to", boom)
-    monkeypatch.setattr("identilock.routes.settings_routes.db.backup_to", boom)
+    monkeypatch.setattr("frostfile.routes.auth.db.backup_to", boom)
+    monkeypatch.setattr("frostfile.routes.settings_routes.db.backup_to", boom)
 
 
 def test_auto_backup_failure_does_not_block_unlock(unlocked, settings, monkeypatch):

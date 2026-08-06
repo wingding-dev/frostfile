@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from conftest import add_person, csrf_token
 
-from identilock.services.reportdiff import compare, extract_entities, normalize
+from frostfile.services.reportdiff import compare, extract_entities, normalize
 
 REPORT_V1 = """
 CREDIT REPORT

@@ -7,7 +7,7 @@ import hashlib
 import httpx
 import pytest
 
-from identilock.services import hibp
+from frostfile.services import hibp
 
 
 class FakeResponse:

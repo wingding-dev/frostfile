@@ -4,7 +4,7 @@ import re
 
 from conftest import add_person
 
-from identilock import sources
+from frostfile import sources
 
 
 def _agency_id(client, name: str) -> int:
@@ -73,8 +73,8 @@ def test_no_packet_for_agency_with_unconfirmed_address(unlocked):
 
 def test_every_letter_capable_agency_has_a_verified_address(unlocked):
     """Guards against a future edit enabling a packet without a source."""
-    from identilock import db
-    from identilock.repo import list_agencies
+    from frostfile import db
+    from frostfile.repo import list_agencies
 
     conn = db.connect(unlocked.app.state.settings.db_path)
     try:
@@ -112,7 +112,7 @@ def test_sources_page_lists_everything(unlocked):
 
 def test_every_citation_key_resolves():
     """A typo in seeds.py would otherwise silently drop a citation."""
-    from identilock.seeds import AGENCIES
+    from frostfile.seeds import AGENCIES
 
     for agency in AGENCIES:
         for field_name, keys in agency.get("citations", {}).items():
@@ -124,7 +124,7 @@ def test_every_citation_key_resolves():
 
 def test_verified_addresses_all_carry_a_primary_source():
     """address_verified must mean a page was actually read, not merely linked."""
-    from identilock.seeds import AGENCIES
+    from frostfile.seeds import AGENCIES
 
     for agency in AGENCIES:
         if not agency.get("address_verified"):
