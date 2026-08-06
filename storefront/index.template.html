@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FrostFile — Freeze your family's credit. Keep it on your own computer.</title>
+<meta name="description" content="A free program that helps you freeze your family's credit across every bureau, track every freeze and PIN, and print the mail-in forms for your kids — entirely on your computer. Nothing is sent anywhere.">
+<link rel="icon" href="__MARK__">
+<style>
+  :root {
+    --ground: #090f15;
+    --ground-2: #0c141c;
+    --panel: rgba(255,255,255,.035);
+    --panel-2: rgba(255,255,255,.05);
+    --frost: rgba(137,196,232,.16);   /* hairline borders */
+    --frost-2: rgba(137,196,232,.28);
+    --ice: #7fb8d8;
+    --cyan: #a9e8ff;
+    --navy: #16324f;
+    --text: #e9f2f8;
+    --text-dim: #93a7b6;
+    --text-faint: #64798a;
+    --ok: #74c58e;
+    --maxw: 1140px;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--ground); color: var(--text);
+    font-family: var(--sans); font-size: 17px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+  h1, h2, h3 { line-height: 1.05; letter-spacing: -.025em; margin: 0; text-wrap: balance; font-weight: 800; }
+  .eyebrow {
+    font-size: .74rem; font-weight: 700; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--ice); display: inline-flex; align-items: center; gap: .55em;
+  }
+  .eyebrow::before { content: ""; width: 26px; height: 1px; background: var(--frost-2); }
+
+  /* ---- ambient cryo glow layers ---- */
+  .aurora { position: fixed; inset: 0; z-index: -2; pointer-events: none;
+    background:
+      radial-gradient(60% 45% at 50% 0%, rgba(127,184,216,.16), transparent 70%),
+      radial-gradient(40% 40% at 85% 20%, rgba(80,150,200,.10), transparent 70%),
+      radial-gradient(50% 50% at 12% 60%, rgba(60,120,170,.10), transparent 70%),
+      var(--ground);
+  }
+  .grain { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .5;
+    background-image: url("__HERO__"); background-size: cover; background-position: center;
+    mix-blend-mode: screen; opacity: .18;
+  }
+
+  /* ---- nav ---- */
+  header.nav { position: sticky; top: 0; z-index: 50;
+    backdrop-filter: blur(14px); background: rgba(9,15,21,.55);
+    border-bottom: 1px solid var(--frost); }
+  .nav-in { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 11px; font-weight: 800; letter-spacing: -.02em; font-size: 1.12rem; }
+  .brand img { width: 30px; height: 30px; filter: drop-shadow(0 0 10px rgba(169,232,255,.35)); }
+  .nav-right { display: flex; align-items: center; gap: 20px; }
+  .nav-note { color: var(--text-dim); font-size: .86rem; }
+  @media (max-width: 620px){ .nav-note { display: none; } }
+
+  /* ---- buttons ---- */
+  .btn { display: inline-flex; align-items: center; gap: .6em; font: inherit; font-weight: 700;
+    font-size: .96rem; padding: .72em 1.25em; border-radius: 11px; cursor: pointer;
+    border: 1px solid transparent; transition: transform .15s ease, box-shadow .25s ease, background .2s; }
+  .btn svg { width: 18px; height: 18px; }
+  .btn-primary { color: #06121b; background: linear-gradient(180deg, #bfeeff, var(--ice));
+    box-shadow: 0 0 0 1px rgba(169,232,255,.4), 0 10px 34px -10px rgba(127,184,216,.7); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 0 1px rgba(169,232,255,.6), 0 16px 44px -10px rgba(127,184,216,.9); }
+  .btn-ghost { color: var(--text); background: var(--panel); border-color: var(--frost-2); }
+  .btn-ghost:hover { background: var(--panel-2); border-color: var(--ice); }
+
+  /* ---- hero ---- */
+  .hero { position: relative; padding: 86px 0 70px; }
+  .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 40px; align-items: center; }
+  @media (max-width: 900px){ .hero-grid { grid-template-columns: 1fr; text-align: center; } .hero { padding-top: 56px; } }
+  .hero h1 { font-size: clamp(2.5rem, 6vw, 4.15rem); margin: 20px 0 0; }
+  .hero h1 .frostword { color: transparent; background: linear-gradient(180deg,#eafaff, var(--ice)); -webkit-background-clip: text; background-clip: text;
+    text-shadow: 0 0 42px rgba(169,232,255,.35); }
+  .hero p.lede { color: var(--text-dim); font-size: clamp(1.05rem,1.6vw,1.24rem); margin: 22px 0 0; max-width: 33ch; }
+  @media (max-width: 900px){ .hero p.lede { margin-inline: auto; } }
+  .hero-cta { display: flex; gap: 14px; margin-top: 34px; flex-wrap: wrap; }
+  @media (max-width: 900px){ .hero-cta { justify-content: center; } }
+  .microtrust { margin-top: 20px; color: var(--text-faint); font-size: .86rem; display: flex; gap: 16px; flex-wrap: wrap; }
+  @media (max-width: 900px){ .microtrust { justify-content: center; } }
+  .microtrust b { color: var(--text-dim); font-weight: 600; }
+
+  /* ---- cryo pod (hero visual) ---- */
+  .pod { position: relative; aspect-ratio: 1; max-width: 460px; margin: 0 auto; display: grid; place-items: center; }
+  .pod::before { content: ""; position: absolute; inset: 6%; border-radius: 50%;
+    background: radial-gradient(circle at 50% 42%, rgba(169,232,255,.22), rgba(22,50,79,.15) 55%, transparent 72%);
+    filter: blur(6px); }
+  .pod .ring { position: absolute; border-radius: 50%; border: 1px solid var(--frost); }
+  .pod .ring.r1 { inset: 0; border-color: var(--frost-2); }
+  .pod .ring.r2 { inset: 9%; }
+  .pod .ring.r3 { inset: 19%; border-style: dashed; border-color: rgba(137,196,232,.14); animation: spin 46s linear infinite; }
+  .pod .glass { position: absolute; inset: 12%; border-radius: 50%;
+    background: linear-gradient(160deg, rgba(255,255,255,.06), rgba(255,255,255,.01));
+    border: 1px solid var(--frost); backdrop-filter: blur(3px);
+    box-shadow: inset 0 1px 30px rgba(169,232,255,.08); }
+  .pod img.seal { position: relative; width: 62%; filter: drop-shadow(0 0 26px rgba(169,232,255,.45)); animation: breathe 6s ease-in-out infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes breathe { 0%,100%{ transform: scale(1); filter: drop-shadow(0 0 22px rgba(169,232,255,.35)); } 50%{ transform: scale(1.025); filter: drop-shadow(0 0 34px rgba(169,232,255,.6)); } }
+
+  /* ---- cold-truth strip ---- */
+  .strip { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin: 8px 0 12px; }
+  @media (max-width: 760px){ .strip { grid-template-columns: 1fr; } }
+  .chip { border: 1px solid var(--frost); background: var(--panel); border-radius: 14px; padding: 18px 20px; backdrop-filter: blur(8px); }
+  .chip b { display: block; font-size: 1.05rem; letter-spacing: -.01em; }
+  .chip span { color: var(--text-dim); font-size: .92rem; }
+
+  /* ---- sections ---- */
+  section.band { padding: 84px 0; position: relative; }
+  .sec-head { max-width: 640px; margin-bottom: 40px; }
+  .sec-head h2 { font-size: clamp(1.9rem, 3.6vw, 2.7rem); margin-top: 14px; }
+  .sec-head p { color: var(--text-dim); margin: 14px 0 0; font-size: 1.08rem; }
+  .hr { height: 1px; background: linear-gradient(90deg, transparent, var(--frost-2), transparent); border: 0; margin: 0; }
+
+  /* ---- feature grid ---- */
+  .features { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+  @media (max-width: 900px){ .features { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px){ .features { grid-template-columns: 1fr; } }
+  .card { border: 1px solid var(--frost); background: var(--panel); border-radius: 16px; padding: 24px;
+    backdrop-filter: blur(8px); transition: border-color .25s, transform .2s, box-shadow .25s; }
+  .card:hover { border-color: var(--frost-2); transform: translateY(-3px); box-shadow: 0 20px 50px -24px rgba(127,184,216,.5); }
+  .icon { width: 42px; height: 42px; border-radius: 11px; display: grid; place-items: center; margin-bottom: 16px;
+    background: radial-gradient(circle at 40% 30%, rgba(169,232,255,.22), rgba(22,50,79,.4));
+    border: 1px solid var(--frost-2); box-shadow: 0 0 22px -6px rgba(169,232,255,.5); }
+  .icon svg { width: 22px; height: 22px; stroke: var(--cyan); fill: none; stroke-width: 1.7; }
+  .card h3 { font-size: 1.16rem; }
+  .card p { color: var(--text-dim); margin: 8px 0 0; font-size: .96rem; }
+
+  /* ---- refuses-to panel ---- */
+  .refuse { border: 1px solid var(--frost); border-radius: 20px; overflow: hidden;
+    background: linear-gradient(180deg, rgba(22,50,79,.4), rgba(9,15,21,.2)); }
+  .refuse-grid { display: grid; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 760px){ .refuse-grid { grid-template-columns: 1fr; } }
+  .refuse-col { padding: 34px; }
+  .refuse-col + .refuse-col { border-left: 1px solid var(--frost); }
+  @media (max-width: 760px){ .refuse-col + .refuse-col { border-left: 0; border-top: 1px solid var(--frost); } }
+  .refuse-col h3 { font-size: .82rem; text-transform: uppercase; letter-spacing: .16em; color: var(--text-faint); margin-bottom: 18px; }
+  .li { display: flex; gap: 12px; padding: 11px 0; align-items: flex-start; border-top: 1px solid rgba(137,196,232,.08); }
+  .li:first-of-type { border-top: 0; }
+  .li .m { flex: none; width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; font-size: 13px; font-weight: 800; margin-top: 1px; }
+  .m.yes { color: var(--ok); background: rgba(116,197,142,.12); }
+  .m.no { color: #e79a92; background: rgba(231,154,146,.12); }
+  .li span { font-size: .98rem; }
+  .li span small { display: block; color: var(--text-faint); font-size: .84rem; font-weight: 400; }
+
+  /* ---- steps ---- */
+  .steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; counter-reset: s; }
+  @media (max-width: 760px){ .steps { grid-template-columns: 1fr; } }
+  .step { position: relative; padding-top: 20px; border-top: 1px solid var(--frost-2); }
+  .step .n { font-family: var(--mono); font-size: .82rem; color: var(--ice); letter-spacing: .1em; }
+  .step h3 { font-size: 1.24rem; margin: 12px 0 8px; }
+  .step p { color: var(--text-dim); margin: 0; font-size: .98rem; }
+
+  /* ---- why ---- */
+  .why { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  @media (max-width: 820px){ .why { grid-template-columns: 1fr; } }
+  .why p { color: var(--text-dim); font-size: 1.06rem; }
+  .why p strong { color: var(--text); }
+  .quote { border-left: 2px solid var(--ice); padding: 6px 0 6px 22px; font-size: 1.15rem; color: var(--text);
+    font-style: italic; }
+
+  /* ---- final CTA ---- */
+  .final { text-align: center; padding: 96px 0; position: relative; }
+  .final::before { content: ""; position: absolute; inset: 0; z-index: -1;
+    background: radial-gradient(50% 90% at 50% 50%, rgba(127,184,216,.14), transparent 70%); }
+  .final h2 { font-size: clamp(2.1rem, 4.5vw, 3.2rem); }
+  .final p { color: var(--text-dim); margin: 16px auto 32px; max-width: 46ch; }
+  .final .hero-cta { justify-content: center; }
+  .req { margin-top: 22px; color: var(--text-faint); font-size: .84rem; font-family: var(--mono); }
+
+  /* ---- footer ---- */
+  footer { border-top: 1px solid var(--frost); padding: 44px 0; color: var(--text-faint); font-size: .9rem; }
+  .foot-in { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; align-items: center; }
+  .foot-in a:hover { color: var(--ice); }
+  .foot-brand { display: flex; align-items: center; gap: 10px; color: var(--text-dim); font-weight: 700; }
+  .foot-brand img { width: 22px; height: 22px; }
+
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before { animation: none !important; scroll-behavior: auto; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+  :focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+<div class="grain"></div>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top"><img src="__MARK__" alt=""> FrostFile</a>
+    <div class="nav-right">
+      <span class="nav-note">Free · Open source · Runs on your computer</span>
+      <a class="btn btn-primary" href="#download">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 19h16"/></svg>
+        Download
+      </a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">Family Credit Freeze Kit</span>
+        <h1>Freeze your family's identity.<br>Keep it <span class="frostword">on ice</span> — and on your own computer.</h1>
+        <p class="lede">After a breach, lock it all down — without handing your family's Social Security numbers to one more company. FrostFile runs on your machine and sends nothing anywhere.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="/download/FrostFile-Setup.exe" id="dl-win">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5 10.5 4.4v7.1H3zM10.5 12.5v7.1L3 18.5v-6zM11.7 4.2 21 3v8.5h-9.3zM21 12.5V21l-9.3-1.3v-7.2z"/></svg>
+            Download for Windows
+          </a>
+          <a class="btn btn-ghost" href="/download/FrostFile.dmg" id="dl-mac">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 12.6c0-2 1.6-2.9 1.7-3-1-1.4-2.4-1.6-2.9-1.6-1.2-.1-2.4.7-3 .7s-1.6-.7-2.6-.7c-1.3 0-2.6.8-3.3 2-1.4 2.4-.4 6 1 8 .7.9 1.4 2 2.5 1.9 1-.04 1.4-.6 2.6-.6s1.5.6 2.6.6 1.7-.9 2.4-1.8c.7-1 1-2 1-2-.02-.02-2-.77-2-3.1zM14.4 6.3c.5-.7.9-1.6.8-2.5-.8.03-1.7.5-2.3 1.2-.5.6-1 1.5-.8 2.4.9.07 1.7-.4 2.3-1.1z"/></svg>
+            Download for Mac
+          </a>
+        </div>
+        <div class="microtrust">
+          <span><b>Free forever.</b> No account.</span>
+          <span><b>Nothing</b> leaves your computer.</span>
+          <span><b>Open source.</b> Anyone can check it.</span>
+        </div>
+      </div>
+      <div class="pod" aria-hidden="true">
+        <span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span>
+        <span class="glass"></span>
+        <img class="seal" src="__SEAL__" alt="">
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap"><div class="strip reveal">
+    <div class="chip"><b>It's a program, not a website</b><span>There's no cloud and no company on the other end. Your data is a file on your machine.</span></div>
+    <div class="chip"><b>Everything is encrypted</b><span>Names, SSNs, and freeze PINs are scrambled with your passphrase the moment you type them.</span></div>
+    <div class="chip"><b>Built after a breach</b><span>Made by one parent for their own family, then given away. No catch to find.</span></div>
+  </div></div>
+
+  <section class="band">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">What it does</span>
+        <h2>Everything a paid service tracks — minus the part that spies on you.</h2>
+        <p>The busywork of locking down an identity is real: a dozen bureaus you've never heard of, mail-only forms for kids, PINs to keep straight. FrostFile carries all of it.</p>
+      </div>
+      <div class="features reveal">
+        <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div><h3>The freeze grid</h3><p>Every family member against ~20 bureaus and controls — status, dates, confirmation numbers, and freeze PINs, all in one place.</p></div>
+        <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><path d="M6 9V4h12v5M6 18H4v-6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6h-2M8 14h8v6H8z"/></svg></div><h3>Mailing packets</h3><p>Freezing a child's credit is free but mail-only. FrostFile prints the cover letter and the exact document checklist — you add copies and a stamp.</p></div>
+        <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg></div><h3>Reminders that recur</h3><p>IP PIN retrieval, earnings-record reviews, quarterly report pulls, freeze re-checks — it nudges you every year and exports to your calendar.</p></div>
+        <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2M9 13l2 2 4-4"/></svg></div><h3>Report comparison</h3><p>Save each credit report you pull; FrostFile shows what's new since last time in plain language, so a strange account can't hide.</p></div>
+        <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div><h3>Breach checks</h3><p>Ask whether an email or password has turned up in a known leak — the one thing that touches the internet, and only when you press the button.</p></div>
+        <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="15.5" r="1.4"/></svg></div><h3>A vault, not a database</h3><p>One encrypted file, opened only by your passphrase. Lose the laptop and a thief gets scrambled noise. A recovery code is your way back in.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" style="padding-top:0">
+    <div class="wrap">
+      <div class="refuse reveal">
+        <div class="refuse-grid">
+          <div class="refuse-col">
+            <h3>What it does for you</h3>
+            <div class="li"><span class="m yes">✓</span><span>Tracks every freeze, PIN, and confirmation number</span></div>
+            <div class="li"><span class="m yes">✓</span><span>Prints the mail-in packets for children's freezes</span></div>
+            <div class="li"><span class="m yes">✓</span><span>Reminds you when yearly tasks come due</span></div>
+            <div class="li"><span class="m yes">✓</span><span>Every fact it prints links to an official source</span></div>
+          </div>
+          <div class="refuse-col">
+            <h3>What it refuses to do</h3>
+            <div class="li"><span class="m no">✕</span><span>Send your data anywhere<small>No cloud, no account, no tracking, no telemetry.</small></span></div>
+            <div class="li"><span class="m no">✕</span><span>Watch your credit for you<small>No consumer tool can — that needs a bureau contract. A freeze prevents; monitoring only warns.</small></span></div>
+            <div class="li"><span class="m no">✕</span><span>Act on its own<small>You place every freeze yourself. FrostFile just keeps the proof straight.</small></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="eyebrow">How it works</span><h2>Three steps, at your kitchen table.</h2></div>
+      <div class="steps reveal">
+        <div class="step"><div class="n">STEP 01</div><h3>Add your family</h3><p>Names and the basics for each person. Encrypted the moment you type them — the full Social Security number is optional and off by default.</p></div>
+        <div class="step"><div class="n">STEP 02</div><h3>Work the list</h3><p>FrostFile shows every place that holds a file on you, why it matters, how to lock it, and marks off what's done. High-impact items first.</p></div>
+        <div class="step"><div class="n">STEP 03</div><h3>Mail the kids' packets</h3><p>It prints the cover letters and checklists for the children's freezes. You enclose the copies, mail them, and record the date back in the app.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="hr">
+
+  <section class="band">
+    <div class="wrap why reveal">
+      <div>
+        <span class="eyebrow">Why it's free</span>
+        <h2 style="font-size:clamp(1.8rem,3.4vw,2.5rem); margin-top:14px;">The valuable half was always free. Nobody just told you.</h2>
+      </div>
+      <div>
+        <p>Paid identity services bundle two things. One is real-time alerts from your credit file — and there's no consumer version of that at any price, because federal law restricts who can pull a report. <strong>Nothing you could buy or build replicates it.</strong></p>
+        <p>The other half is simply knowing which fifteen places will let you lock your file, and keeping track of what you've done. That part is free, entirely yours, and nobody does it well.</p>
+        <p class="quote">FrostFile does that half — and asks nothing back. No account, no data to hand over, no subscription to cancel.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="final" id="download">
+    <div class="wrap reveal">
+      <span class="eyebrow" style="justify-content:center">Download</span>
+      <h2 style="margin-top:16px">Lock it down this weekend.</h2>
+      <p>Free, open source, and yours to keep. Runs in its own window — no install wizard, no account, nothing sent anywhere.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="/download/FrostFile-Setup.exe">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5 10.5 4.4v7.1H3zM10.5 12.5v7.1L3 18.5v-6zM11.7 4.2 21 3v8.5h-9.3zM21 12.5V21l-9.3-1.3v-7.2z"/></svg>
+          Download for Windows
+        </a>
+        <a class="btn btn-ghost" href="/download/FrostFile.dmg">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 12.6c0-2 1.6-2.9 1.7-3-1-1.4-2.4-1.6-2.9-1.6-1.2-.1-2.4.7-3 .7s-1.6-.7-2.6-.7c-1.3 0-2.6.8-3.3 2-1.4 2.4-.4 6 1 8 .7.9 1.4 2 2.5 1.9 1-.04 1.4-.6 2.6-.6s1.5.6 2.6.6 1.7-.9 2.4-1.8c.7-1 1-2 1-2-.02-.02-2-.77-2-3.1zM14.4 6.3c.5-.7.9-1.6.8-2.5-.8.03-1.7.5-2.3 1.2-.5.6-1 1.5-.8 2.4.9.07 1.7-.4 2.3-1.1z"/></svg>
+          Download for Mac
+        </a>
+      </div>
+      <div class="req">Windows 10+ · macOS 11+ · ~40 MB · opens in its own window</div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot-in">
+    <span class="foot-brand"><img src="__MARK__" alt=""> FrostFile</span>
+    <span>Family Credit Freeze Kit · Made after a breach, for families.</span>
+    <span>Open source (AGPL) · <a href="https://frostfile.org">frostfile.org</a></span>
+  </div>
+</footer>
+
+<script>
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+  }, { threshold: .12 });
+  document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
+
+  // Point the primary hero button at the visitor's OS.
+  (function () {
+    var mac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+    if (mac) {
+      var w = document.getElementById("dl-win"), m = document.getElementById("dl-mac");
+      if (w && m) { w.parentNode.insertBefore(m, w); m.className = "btn btn-primary"; w.className = "btn btn-ghost"; }
+    }
+  })();
+</script>
+</body>
+</html>
