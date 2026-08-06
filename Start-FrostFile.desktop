@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=FrostFile
+Comment=Family Credit Freeze Kit — runs entirely on this computer
+Exec=/home/bleep/Identilock/.venv/bin/python -m identilock
+Path=/home/bleep/Identilock
+Icon=/home/bleep/Identilock/brand/frostfile-mark.svg
+Terminal=false
+Categories=Utility;Security;
