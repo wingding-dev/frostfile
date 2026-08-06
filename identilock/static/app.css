@@ -1,14 +1,15 @@
 /* Identilock — deliberately plain. No build step, no framework, no CDN. */
 
 :root {
-  --bg: #f7f7f5;
+  /* Palette tuned to the FrostFile seal: navy + ice blue, cool neutrals. */
+  --bg: #f5f7f9;
   --surface: #ffffff;
-  --surface-2: #f1f1ee;
-  --border: #dcdcd6;
-  --text: #1c1c1a;
-  --text-dim: #61615c;
-  --accent: #1f5f4f;
-  --accent-soft: #e3efe9;
+  --surface-2: #eef1f4;
+  --border: #d8dee4;
+  --text: #17242e;
+  --text-dim: #5c6b76;
+  --accent: #1d5b82;         /* frost navy-blue — links, buttons, active nav */
+  --accent-soft: #e6f0f6;    /* pale ice — soft fills, active-nav background */
   --warn: #8a5a00;
   --warn-soft: #fdf1dc;
   --danger: #97231d;
@@ -21,14 +22,14 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #16171a;
-    --surface: #1e2024;
-    --surface-2: #25282d;
-    --border: #34383e;
-    --text: #e6e6e3;
-    --text-dim: #9a9a95;
-    --accent: #67c0a4;
-    --accent-soft: #1c2f2a;
+    --bg: #12171b;
+    --surface: #1a2027;
+    --surface-2: #222a32;
+    --border: #333d47;
+    --text: #e6ecf0;
+    --text-dim: #98a4ad;
+    --accent: #7fb8d8;         /* ice blue reads brightest on dark */
+    --accent-soft: #183041;    /* deep navy tint */
     --warn: #e0ac5a;
     --warn-soft: #33291a;
     --danger: #ef8981;
