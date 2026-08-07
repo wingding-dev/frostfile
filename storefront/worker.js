@@ -53,11 +53,13 @@ export default {
         await env.COUNTS.put("downloads", String(downloads));
       } catch (e) { /* counter paused */ }
 
+      // no-store: when a release is re-cut, a browser that cached the old
+      // bytes would silently serve a stale build — worse than the bandwidth.
       return new Response(object.body, {
         headers: {
           "Content-Type": "application/octet-stream",
           "Content-Disposition": `attachment; filename="${key}"`,
-          "Cache-Control": "public, max-age=3600",
+          "Cache-Control": "no-store",
         },
       });
     }
