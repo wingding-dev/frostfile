@@ -64,6 +64,27 @@ Actions builds both for free (step 5b).
 5. Test: `https://frostfile.org/api/count` should return
    `{"visits":0,"downloads":0}`, and the storefront's odometer starts moving.
 
+## 4½. Update emails: updates@frostfile.org (~5 min, free)
+
+The site, the drive readme, and the app's Settings page all invite people to
+email `updates@frostfile.org` to hear about new versions. Wire that address
+up with Cloudflare Email Routing (receiving/forwarding only — free,
+unlimited):
+
+1. Cloudflare → frostfile.org zone → **Email → Email Routing → Get started**.
+2. Add custom address `updates@frostfile.org` → forward to your Gmail →
+   click the verification link Cloudflare emails you.
+3. Cloudflare adds the MX/SPF DNS records itself — accept them.
+4. In Gmail, make a label/filter for mail to `updates@frostfile.org` — that
+   label IS the subscriber list.
+
+Sending updates stays manual and personal, which is the point: when a
+version ships, write one email from your own account and **BCC** the list
+(BCC, so recipients never see each other's addresses). Honor "stop" replies
+by deleting that person from the label. At coworker scale this beats any
+mailing-list service — no third party ever holds their addresses, which is
+exactly the promise the rest of FrostFile makes.
+
 ## 5. Build the executables
 
 ### 5a. On your own machines

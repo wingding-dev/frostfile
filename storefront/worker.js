@@ -19,17 +19,26 @@ export default {
     const url = new URL(request.url);
 
     // ---- hit counter API (the page calls this once per visit) ----
+    // The free KV tier caps writes at 1,000/day. The counter is decoration:
+    // if a write ever fails, the numbers pause — nothing else may break.
     if (url.pathname === "/api/hit" && request.method === "POST") {
-      const visits = (parseInt(await env.COUNTS.get("visits")) || 0) + 1;
-      await env.COUNTS.put("visits", String(visits));
-      const downloads = parseInt(await env.COUNTS.get("downloads")) || 0;
+      let visits = 0, downloads = 0;
+      try {
+        visits = (parseInt(await env.COUNTS.get("visits")) || 0) + 1;
+        await env.COUNTS.put("visits", String(visits));
+        downloads = parseInt(await env.COUNTS.get("downloads")) || 0;
+      } catch (e) { /* counter paused; page hides it on bad data */ }
       return json({ visits, downloads });
     }
     if (url.pathname === "/api/count") {
-      return json({
-        visits: parseInt(await env.COUNTS.get("visits")) || 0,
-        downloads: parseInt(await env.COUNTS.get("downloads")) || 0,
-      });
+      try {
+        return json({
+          visits: parseInt(await env.COUNTS.get("visits")) || 0,
+          downloads: parseInt(await env.COUNTS.get("downloads")) || 0,
+        });
+      } catch (e) {
+        return json({ visits: 0, downloads: 0 });
+      }
     }
 
     // ---- downloads: serve from R2 and count ----
@@ -38,8 +47,11 @@ export default {
       const object = await env.BUCKET.get(key);
       if (object === null) return new Response("Not found.", { status: 404 });
 
-      const downloads = (parseInt(await env.COUNTS.get("downloads")) || 0) + 1;
-      await env.COUNTS.put("downloads", String(downloads));
+      // A download must NEVER fail because the odometer couldn't tick.
+      try {
+        const downloads = (parseInt(await env.COUNTS.get("downloads")) || 0) + 1;
+        await env.COUNTS.put("downloads", String(downloads));
+      } catch (e) { /* counter paused */ }
 
       return new Response(object.body, {
         headers: {

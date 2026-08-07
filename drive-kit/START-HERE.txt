@@ -47,4 +47,12 @@ file is on this drive so the technically-minded can verify the copy is
 identical. Please don't install this on a work computer — your family's
 Social Security numbers have no business on a machine your employer owns.
 
+UPDATES
+-------
+FrostFile never checks the internet — not even for its own updates. To hear
+about new versions, either look at frostfile.org once in a while (the app
+sets a yearly reminder for you), or email updates@frostfile.org with
+"add me" and you'll get an email when one comes out. A couple of emails a
+year, from a person; reply "stop" anytime.
+
 Questions? Ask the person who gave you the drive, or visit frostfile.org.
