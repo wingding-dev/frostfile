@@ -395,6 +395,42 @@
     </div>
   </section>
 
+  <section class="band" style="padding-top:0">
+    <div class="wrap">
+      <div class="refuse reveal">
+        <div class="refuse-grid">
+          <div class="refuse-col">
+            <h3>Reading this at work?</h3>
+            <p style="margin:0 0 10px; font-size:1.05rem; font-weight:700; letter-spacing:-.01em;">Perfect. Do this at home.</p>
+            <p style="margin:0; color:var(--text-dim); font-size:.96rem;">
+              Work computers usually block new software — that admin-password
+              prompt isn't going to let FrostFile through. And honestly, that's
+              the right call here anyway: your family's Social Security numbers
+              have no business on a machine your employer owns and can monitor.
+              FrostFile belongs on <em>your</em> computer, at your kitchen table.
+            </p>
+            <p style="margin:12px 0 0; color:var(--text-faint); font-size:.88rem;">
+              The whole address is just <strong style="color:var(--cyan)">frostfile.org</strong> —
+              easy to remember until you're home.
+            </p>
+          </div>
+          <div class="refuse-col" style="text-align:center;">
+            <h3>Take it home with you</h3>
+            <img src="__QR__" alt="QR code for frostfile.org" style="width:132px; height:132px; border-radius:10px; margin-bottom:6px;">
+            <p style="margin:0 0 14px; color:var(--text-faint); font-size:.82rem;">
+              Scan with your phone — this site works on phones, and you can
+              share it to yourself from there.
+            </p>
+            <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+              <a class="btn btn-ghost" href="mailto:?subject=FrostFile%20—%20set%20this%20up%20at%20home&body=Free%20tool%20to%20freeze%20the%20whole%20family%27s%20credit%2C%20runs%20entirely%20on%20your%20own%20computer%3A%0A%0Ahttps%3A%2F%2Ffrostfile.org%0A%0ADeadbolts%20beat%20doorbells.">&#9993;&#65039; Email myself the link</a>
+              <button class="btn btn-ghost" id="copylink" type="button">&#128203; Copy the link</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="final" id="download">
     <div class="wrap reveal">
       <span class="eyebrow" style="justify-content:center">Download</span>
@@ -458,6 +494,17 @@
       document.getElementById("hc-downloads").textContent = pad(d.downloads || 0);
       document.getElementById("hitbox").hidden = false;
     }).catch(function () {});
+
+  // "Copy the link" for taking FrostFile home from a work machine.
+  var copyBtn = document.getElementById("copylink");
+  if (copyBtn) copyBtn.addEventListener("click", function () {
+    navigator.clipboard.writeText("https://frostfile.org").then(function () {
+      copyBtn.textContent = "✓ Copied — paste it to yourself";
+      setTimeout(function () { copyBtn.innerHTML = "&#128203; Copy the link"; }, 2600);
+    }).catch(function () {
+      copyBtn.textContent = "frostfile.org";
+    });
+  });
 
   // Point the primary hero button at the visitor's OS.
   (function () {

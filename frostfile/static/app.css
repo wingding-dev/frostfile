@@ -70,6 +70,18 @@ body {
   font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
+/* A whisper of frost fog framing every page — edges only, clean center, so
+   content stays perfectly readable. Fixed layer under everything. */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: url("/static/frost-light.jpg") center / cover no-repeat;
+  opacity: .75;
+}
+@media (prefers-color-scheme: dark) {
+  body::before { background-image: url("/static/frost-dark.jpg"); opacity: .45; }
+}
+@media print { body::before { display: none; } }
+
 a { color: var(--accent); }
 a:hover { text-decoration: underline; }
 
