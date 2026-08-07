@@ -138,3 +138,13 @@ def test_unlock_opens_normalized_vault():
     norm_key = derive_key(pw, params, normalize=True)   # current scheme
     v = Vault.unlock(pw, params, make_verifier(norm_key))
     assert v.key == norm_key
+
+
+def test_on_disk_constants_are_frozen():
+    """These are baked into every vault at creation and compared on every
+    unlock. If a rename or refactor changes them, all existing vaults stop
+    opening (this is exactly what broke Identilock->FrostFile). Never change."""
+    from frostfile.crypto import MAGIC, _VERIFIER_PLAINTEXT
+
+    assert MAGIC == b"IL1"
+    assert _VERIFIER_PLAINTEXT == b"identilock-vault-v1"
