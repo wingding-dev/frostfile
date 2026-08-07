@@ -1,0 +1,20 @@
+# Cloudflare Worker config for the frostfile.org downloads + hit counter.
+# Deploy from the storefront/ directory:  npx wrangler deploy
+# (Routes activate once the frostfile.org zone is active on the account.)
+
+name = "frostfile-api"
+main = "worker.js"
+compatibility_date = "2026-08-01"
+
+kv_namespaces = [
+  { binding = "COUNTS", id = "50fd549c07cd478db33b71bd82b4eb11" },
+]
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "frostfile-downloads"
+
+routes = [
+  { pattern = "frostfile.org/download/*", zone_name = "frostfile.org" },
+  { pattern = "frostfile.org/api/*", zone_name = "frostfile.org" },
+]
