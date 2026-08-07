@@ -67,11 +67,14 @@ class KdfParams:
         return cls(salt=os.urandom(SALT_BYTES))
 
 
-def derive_key(passphrase: str, params: KdfParams) -> bytes:
+def derive_key(passphrase: str, params: KdfParams, normalize: bool = True) -> bytes:
     # Normalize to NFC so an accented passphrase typed on macOS (NFD) and on
     # Windows (NFC) derives the same key — the app encourages moving the vault
     # between machines, and a normalization mismatch would be a silent lockout.
-    passphrase = unicodedata.normalize("NFC", passphrase)
+    # `normalize=False` reproduces the pre-normalization derivation, used as a
+    # fallback so vaults created before this change still open (see Vault.unlock).
+    if normalize:
+        passphrase = unicodedata.normalize("NFC", passphrase)
     return hash_secret_raw(
         secret=passphrase.encode("utf-8"),
         salt=params.salt,
@@ -130,10 +133,15 @@ class Vault:
 
     @classmethod
     def unlock(cls, passphrase: str, params: KdfParams, verifier: bytes) -> "Vault":
-        key = derive_key(passphrase, params)
-        if not check_verifier(key, verifier):
-            raise WrongPassphrase("passphrase did not open the vault")
-        return cls(key)
+        # Try the current (NFC-normalized) derivation first, then fall back to the
+        # raw, un-normalized derivation so a vault created before normalization —
+        # whose fields were sealed under the raw passphrase bytes — still opens.
+        # For an ASCII passphrase the two are identical, so there is no cost.
+        for normalize in (True, False):
+            key = derive_key(passphrase, params, normalize=normalize)
+            if check_verifier(key, verifier):
+                return cls(key)
+        raise WrongPassphrase("passphrase did not open the vault")
 
     @property
     def key(self) -> bytes:

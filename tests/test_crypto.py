@@ -114,3 +114,27 @@ def test_change_passphrase_rewraps_every_field(tmp_path):
     with pytest.raises(WrongPassphrase):
         db.unlock(conn, "old passphrase here")
     conn.close()
+
+
+def test_unlock_opens_pre_normalization_vault():
+    """A vault whose fields were sealed before NFC normalization existed (raw
+    passphrase bytes, e.g. a non-ASCII passphrase) must still open."""
+    from frostfile.crypto import KdfParams, Vault, derive_key, make_verifier
+
+    params = KdfParams.generate()
+    pw = "café-freeze-winter"  # contains é (non-ASCII)
+    raw_key = derive_key(pw, params, normalize=False)   # old scheme
+    verifier = make_verifier(raw_key)
+
+    v = Vault.unlock(pw, params, verifier)  # current code, with fallback
+    assert v.key == raw_key
+
+
+def test_unlock_opens_normalized_vault():
+    from frostfile.crypto import KdfParams, Vault, derive_key, make_verifier
+
+    params = KdfParams.generate()
+    pw = "café-freeze-winter"
+    norm_key = derive_key(pw, params, normalize=True)   # current scheme
+    v = Vault.unlock(pw, params, make_verifier(norm_key))
+    assert v.key == norm_key
