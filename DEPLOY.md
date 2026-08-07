@@ -64,26 +64,26 @@ Actions builds both for free (step 5b).
 5. Test: `https://frostfile.org/api/count` should return
    `{"visits":0,"downloads":0}`, and the storefront's odometer starts moving.
 
-## 4½. Update emails: updates@frostfile.org (~5 min, free)
+## 4½. Update emails: updates@frostfile.org
 
-The site, the drive readme, and the app's Settings page all invite people to
-email `updates@frostfile.org` to hear about new versions. Wire that address
-up with Cloudflare Email Routing (receiving/forwarding only — free,
-unlimited):
+DONE 2026-08-06: real frostfile.org mailboxes exist (2 inboxes + 10
+aliases), so no Cloudflare Email Routing is needed — point the
+`updates@` alias/inbox wherever you read mail. The site, the drive readme,
+and the app's Settings page all invite people to email `updates@` to hear
+about new versions; a folder/label on that inbox IS the subscriber list.
 
-1. Cloudflare → frostfile.org zone → **Email → Email Routing → Get started**.
-2. Add custom address `updates@frostfile.org` → forward to your Gmail →
-   click the verification link Cloudflare emails you.
-3. Cloudflare adds the MX/SPF DNS records itself — accept them.
-4. In Gmail, make a label/filter for mail to `updates@frostfile.org` — that
-   label IS the subscriber list.
+Two checks since the domain's DNS is moving to Cloudflare tonight:
+- **Copy the mail DNS records over.** When a zone joins Cloudflare it
+  imports existing DNS, but verify the MX records (and the mail provider's
+  SPF/DKIM TXT records) survived — otherwise mail to updates@ bounces.
+  Keep MX records set to "DNS only" (grey cloud), never proxied.
+- **Send a test** from updates@ to a Gmail address and confirm it lands in
+  the inbox, not spam, before drives go out.
 
-Sending updates stays manual and personal, which is the point: when a
-version ships, write one email from your own account and **BCC** the list
-(BCC, so recipients never see each other's addresses). Honor "stop" replies
-by deleting that person from the label. At coworker scale this beats any
-mailing-list service — no third party ever holds their addresses, which is
-exactly the promise the rest of FrostFile makes.
+Sending updates stays manual and personal: when a version ships, write one
+email from updates@frostfile.org and **BCC** the list (BCC, so recipients
+never see each other's addresses). Honor "stop" replies by removing that
+person. No third party holds the list — the same promise the app makes.
 
 ## 5. Build the executables
 
