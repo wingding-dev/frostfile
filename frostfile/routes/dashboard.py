@@ -201,3 +201,8 @@ def sources_check(
 @router.get("/help")
 def help_page(request: Request, vault: Vault = Depends(get_vault)):
     return render(request, "help.html", {"active": "help"})
+
+
+@router.get("/learn")
+def learn_page(request: Request, vault: Vault = Depends(get_vault)):
+    return render(request, "learn.html", {"active": "learn"})

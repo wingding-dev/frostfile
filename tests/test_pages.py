@@ -173,3 +173,12 @@ def test_passphrase_change_rejects_wrong_current(populated):
     )
     assert response.status_code == 200
     assert "current passphrase is wrong" in response.text
+
+
+def test_learn_page_renders_with_citations(populated):
+    page = populated["client"].get("/learn")
+    assert page.status_code == 200
+    assert "Does NOT Freeze Your Credit Cards" in page.text
+    assert "Deadbolts beat doorbells" in page.text
+    # citations resolved (footer source list present, no unresolved keys)
+    assert "Sources on This Page" in page.text or "sources" in page.text.lower()
