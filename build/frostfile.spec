@@ -43,25 +43,36 @@ a = Analysis(
 
 pyz = PYZ(a.pure)
 
+# One-DIR, not one-file: a one-file exe self-extracts to temp at launch —
+# the single biggest antivirus false-positive trigger for unsigned software.
+# The folder ships zipped; users unzip once and double-click FrostFile.exe.
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.datas,
+    exclude_binaries=True,
     name="FrostFile",
     icon=str(repo / "frostfile" / "static" / "frostfile-icon.ico")
     if (repo / "frostfile" / "static" / "frostfile-icon.ico").exists()
     else None,
+    version=str(repo / "build" / "version_info.txt"),
     console=False,  # no terminal window; the app opens its own window/browser
     upx=False,  # UPX-packed exes trip antivirus heuristics — not worth the MB
 )
 
-# On a Mac, wrap the binary in a double-clickable .app bundle.
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.datas,
+    name="FrostFile",
+    upx=False,
+)
+
+# On a Mac, wrap it into a double-clickable .app bundle.
 import sys
 
 if sys.platform == "darwin":
     app = BUNDLE(
-        exe,
+        coll,
         name="FrostFile.app",
         icon=None,
         bundle_identifier="org.frostfile.app",

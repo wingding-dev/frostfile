@@ -12,14 +12,29 @@ No account, no subscription, no catch.
 
 WINDOWS
 -------
-1. Copy FrostFile.exe from this drive onto your computer (the Desktop is
-   fine — anywhere you'll find it again).
-2. Double-click it.
-3. Windows will likely show a blue box: "Windows protected your PC."
-   That warning appears for ANY new program that hasn't paid Microsoft for
-   a publisher certificate — it is not a virus detection. Click
-   "More info", then "Run anyway."
-4. FrostFile opens and walks you through the rest.
+1. Copy FrostFile-windows.zip from this drive onto your computer (the
+   Desktop is fine — anywhere you'll find it again).
+2. Right-click the zip -> "Extract All..." -> Extract. You get a folder
+   called FrostFile.
+3. Open that folder and double-click FrostFile.exe (the snowflake icon).
+4. Windows may show a blue box: "Windows protected your PC." That warning
+   appears for ANY new program that hasn't paid Microsoft for a publisher
+   certificate — it is not a virus detection. Click "More info", then
+   "Run anyway."
+5. FrostFile opens and walks you through the rest.
+
+IF YOUR ANTIVIRUS COMPLAINS
+---------------------------
+Some antivirus programs quarantine ALL new, uncertified software on sight —
+reputation, not analysis. The honest facts: FrostFile is brand new, free,
+and unsigned (certificates cost hundreds a year), so it has no reputation
+yet. What it does have: public source code (github.com/wingding-dev/
+frostfile), published fingerprints (SHA256SUMS.txt on this drive — your
+copy can be checked against them), and zero internet connections, which
+you can prove by turning off Wi-Fi and watching it work. If you're
+comfortable with that, restore the file from quarantine and choose
+"allow" / "trust". If you're not, that's okay too — ask the person who
+gave you this drive to sit with you the first time.
 
 MAC
 ---
