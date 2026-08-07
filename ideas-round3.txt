@@ -1,0 +1,19 @@
+1. website - need to add at LEAST a download counter to the website.  is there anything else worth thinking about?  
+2. website - pulsing/freeze still an option?  super cool effect, need more frames than previous iteration though, too choppy
+3. website - must be mobile friendly
+4. FAQ - please add "why is this software 40mb if its a checklist?" to the FAQ - link (or explain right there) at the front page at the download MS and OS buttons area
+5. Credit Report Diffing - *MAJOR CONCERN* how is the uploaded credit reports being diffed?  is there a ai nugget in here or how does that actually occur? 
+6. website - at the "breach checks" are, please note HIBP as superscript link
+7. website - at the "vault, not database", please emphasise the local recovery code held by themself is the ONLY way back in - no "reset my password" because FF doesen't have it!
+8. splash screen - generate new abstract background via google ai studio (GAS) - currently the background image includes the old FF lock logo, so the overlaid new logo on top is conflicting.  replace old image and overlay should be good as you have it.
+9. FF - add option to "use same address" or similar for each person.  likely that many share the same address (a family living in the same home), but also accomodate for multiple addresses stored for quick use.
+10. FF - at the PDF or Print options - is it possible to use diagrams or make a little table.  I am tech ssavy and its still a little confusing every time i read it first, so it'll be foreign to non-tech folks without some pictograms
+11. Mailing Docs - i've never heard the term overleaf before, curious what is, but also please replace to ensure audience is clear what they are sending.
+12. Teen Freeze - a major wrinkle... i see on the agency notes for equifax that for 16 and 17 year-olds, "ask equifax about a standard freeze instead" - what does that mean?  If a new branch (adult, *teen*, child) is now required for this to be affective for families, we must undertake that.  leaving a this gap would be wrong.
+13. SSN Notice - where we talk about auto-filling the forms, please note that user can simply handwrite the SSN after they print.
+14. FF - "print" button on the auto-drafted letter does not appear to do anything, though i do not have a printer set up, i would assume it would pull up the print dialog or something.
+15. FF - i'd like to add an "education" or "learn" section - help people understand how this all actually works.  i was AMAZED at how many people thought their credit cards we're going to be frozen when i told them to freeze their credit.  The same should go on the website.  Cite sources as usual.  Make graphics and diagrams as needed.  Use GAS if helpful.
+16. FF - layout of cards, please ensure the text wraps dyanimcally to fit within cards.  currently on the Freeze Grid > Innovis > "How to Do It" card - the online hyperlink text extends beyond the card it resides within.
+17. FF - "How do i find my birth cert?" "Where to make photocopies" etc. less "educational" and more actual literally where to go and what to do (photocopies - library, kinkos (still around? regional?), county office with certs makes copies for a fee usually?, where do i buy stamps?) -  I've realized the younger generation of workers has less experience with some of the paper things so sending a letter is so rare, unsure where to even get stamps as an exmaple.
+
+
