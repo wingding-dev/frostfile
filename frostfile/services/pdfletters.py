@@ -225,7 +225,8 @@ def build_packet_pdf(person, agency, guardian, today: str) -> bytes:
         _p(
             "Copies of the documents establishing my identity, the minor's "
             "identity, and my authority to act on the minor's behalf are "
-            "enclosed, as listed overleaf. Please confirm in writing once the "
+            "enclosed, as listed on the attached checklist page. Please "
+            "confirm in writing once the "
             "freeze is in place."
         ),
         Spacer(1, 30),

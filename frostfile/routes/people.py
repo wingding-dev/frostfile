@@ -92,8 +92,23 @@ def people_index(
     return render(request, "people_list.html", {"active": "people", "rows": rows})
 
 
+def _address_sources(
+    conn: sqlite3.Connection, vault: Vault, exclude_id: int | None = None
+) -> list:
+    """People whose stored address can be copied — families usually share one."""
+    return [
+        p
+        for p in list_people(conn, vault)
+        if p.address and p.id != exclude_id
+    ]
+
+
 @router.get("/people/new")
-def person_new(request: Request, vault: Vault = Depends(get_vault)):
+def person_new(
+    request: Request,
+    conn: sqlite3.Connection = Depends(get_conn),
+    vault: Vault = Depends(get_vault),
+):
     return render(
         request,
         "person_form.html",
@@ -102,6 +117,7 @@ def person_new(request: Request, vault: Vault = Depends(get_vault)):
             "person": None,
             "errors": [],
             "address_parts": split_address(None),
+            "address_sources": _address_sources(conn, vault),
         },
     )
 
@@ -161,6 +177,7 @@ def person_create(
     address_zip: str = Form(""),
     notes: str = Form(""),
     store_full_ssn: str = Form(""),
+    copy_address_from: str = Form(""),
     csrf_token: str = Form(""),
     session: Session = Depends(get_session),
     conn: sqlite3.Connection = Depends(get_conn),
@@ -172,6 +189,7 @@ def person_create(
         address_street, address_city, address_state, address_zip,
         notes, store_full_ssn,
     )
+    _apply_copied_address(conn, vault, values, copy_address_from)
     if not values["display_name"]:
         return render(
             request,
@@ -181,10 +199,26 @@ def person_create(
                 "person": None,
                 "errors": ["A name is required."],
                 "address_parts": split_address(values["address"]),
+                "address_sources": _address_sources(conn, vault),
             },
         )
     person_id = create_person(conn, vault, **values)
     return redirect(f"/people/{person_id}")
+
+
+def _apply_copied_address(
+    conn: sqlite3.Connection, vault: Vault, values: dict, copy_from: str
+) -> None:
+    """'Same address as X': copying wins over whatever is in the boxes, since
+    picking a person is the more deliberate act."""
+    if not copy_from:
+        return
+    try:
+        source = get_person(conn, vault, int(copy_from))
+    except (TypeError, ValueError):
+        return
+    if source is not None and source.address:
+        values["address"] = source.address
 
 
 @router.get("/people/{person_id}")
@@ -232,6 +266,7 @@ def person_edit(
             "person": person,
             "errors": [],
             "address_parts": split_address(person.address),
+            "address_sources": _address_sources(conn, vault, exclude_id=person.id),
         },
     )
 
@@ -254,6 +289,7 @@ def person_update(
     address_zip: str = Form(""),
     notes: str = Form(""),
     store_full_ssn: str = Form(""),
+    copy_address_from: str = Form(""),
     csrf_token: str = Form(""),
     session: Session = Depends(get_session),
     conn: sqlite3.Connection = Depends(get_conn),
@@ -269,6 +305,7 @@ def person_update(
         address_street, address_city, address_state, address_zip,
         notes, store_full_ssn,
     )
+    _apply_copied_address(conn, vault, values, copy_address_from)
     # An unchanged edit form shows the SSN masked rather than in the clear, so
     # a blank field means "leave it alone", not "erase it".
     if store_full_ssn and not values["ssn"]:
@@ -285,6 +322,7 @@ def person_update(
                 "person": existing,
                 "errors": ["A name is required."],
                 "address_parts": split_address(values["address"]),
+                "address_sources": _address_sources(conn, vault, exclude_id=person_id),
             },
         )
     update_person(conn, vault, person_id, **values)
