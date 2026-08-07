@@ -28,11 +28,14 @@
 
 {% if session %}
 <header class="topbar">
+<div class="topbar-in">
   <nav class="nav-history" aria-label="History">
     <button type="button" onclick="history.back()" title="Back to the page you were just on">&#8592;</button>
     <button type="button" onclick="history.forward()" title="Forward">&#8594;</button>
   </nav>
-  <a class="brand" href="/"><img src="/static/frostfile-icon.png" alt=""> FrostFile</a>
+  <a class="brand" href="/"><img src="/static/frostfile-icon.png" alt=""><img
+    class="wordmark only-light" src="/static/frostfile-wordmark.png" alt="FrostFile"><img
+    class="wordmark only-dark" src="/static/frostfile-wordmark-dark.png" alt="FrostFile"></a>
   <nav>
     <a href="/" class="{{ 'active' if active == 'dashboard' }}">Dashboard</a>
     <a href="/matrix" class="{{ 'active' if active == 'matrix' }}">Freezes</a>
@@ -50,6 +53,7 @@
     <a href="/settings" class="link-quiet">Settings</a>
     <button type="submit" class="btn btn-quiet" title="Locks immediately. Auto-locks after {{ lock_minutes }} minutes idle.">Lock</button>
   </form>
+</div>
 </header>
 {% endif %}
 

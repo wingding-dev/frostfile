@@ -96,14 +96,24 @@ h3 { font-size: .95rem; margin: 1.2rem 0 .4rem; }
 /* ------------------------------------------------------------------ topbar */
 
 .topbar {
-  display: flex; align-items: center; gap: 1.2rem;
-  padding: .6rem 1.4rem;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  flex-wrap: wrap;
+  padding: .6rem 1.4rem;
 }
-.brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 650; text-decoration: none; color: var(--text); letter-spacing: -.02em; }
+/* Inner wrapper shares the content column's max-width, so the header lines up
+   with the page below it instead of hugging the window edge. */
+.topbar-in {
+  max-width: 1080px; margin: 0 auto;
+  display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap;
+}
+.brand { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; }
 .brand img { width: 24px; height: 24px; display: block; }
+.brand img.wordmark { width: auto; height: 17px; }
+.only-dark { display: none; }
+@media (prefers-color-scheme: dark) {
+  .only-light { display: none; }
+  .only-dark { display: block; }
+}
 .topbar nav { display: flex; gap: .1rem; flex: 1; flex-wrap: wrap; }
 .topbar nav a {
   padding: .3rem .6rem; border-radius: var(--radius);
