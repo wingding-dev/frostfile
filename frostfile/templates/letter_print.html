@@ -10,16 +10,27 @@
     <h1>{{ agency.name }} {{ 'teen letter' if person.is_teen else 'packet' }} for {{ person.display_name }}</h1>
     <span class="btn-row" style="margin:0">
       <a class="btn" href="/letters/{{ person.id }}/{{ agency.id }}.pdf{{ '?guardian=' + guardian.id|string if guardian else '' }}">Save as PDF</a>
-      <button class="btn btn-quiet" onclick="window.print()">Print on Paper</button>
+      <button class="btn btn-quiet paper-print" onclick="window.print()">Print on Paper</button>
     </span>
   </div>
   <p class="small muted">
-    <strong>Save as PDF</strong> downloads a ready-to-print file already named
-    &ldquo;{{ agency.name }} freeze packet - {{ person.display_name }}&rdquo; —
-    open it and print, or send it to whoever has the printer.
-    <strong>Print on Paper</strong> opens your printer window directly (works
-    in a web browser; if nothing happens, use Save as PDF instead).
+    <strong>Save as PDF</strong> downloads a ready-to-print file, already named
+    &ldquo;{{ agency.name }} freeze packet - {{ person.display_name }}&rdquo;.
+    No printer drivers or &ldquo;print to PDF&rdquo; setup needed — FrostFile
+    makes the file itself. Open it and hit print, or send it to whoever has
+    the printer.
+    <span class="paper-print"><strong>Print on Paper</strong> opens your
+    printer window directly.</span>
   </p>
+  <script>
+    // The app window's page engine ignores window.print(), so hide the paper
+    // button there; Save as PDF covers every environment.
+    if (window.pywebview) {
+      document.querySelectorAll(".paper-print").forEach(function (el) {
+        el.style.display = "none";
+      });
+    }
+  </script>
 
   {% if guardians|length > 1 %}
   <form method="get" class="card" style="padding:.7rem 1rem">
