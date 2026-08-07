@@ -258,7 +258,9 @@ details.faq p { font-size: .88rem; color: var(--text-dim); margin: .5rem 0 0; }
 .field { display: grid; grid-template-columns: 160px 1fr; gap: .8rem; padding: .4rem 0; border-bottom: 1px solid var(--border); }
 .field:last-child { border-bottom: none; }
 .field-label { color: var(--text-dim); font-size: .85rem; }
-.field-value { white-space: pre-wrap; }
+.field-value { white-space: pre-wrap; overflow-wrap: anywhere; min-width: 0; }
+/* Long URLs (agency freeze links) must wrap inside their cards, not overflow. */
+.card a, td a { overflow-wrap: anywhere; }
 .mono { font-family: var(--mono); font-size: .88em; }
 .secret { font-family: var(--mono); letter-spacing: .04em; }
 .muted { color: var(--text-dim); }
