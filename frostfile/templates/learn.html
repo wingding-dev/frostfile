@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cite %}
+{% block title %}Learn — FrostFile{% endblock %}
+{% block main_class %}wrap-narrow{% endblock %}
+
+{% block content %}
+<h1>How This Actually Works</h1>
+<p class="lede">
+  Plain answers to the questions everyone has — starting with the one almost
+  everybody gets wrong. Every fact links to its source.
+</p>
+
+<div class="card">
+  <h3 style="margin-top:0">No. 1: Freezing Your Credit Does NOT Freeze Your Credit Cards</h3>
+  <p>
+    A credit freeze does not touch anything you already have. Your credit
+    cards keep working. Your car loan, your mortgage, your bank account — all
+    exactly the same as before. Your paycheck still lands. Your debit card
+    still swipes. And your credit score is completely
+    unaffected{{ cite(citer, refs('cfpb-freeze')) }}.
+  </p>
+  <div class="doors" aria-hidden="true">
+    <div class="door door-open">
+      <div class="door-title">What you already have</div>
+      <div class="door-frame open">OPEN</div>
+      <div class="small muted">Cards, loans, bank account — all keep working{{ cite(citer, refs('fcra-1681c1')) }}</div>
+    </div>
+    <div class="door door-shut">
+      <div class="door-title">New accounts in your name</div>
+      <div class="door-frame shut">BOLTED</div>
+      <div class="small muted">A thief's application gets a locked file, and a &ldquo;no&rdquo;</div>
+    </div>
+  </div>
+  <p style="margin-bottom:0">
+    What a freeze stops is someone opening a <strong>new</strong> account in
+    your name. Before approving new credit, a lender asks a credit bureau — a
+    company that keeps a file about your borrowing — to see your file. A
+    freeze tells the bureau: don't show it. No file check, no new
+    account{{ cite(citer, refs('cfpb-freeze')) }}.
+  </p>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">What a Credit Freeze Actually Is</h3>
+  <p>
+    Three big companies — Equifax, Experian, and TransUnion — are called
+    credit bureaus. Each keeps a file about you: what loans you have, whether
+    you pay on time. You never signed up for this; they keep the file anyway.
+  </p>
+  <p style="margin-bottom:0">
+    A freeze (the law calls it a &ldquo;security freeze&rdquo;) tells each
+    bureau: do not release my file to anyone trying to open something new.
+    It's free at all three, and you place it at each one separately. Asked
+    online or by phone, the bureau must freeze your file within one business
+    day{{ cite(citer, refs('cfpb-freeze', 'fcra-1681c1')) }}.
+  </p>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">Freeze vs. Fraud Alert vs. &ldquo;Lock&rdquo; vs. Monitoring</h3>
+  <p class="small muted">Four tools with similar names. They are not the same.</p>
+  <div class="table-scroll">
+  <table class="small">
+    <thead><tr><th>Tool</th><th>What It Does</th><th>Cost</th><th>Honest Take</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Freeze</strong></td>
+        <td>Blocks new-account checks on your file until you unlock it</td>
+        <td>Free — federal law{{ cite(citer, refs('fcra-1681c1')) }}</td>
+        <td>The strongest. The deadbolt.</td>
+      </tr>
+      <tr>
+        <td><strong>Fraud alert</strong></td>
+        <td>A warning flag; lenders must double-check it's you</td>
+        <td>Free, 1 year{{ cite(citer, refs('cfpb-idtheft')) }}</td>
+        <td>Weaker — your file stays visible</td>
+      </tr>
+      <tr>
+        <td><strong>&ldquo;Credit lock&rdquo;</strong></td>
+        <td>The bureaus' app product; holds your file under <em>their</em> terms</td>
+        <td>Sometimes a monthly fee</td>
+        <td>&ldquo;No more effective than security freezes&rdquo; — the government's words{{ cite(citer, refs('cfpb-freeze')) }}</td>
+      </tr>
+      <tr>
+        <td><strong>Monitoring</strong></td>
+        <td>Watches and alerts you <em>after</em> something happens{{ cite(citer, refs('cfpb-monitoring')) }}</td>
+        <td>Usually paid</td>
+        <td>The doorbell camera — it films the break-in</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="margin-bottom:0"><strong>Deadbolts beat doorbells.</strong> A freeze prevents; monitoring narrates.</p>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">Unfreezing (&ldquo;Thawing&rdquo;) — What It Takes</h3>
+  <p>
+    You lift your freeze when someone must check your file to say yes to you:
+    a new loan or card, and often a phone plan or an
+    apartment{{ cite(citer, refs('cfpb-companies-list')) }}. Lifting is free,
+    every time, forever. Ask online or by phone and the bureau must lift it
+    within one hour; you can lift it for just a window of time — a week while
+    the car dealer runs your application — and it refreezes on its
+    own{{ cite(citer, refs('cfpb-freeze', 'fcra-1681c1')) }}.
+  </p>
+  <p style="margin-bottom:0">
+    The one habit that matters: each bureau gives you a PIN or account
+    password when you freeze. That's your key — record it in FrostFile (it's
+    encrypted) and you'll never be stuck. Tip: before applying for anything,
+    ask which bureau the company checks, and thaw only that one.
+  </p>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">Why Children Are Prime Targets</h3>
+  <p>
+    A child usually has no credit file at all — exactly what a thief wants.
+    In the government's words, thieves like children's Social Security numbers
+    &ldquo;because children have no credit blemishes and because the
+    fraudulent activity may go unchecked for
+    years&rdquo;{{ cite(citer, refs('cfpb-child-report')) }}. Nobody runs a
+    credit check on a 7-year-old, so the fraud sits and grows until they turn
+    18 and get denied their first loan for debts they never knew existed.
+  </p>
+  <p style="margin-bottom:0">
+    The fix: federal law lets a parent freeze a child under 16 — and if the
+    child has no file, the bureau creates one just to freeze it
+    shut{{ cite(citer, refs('fcra-1681c1', 'cfpb-blog-2018')) }}. It's done
+    by mail with document copies, and FrostFile prints those packets for you.
+    At 16–17 the process changes — the teen requests their own freeze by phone
+    or mail{{ cite(citer, refs('equifax-child-faq', 'ftc-minors-under-16')) }} —
+    and FrostFile switches to teen letters automatically.
+  </p>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">Why There Are More Than 3 Places to Freeze</h3>
+  <p style="margin-bottom:0">
+    The big three aren't the only companies keeping files on your family. The
+    government maintains a list of dozens of &ldquo;specialty&rdquo; reporting
+    companies tracking narrower slices of your life — opening bank accounts,
+    phone and utility service, apartment rentals, payday-style
+    lending{{ cite(citer, refs('cfpb-companies-list')) }}. Freezing the big
+    three does nothing at these — each keeps its own file, so each needs its
+    own freeze. That's why FrostFile's grid is longer than three rows: a
+    locked front door doesn't help if the side door's open.
+  </p>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">&ldquo;Is This Legal? Why Is It Free?&rdquo;</h3>
+  <p style="margin-bottom:0">
+    Completely legal — it's your federal right, and Congress is why it's
+    free. After the giant Equifax breach, Congress passed the Economic
+    Growth, Regulatory Relief, and Consumer Protection Act (2018), whose
+    Section 301 is literally titled &ldquo;Protecting consumers'
+    credit&rdquo;{{ cite(citer, refs('plaw-115-174')) }}. Since September 21,
+    2018, placing a freeze, lifting it, and re-placing it are free at every
+    nationwide bureau, in every state{{ cite(citer, refs('cfpb-blog-2018', 'fcra-1681c1')) }}.
+    This is not a loophole or a trick — it's a right you already own.
+    FrostFile just helps you use it.
+  </p>
+</div>
+{% endblock %}

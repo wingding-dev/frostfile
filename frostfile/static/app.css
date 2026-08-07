@@ -248,6 +248,20 @@ fieldset.subsection legend { font-size: .85rem; font-weight: 550; padding: 0 .35
 .tick { color: var(--ok); font-weight: 700; margin-right: .3rem; }
 .cross { color: var(--danger); font-weight: 700; margin-right: .3rem; }
 
+/* Learn page: the two-doors diagram for "your cards keep working". */
+.doors { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+@media (max-width: 560px) { .doors { grid-template-columns: 1fr; } }
+.door { text-align: center; padding: .9rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); }
+.door-title { font-weight: 600; font-size: .85rem; margin-bottom: .5rem; }
+.door-frame { width: 84px; height: 110px; margin: 0 auto .5rem; border-radius: 6px 6px 0 0;
+  display: grid; place-items: center; font-weight: 800; font-size: .8rem; letter-spacing: .08em; }
+.door-frame.open { border: 3px solid var(--ok); color: var(--ok); background: var(--ok-soft);
+  transform: perspective(240px) rotateY(24deg); }
+.door-frame.shut { border: 3px solid var(--accent); color: var(--accent); background: var(--accent-soft);
+  position: relative; }
+.door-frame.shut::after { content: ""; position: absolute; right: 10px; top: 50%;
+  width: 26px; height: 8px; background: var(--accent); border-radius: 3px; }
+
 details.faq { border-bottom: 1px solid var(--border); padding: .55rem 0; }
 details.faq:last-child { border-bottom: none; }
 details.faq summary { cursor: pointer; font-weight: 550; font-size: .92rem; }
