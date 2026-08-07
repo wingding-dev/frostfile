@@ -32,7 +32,13 @@ from argon2.low_level import Type, hash_secret_raw
 from cryptography.exceptions import InvalidTag
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-MAGIC = b"IL1"
+# ON-DISK CONSTANTS — FROZEN. These are written into every vault at creation
+# and compared on every unlock. They must NEVER change, or every existing vault
+# stops opening. In particular they must survive a project rename: do not let a
+# find-and-replace touch them (that is exactly what broke Identilock->FrostFile).
+MAGIC = b"IL1"                              # AEAD ciphertext prefix
+_VERIFIER_PLAINTEXT = b"identilock-vault-v1"  # passphrase-check sentinel
+
 NONCE_BYTES = 12
 KEY_BYTES = 32
 SALT_BYTES = 16
@@ -42,8 +48,6 @@ SALT_BYTES = 16
 DEFAULT_TIME_COST = 3
 DEFAULT_MEMORY_COST = 64 * 1024  # KiB
 DEFAULT_PARALLELISM = 4
-
-_VERIFIER_PLAINTEXT = b"frostfile-vault-v1"
 _VERIFIER_CONTEXT = "meta:verifier"
 
 
