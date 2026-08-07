@@ -123,10 +123,27 @@ Copy onto each drive:
 - `START-HERE.txt` (in `drive-kit/`)
 - `SHA256SUMS.txt`
 
-## 8. Not tonight (parked, deliberately)
+## 8. Code signing with Certum (purchased 2026-08-07)
 
-- **Code signing** (~$220/yr, days of identity vetting) — kills the
-  SmartScreen warning; revisit if the giveaway grows past coworkers.
+Product: "Open Source Code Signing in the Cloud" (~$50/yr, SimplySign).
+One-time setup, then signing is one script per release:
+
+1. **Activate** (1–3 business days): Certum account → identity documents
+   (government photo ID matching the order name) → wait for verification
+   email → issue the certificate into SimplySign (no USB token involved).
+2. **On your Windows PC**: install the SimplySign Desktop app + the
+   SimplySign mobile app (the phone app is the 2FA that unlocks the cloud
+   card). Install "Windows SDK Signing Tools" if `signtool` is missing.
+3. **Every release**: download the CI-built FrostFile-windows.zip, then
+   `build\sign-windows.bat FrostFile-windows.zip` — it extracts, signs
+   FrostFile.exe with a Certum timestamp, verifies, re-zips, and prints
+   the new SHA-256. Upload the signed zip to R2 under the usual name and
+   update SHA256SUMS.txt.
+4. Reputation note: signing kills the "unknown publisher" class of warning
+   immediately; SmartScreen/AV *reputation* still accrues over the first
+   days-to-weeks of downloads. Fewer warnings right away, near-zero later.
+
+## 8b. Still parked, deliberately
 - **Custom R2 domain / caching tweaks** — the Worker route is enough.
 - **Auto-anything** — releasing stays a human uploading files on purpose.
 
