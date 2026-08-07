@@ -27,31 +27,25 @@
   </p>
 </div>
 
-{% if message %}<div class="notice notice-info">{{ message }}</div>{% endif %}
-
 <div class="card">
-  <div class="card-head">
-    <h3 style="margin:0">Are These Links Still Alive?</h3>
-    <form method="post" action="/sources/check">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-      <button type="submit" class="btn">Check All Links Now</button>
-    </form>
-  </div>
+  <h3 style="margin-top:0">Are These Links Still Alive?</h3>
   <p class="small muted" style="margin-bottom:0">
-    Visits each page below to see whether it still exists — like an antivirus
-    updating its list, except this only <em>reports</em>; it never changes an
-    address or a letter, because a working link proves the page is there, not
-    that it still says the same thing. Takes about fifteen seconds. This is one
-    of the few buttons that touches the internet, and it sends nothing about
-    you — just ordinary page requests.
-    {% if link_check.checked_at %}<br>Last checked: {{ link_check.checked_at }}.{% endif %}
+    Every link below was opened and confirmed working on
+    <strong>{{ links_verified_on }}</strong>, as part of preparing the version
+    of FrostFile you are running — and that check happens again for every new
+    version. The app itself never checks: FrostFile makes zero internet
+    connections, so a link can only be tested by a person before release, or
+    by you clicking it. A working link proves the page is still there — not
+    that it still says the same thing — which is why mailing addresses always
+    get the &ldquo;checked today, by you&rdquo; treatment on the printed
+    checklist.
   </p>
 </div>
 
 <div class="card">
   <div class="table-scroll">
   <table>
-    <thead><tr><th>Publisher</th><th>Document</th><th>How Solid?</th><th>Link</th></tr></thead>
+    <thead><tr><th>Publisher</th><th>Document</th><th>How Solid?</th></tr></thead>
     <tbody>
       {% for source in all_sources %}
       <tr>
@@ -62,18 +56,6 @@
             <span class="src-tag src-primary">&#10003; read {{ source.retrieved }}</span>
           {% else %}
             <span class="src-tag src-listed">link only — go check</span>
-          {% endif %}
-        </td>
-        <td class="small">
-          {% set check = link_check.get('results', {}).get(source.key) %}
-          {% if check %}
-            {% if check.status == 'ok' %}
-              <span class="src-tag src-alive" title="The page still loads (it exists). This does NOT re-verify what it says — only that the link is not dead.">&#10003; link works</span>
-            {% else %}
-              <span class="src-tag src-dead" title="The page did not answer when last checked. Double-check this information before relying on it.">&#10007; not answering</span>
-            {% endif %}
-          {% else %}
-            <span class="muted">—</span>
           {% endif %}
         </td>
       </tr>

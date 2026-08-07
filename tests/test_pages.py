@@ -107,12 +107,14 @@ def test_dashboard_surfaces_expiring_and_child_warning(populated):
     assert "Expiring soon" in page
 
 
-def test_breaches_page_offers_no_email_lookup_without_a_key(populated):
+def test_breaches_page_is_pure_link_out(populated):
+    # Zero-network rule: no forms that would trigger an app-side lookup —
+    # only links that open haveibeenpwned.com in the user's own browser.
     page = populated["client"].get("/breaches").text
-    assert "API key" in page
     assert 'action="/breaches/email"' not in page
-    # Password checking works without a key, so that form must be present.
-    assert 'action="/breaches/password"' in page
+    assert 'action="/breaches/password"' not in page
+    assert "https://haveibeenpwned.com/" in page
+    assert "https://haveibeenpwned.com/Passwords" in page
 
 
 def test_missing_records_return_404_not_a_crash(populated):

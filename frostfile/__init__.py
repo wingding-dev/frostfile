@@ -1,9 +1,13 @@
 """FrostFile — a local-only identity-control tracker.
 
-Nothing in this package sends data on its own. Outbound network calls happen
-only when the user presses a button: breach lookups to Have I Been Pwned
-(services/hibp.py) and the Sources page's agency-link checker
-(services/linkcheck.py). There is no telemetry, analytics, or update check.
+Nothing in this package touches the network. Ever. This is a project
+requirement, not an accident: the app makes ZERO outbound connections — no
+breach lookups, no link checks, no telemetry, no update checks. Anything that
+needs the internet is a plain <a> link that opens in the user's own browser
+(agency sites, haveibeenpwned.com, frostfile.org). Source links are verified
+by a human running tools/linkcheck.py before each release.
+
+Do not add an outbound call, however benign. It erodes the core promise.
 """
 
-__version__ = "0.3.0"
+__version__ = "1.0.0"

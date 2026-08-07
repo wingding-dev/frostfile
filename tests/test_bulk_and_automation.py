@@ -139,16 +139,10 @@ def test_unlock_makes_a_weekly_auto_backup(unlocked, settings):
     assert len(list(settings.backup_dir.glob("frostfile-auto-*.db"))) == 1
 
 
-def test_check_everyone_without_emails_or_key_explains_itself(unlocked):
-    add_person(unlocked, "No Email")
-    response = unlocked.post(
-        "/breaches/email-all", data={"csrf_token": csrf_token(unlocked)}
-    )
-    assert "Nobody has an email address on file" in response.text
-
+def test_breaches_page_lists_family_emails_for_manual_checking(unlocked):
+    # Zero-network rule: the page never checks anything itself — it lists the
+    # family's emails and links out to HIBP for the user to check in a browser.
     add_person(unlocked, "Has Email", email="someone@example.com")
-    response = unlocked.post(
-        "/breaches/email-all", data={"csrf_token": csrf_token(unlocked)}
-    )
-    # No API key configured: the per-address failure is reported, not crashed on.
-    assert "No API key configured" in response.text
+    page = unlocked.get("/breaches").text
+    assert "someone@example.com" in page
+    assert "haveibeenpwned.com" in page

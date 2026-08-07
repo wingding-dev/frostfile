@@ -2,30 +2,22 @@
 
 from __future__ import annotations
 
-import json
 import sqlite3
-from datetime import date
 
-from fastapi import APIRouter, Depends, Form, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from .. import sources as source_registry
 from ..crypto import Vault
 from ..repo import (
     freeze_matrix,
     get_agency,
-    get_setting,
     household_progress,
     list_agencies,
     list_people,
     list_reminders,
-    set_setting,
 )
-from ..security import Session, verify_csrf
 from ..seeds import STATUS_NOT_APPLICABLE
-from ..services import linkcheck
-from ..web import get_conn, get_session, get_vault, render
-
-LINK_CHECK_SETTING = "link_check"
+from ..web import get_conn, get_vault, render
 
 router = APIRouter()
 
@@ -135,19 +127,9 @@ def agency_detail(
     )
 
 
-def _stored_link_check(conn: sqlite3.Connection, vault: Vault) -> dict:
-    raw = get_setting(conn, vault, LINK_CHECK_SETTING)
-    try:
-        parsed = json.loads(raw) if raw else {}
-    except ValueError:
-        parsed = {}
-    return parsed if isinstance(parsed, dict) else {}
-
-
 @router.get("/sources")
 def sources_index(
     request: Request,
-    conn: sqlite3.Connection = Depends(get_conn),
     vault: Vault = Depends(get_vault),
 ):
     return render(
@@ -157,43 +139,7 @@ def sources_index(
             "active": "agencies",
             "all_sources": source_registry.all_sources(),
             "compiled_on": source_registry.COMPILED_ON,
-            "link_check": _stored_link_check(conn, vault),
-        },
-    )
-
-
-@router.post("/sources/check")
-def sources_check(
-    request: Request,
-    csrf_token: str = Form(""),
-    session: Session = Depends(get_session),
-    conn: sqlite3.Connection = Depends(get_conn),
-    vault: Vault = Depends(get_vault),
-):
-    verify_csrf(session, csrf_token)
-    urls = {s.key: s.url for s in source_registry.all_sources()}
-    results = linkcheck.check_links(urls)
-    payload = {"checked_at": date.today().isoformat(), "results": results}
-    set_setting(conn, vault, LINK_CHECK_SETTING, json.dumps(payload))
-
-    broken = sum(1 for r in results.values() if r.get("status") != linkcheck.STATUS_OK)
-    if broken:
-        message = (
-            f"Checked {len(results)} links: {broken} did not answer. A broken "
-            "link doesn't mean the address is wrong — it means nobody can "
-            "currently confirm it, so double-check before relying on it."
-        )
-    else:
-        message = f"Checked {len(results)} links — every one still answers."
-    return render(
-        request,
-        "sources.html",
-        {
-            "active": "agencies",
-            "all_sources": source_registry.all_sources(),
-            "compiled_on": source_registry.COMPILED_ON,
-            "link_check": payload,
-            "message": message,
+            "links_verified_on": source_registry.LINKS_VERIFIED_ON,
         },
     )
 

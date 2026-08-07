@@ -1,139 +1,59 @@
 {% extends "base.html" %}
 {% from "_macros.html" import cite %}
-{% block title %}Breach exposure — FrostFile{% endblock %}
+{% block title %}Breach Exposure — FrostFile{% endblock %}
 
 {% block content %}
 <h1>Breach Exposure</h1>
 <p class="lede">
-  This page asks Have I Been Pwned — a well-known service that keeps a public
-  list of data leaks — whether something of yours has shown up in one, and only
-  when you press a button. (The one other place FrostFile reaches the internet
-  is the Sources page's link checker; see Settings for the full list.)
+  FrostFile makes <strong>zero</strong> internet connections — so breach
+  checking happens in <em>your</em> browser, on a site you visit yourself.
+  The buttons below are plain links: they open Have I Been
+  Pwned{{ cite(citer, refs('hibp')) }}, a well-known free service that
+  keeps a public list of data leaks. Nothing you type there passes through
+  this app.
 </p>
-
-{% if error %}<div class="notice notice-danger">{{ error }}</div>{% endif %}
-{% if message %}<div class="notice notice-ok">{{ message }}</div>{% endif %}
 
 <div class="grid-2">
   <div class="card">
-    <h3 style="margin-top:0">Check a Password</h3>
+    <h3 style="margin-top:0">Check an Email Address</h3>
     <p class="small muted">
-      Free, and the password itself never leaves this machine. It gets
-      scrambled on this computer first, and only the first five characters of
-      the scramble are sent — thousands of different passwords share those same
-      five characters, so the service cannot tell which one you were asking
-      about{{ cite(citer, refs('hibp-api')) }}.
+      Type an email address on their site and it lists every known leak that
+      address appears in — which sites, when, and what kind of data got out.
     </p>
-    <form method="post" action="/breaches/password">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-      <div class="form-row">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" autocomplete="off" required>
-      </div>
-      <button type="submit" class="btn">Check</button>
-    </form>
-
-    {% if password_result %}
-      {% if password_result.count %}
-        <div class="notice notice-danger" style="margin-top:1rem">
-          This password has shown up in known leaks
-          <strong>{{ "{:,}".format(password_result.count) }}</strong> times.
-          Criminals try leaked passwords first — stop using it anywhere.
-        </div>
-      {% else %}
-        <div class="notice notice-ok" style="margin-top:1rem">
-          Not found in any known leak so far. That does not prove it is a strong
-          password — only that it has not turned up in a leak yet.
-        </div>
-      {% endif %}
+    {% if emails %}
+    <p class="small muted">Emails on file to check, one at a time:</p>
+    <ul class="small">
+      {% for email in emails %}<li class="mono">{{ email }}</li>{% endfor %}
+    </ul>
     {% endif %}
+    <a class="btn" href="https://haveibeenpwned.com/" target="_blank" rel="noopener noreferrer">Open haveibeenpwned.com &#8599;</a>
   </div>
 
   <div class="card">
-    <h3 style="margin-top:0">Check an Email Address</h3>
-    {% if has_key %}
-      <p class="small muted">
-        Fair warning: this one does send the email address to Have I Been
-        Pwned — there is no way to ask "has this address leaked?" without
-        telling them the address.
-      </p>
-      <form method="post" action="/breaches/email">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-        <div class="form-row">
-          <label for="email">Email address</label>
-          <input type="email" id="email" name="email" required>
-        </div>
-        <div class="form-row">
-          <label for="person_id">Belongs to</label>
-          <select id="person_id" name="person_id">
-            <option value="">Not recorded</option>
-            {% for person in people %}<option value="{{ person.id }}">{{ person.display_name }}</option>{% endfor %}
-          </select>
-        </div>
-        <button type="submit" class="btn">Check</button>
-      </form>
-      <form method="post" action="/breaches/email-all" style="margin-top:.9rem">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-        <button type="submit" class="btn btn-quiet">Check the Whole Family at Once</button>
-        <p class="hint">
-          Runs the check for everyone with an email on file. The lookup service
-          limits how fast questions can be asked, so this takes about seven
-          seconds per person — leave the page open.
-        </p>
-      </form>
-    {% else %}
-      <div class="notice notice-info">
-        <p>
-          Checking an email address needs an "API key" — a paid pass that Have
-          I Been Pwned sells for this kind of lookup, and that you buy from
-          them directly{{ cite(citer, refs('hibp-subscription')) }}. FrostFile
-          comes with no key and sells nothing; the key is between you and them.
-        </p>
-        <p style="margin-bottom:0">
-          <a href="{{ subscription_url }}" target="_blank" rel="noopener noreferrer">See HIBP's plans</a>,
-          then add the key under <a href="/settings">Settings</a>.
-        </p>
-      </div>
-    {% endif %}
+    <h3 style="margin-top:0">Check a Password</h3>
+    <p class="small muted">
+      Their password page tells you whether a password has ever shown up in a
+      known leak. If it has, criminals try it first — stop using it anywhere.
+    </p>
+    <a class="btn" href="https://haveibeenpwned.com/Passwords" target="_blank" rel="noopener noreferrer">Open the Password Checker &#8599;</a>
   </div>
 </div>
 
-<h2>Past Checks</h2>
-{% if checks %}
-{% for check in checks %}
 <div class="card">
-  <div class="card-head">
-    <strong>{{ check.email }}</strong>
-    <span class="small muted">{{ check.checked_at[:10] }}{% if check.person_name %} · {{ check.person_name }}{% endif %}</span>
-  </div>
-  {% set breaches = check.result.get('breaches', []) %}
-  {% if breaches %}
-    <table>
-      <thead><tr><th>Breach</th><th>Date</th><th>What leaked</th></tr></thead>
-      <tbody>
-        {% for breach in breaches %}
-        <tr>
-          <td>
-            {{ breach.title }}
-            {% if breach.domain %}<div class="small muted">{{ breach.domain }}</div>{% endif %}
-          </td>
-          <td class="small">{{ breach.breach_date }}</td>
-          <td class="small">
-            {{ breach.data_classes|join(', ') }}
-            {% if 'Social security numbers' in breach.data_classes %}
-              <div><span class="pill pill-in_progress">SSN exposed — freezes matter here</span></div>
-            {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p class="small muted" style="margin:0">No known leaks at the time of this check.</p>
-  {% endif %}
+  <h3 style="margin-top:0">If Something Turns Up</h3>
+  <ul class="small">
+    <li><strong>An email in leaks:</strong> normal for most people — what
+      matters is which data leaked. Passwords or Social Security numbers
+      leaked means act; just an email address means stay alert for phishing.</li>
+    <li><strong>A leaked password:</strong> change it everywhere you used it,
+      starting with email and banking. Never reuse it again.</li>
+    <li><strong>SSN in a leak:</strong> the freezes you're placing with
+      FrostFile are exactly the right response — plus the IRS IP PIN on your
+      grid, which blocks fake tax filings.</li>
+  </ul>
+  <p class="small muted" style="margin-bottom:0">
+    Results are between you and that website — FrostFile doesn't see or store
+    them. If you want a record, add a note on the person's page.
+  </p>
 </div>
-{% endfor %}
-{% else %}
-<div class="empty">No checks run yet.</div>
-{% endif %}
 {% endblock %}
