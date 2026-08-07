@@ -1,0 +1,10 @@
+# FrostFile v1.0.0 — SHA-256 checksums
+# Verify on Windows:  certutil -hashfile FrostFile.exe SHA256
+# Verify on Mac:      shasum -a 256 FrostFile-mac.zip
+#
+# ADD THE EXE/APP LINES AFTER BUILDING THEM (see DEPLOY.md step 6):
+# <hash>  FrostFile.exe
+# <hash>  FrostFile-mac.zip
+
+a854eafbf6419b7f068ae3b9b93c802ef161888d34ed5f4424c9c7e459be7837  frostfile-1.0.0-py3-none-any.whl
+e208b5ac50d265e081549d172ca2cf1ef02b5bbc1d293d2d8a70765e503a9b5d  frostfile-1.0.0.tar.gz

@@ -1,0 +1,50 @@
+FROSTFILE — Family Credit Freeze Kit
+=====================================
+
+This drive was given to you by someone who knows you. It contains a free
+program that helps you freeze your family's credit — the single most
+effective thing you can do against identity theft — and keep track of the
+PINs, confirmation numbers, and paperwork that come with it.
+
+Everything stays on YOUR computer. The program never touches the internet.
+No account, no subscription, no catch.
+
+
+WINDOWS
+-------
+1. Copy FrostFile.exe from this drive onto your computer (the Desktop is
+   fine — anywhere you'll find it again).
+2. Double-click it.
+3. Windows will likely show a blue box: "Windows protected your PC."
+   That warning appears for ANY new program that hasn't paid Microsoft for
+   a publisher certificate — it is not a virus detection. Click
+   "More info", then "Run anyway."
+4. FrostFile opens and walks you through the rest.
+
+MAC
+---
+1. Copy FrostFile-mac.zip onto your computer and double-click to unzip.
+2. Right-click (or hold Control and click) FrostFile.app -> Open -> Open.
+   (Plain double-clicking gets blocked the first time because the app
+   isn't in Apple's store. Right-click -> Open is the official way around
+   that, and you only need it once.)
+
+IMPORTANT — THE TWO THINGS TO NEVER LOSE
+----------------------------------------
+When you set up, FrostFile asks you to create a passphrase and then shows
+you a RECOVERY CODE — print it or write it down and put it somewhere safe
+(with your passports is a good spot). Your information is scrambled with
+your passphrase; nobody — not the person who gave you this drive, not
+anybody — can recover it if you lose both the passphrase and that code.
+That's not a flaw. That's the point.
+
+A NOTE ON TRUST
+---------------
+Don't run programs from strangers' flash drives. This one came from
+someone you know, and you can hold them to it: the same download and the
+full source code live at https://frostfile.org — and a SHA256SUMS.txt
+file is on this drive so the technically-minded can verify the copy is
+identical. Please don't install this on a work computer — your family's
+Social Security numbers have no business on a machine your employer owns.
+
+Questions? Ask the person who gave you the drive, or visit frostfile.org.
