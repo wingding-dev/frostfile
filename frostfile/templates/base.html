@@ -6,11 +6,11 @@
   <meta name="referrer" content="no-referrer">
   <title>{% block title %}FrostFile{% endblock %}</title>
   <link rel="stylesheet" href="/static/app.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>&#128274;</text></svg>">
+  <link rel="icon" type="image/png" href="/static/frostfile-icon.png">
 </head>
 <body class="{% block body_class %}{% endblock %}">
 
-<div id="splash" aria-hidden="true"></div>
+<div id="splash" aria-hidden="true"><img src="/static/frostfile-logo-white.png" alt=""></div>
 <script>
   // Fade the launch splash in, hold, then out — once per app-window session.
   (function () {
@@ -32,7 +32,7 @@
     <button type="button" onclick="history.back()" title="Back to the page you were just on">&#8592;</button>
     <button type="button" onclick="history.forward()" title="Forward">&#8594;</button>
   </nav>
-  <a class="brand" href="/">FrostFile</a>
+  <a class="brand" href="/"><img src="/static/frostfile-icon.png" alt=""> FrostFile</a>
   <nav>
     <a href="/" class="{{ 'active' if active == 'dashboard' }}">Dashboard</a>
     <a href="/matrix" class="{{ 'active' if active == 'matrix' }}">Freezes</a>
