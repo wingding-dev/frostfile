@@ -4,7 +4,9 @@ What is encrypted and what is not
 ---------------------------------
 Encrypted: names, dates of birth, SSNs, emails, phones, addresses, freeze
 confirmation numbers, freeze PINs, free-text notes, reminder titles and details,
-stored credit report text and filenames, breach results, and the HIBP API key.
+stored credit report text and filenames, and settings values. (The breach_checks
+table remains in the schema for vaults created before v1.0.0, when the app could
+run breach lookups itself; the app is now fully offline and never writes to it.)
 
 Left in the clear: row ids, whether a person is an adult or a minor, freeze
 statuses, the freeze "method" field, and action/due dates. These stay queryable

@@ -31,15 +31,6 @@ def test_freeze_save_with_bad_ids_is_404_not_500(unlocked):
     assert r.status_code == 404
 
 
-def test_breach_check_with_junk_person_id_does_not_crash(unlocked):
-    # Superscript digit: isdigit() True, int() would raise — must not 500.
-    r = unlocked.post(
-        "/breaches/email",
-        data={"email": "a@b.com", "person_id": "²", "csrf_token": csrf_token(unlocked)},
-    )
-    assert r.status_code in (200, 303)  # handled, not a 500
-
-
 def test_kdf_params_are_clamped_against_tampering(unlocked, settings):
     from frostfile import db
 
@@ -67,3 +58,38 @@ def test_passphrase_is_nfc_normalized():
     nfc = unicodedata.normalize("NFC", "café-passphrase-xyz")
     assert nfd != nfc  # different byte sequences
     assert derive_key(nfd, params) == derive_key(nfc, params)  # same key
+
+
+def test_zero_network_rule_no_http_client_in_app_code():
+    """PROJECT REQUIREMENT: the app makes zero outbound connections.
+
+    Anything needing the internet must be a plain link the user clicks.
+    This scans every shipped module for HTTP-client imports so a violation
+    fails CI instead of eroding the promise quietly. (tools/ is exempt —
+    tools/linkcheck.py is a release-time dev script, never shipped.)
+    """
+    from pathlib import Path
+
+    import frostfile
+
+    package_dir = Path(frostfile.__file__).parent
+    forbidden = ("import httpx", "import requests", "import aiohttp",
+                 "import urllib.request", "from urllib import request",
+                 "from urllib.request import")
+    offenders = []
+    for py in package_dir.rglob("*.py"):
+        text = py.read_text(encoding="utf-8")
+        for needle in forbidden:
+            if needle in text:
+                offenders.append(f"{py.relative_to(package_dir)}: {needle}")
+    assert not offenders, f"Outbound HTTP client in shipped code: {offenders}"
+
+
+def test_settings_declares_zero_network_and_sources_shows_verified_date(unlocked):
+    from frostfile import sources as source_registry
+
+    settings_page = unlocked.get("/settings").text
+    assert "Nothing. Ever." in settings_page
+
+    sources_page = unlocked.get("/sources").text
+    assert source_registry.LINKS_VERIFIED_ON in sources_page

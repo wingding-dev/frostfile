@@ -6,8 +6,9 @@ Security enrollments, mailing packets for children's freezes, and breach
 exposure checks.
 
 It runs on your computer. It has no accounts, no cloud, no subscription, and no
-telemetry. It touches the network only when you press a button — a breach
-lookup, or the Sources page's agency-link checker — never on its own.
+telemetry — and it makes **zero network connections**. Not on a timer, not on a
+button press, not ever. Anything that needs the internet is a plain link that
+opens in your own browser. Turn off your Wi-Fi and every feature works the same.
 
 ---
 
@@ -41,8 +42,8 @@ credit, you have replaced the most expensive part of what those services sell.
 - **Reminders** — IP PIN retrieval, SSA earnings review, report pulls, broker
   opt-outs, freeze re-verification. Exports to `.ics`.
 - **Report comparison** — save each credit report pull; see what's new.
-- **Breach checks** — password checking is free and sends only a scrambled
-  prefix (never the password); email checking needs your own Have I Been Pwned key.
+- **Breach guidance** — lists the family's emails and links you to Have I Been
+  Pwned to check them in your own browser. The app itself never checks anything.
 
 ### What it can't do
 
@@ -130,8 +131,7 @@ vault is unlocked, and it can't protect against someone who has your passphrase.
 
 **What's encrypted.** Names, dates of birth, SSNs, emails, phone numbers,
 addresses, freeze confirmation numbers, freeze PINs, notes, stored report text,
-breach results, and your HIBP key. AES-256-GCM per field, key derived with
-Argon2id.
+and settings. AES-256-GCM per field, key derived with Argon2id.
 
 **What isn't.** Row ids, whether a person is an adult or a minor, freeze
 statuses, and action dates — these stay queryable so the app can sort and filter.
@@ -144,13 +144,10 @@ mailing packets. Leave it off and packets print a blank line you fill in by hand
 
 **Network.** Binds to `127.0.0.1` only, and refuses any other interface unless
 you set `FROSTFILE_ALLOW_REMOTE=1` — there's no TLS and no multi-user access
-control, so exposing it would be a mistake. Outbound traffic happens only on a
-button press: the two breach lookups, the one-off API-key validation, and the
-Sources page's link checker (which fetches the agency pages to see if they're
-alive, sending nothing about you). Password checks use HIBP's k-anonymity range
-API, so the password itself never leaves your machine. Email checks do send the
-address, which is why they require your own key and are off until you configure
-one.
+control, so exposing it would be a mistake. Outbound traffic: **none, ever.**
+The app contains no HTTP client (a test enforces this). Breach checking,
+update checking, and source-link verification all happen either in your own
+browser via plain links, or by a human before release (`tools/linkcheck.py`).
 
 **Auto-lock** after 15 minutes idle (`FROSTFILE_LOCK_MINUTES` to change). The
 key lives only in the server process's memory; locking drops it. Restarting

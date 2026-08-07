@@ -28,6 +28,10 @@ from dataclasses import dataclass
 
 COMPILED_ON = "2026-08-03"
 
+# Stamped by a human running tools/linkcheck.py as part of cutting a release.
+# The app itself never checks links at runtime — it makes zero connections.
+LINKS_VERIFIED_ON = "2026-08-06"
+
 
 @dataclass(frozen=True)
 class Source:
@@ -50,9 +54,23 @@ class Source:
         return "Official page for this topic; contents not captured. Confirm before relying on it."
 
 
-def _s(key: str, title: str, url: str, publisher: str, kind: str, checked: str) -> Source:
+def _s(
+    key: str,
+    title: str,
+    url: str,
+    publisher: str,
+    kind: str,
+    checked: str,
+    retrieved: str = COMPILED_ON,
+) -> Source:
     return Source(
-        key=key, title=title, url=url, publisher=publisher, kind=kind, checked=checked
+        key=key,
+        title=title,
+        url=url,
+        publisher=publisher,
+        kind=kind,
+        checked=checked,
+        retrieved=retrieved,
     )
 
 
@@ -176,11 +194,21 @@ SOURCES: dict[str, Source] = {
         ),
         _s(
             "telecheck-consumer",
-            "TeleCheck Consumer Information",
-            "https://www.firstdata.com/telecheck/consumer-information.html",
-            "Fiserv / TeleCheck",
+            "TeleCheck Consumer Assistance",
+            "https://getassistance.telecheck.com/",
+            "TeleCheck (Fiserv)",
             "official",
-            "listed",
+            "fetched",
+            retrieved="2026-08-06",
+        ),
+        _s(
+            "cfpb-telecheck",
+            "TeleCheck Services — CFPB company entry (phone and mailing address)",
+            "https://www.consumerfinance.gov/consumer-tools/credit-reports-and-scores/consumer-reporting-companies/companies-list/tele-check-services/",
+            "Consumer Financial Protection Bureau",
+            "government",
+            "fetched",
+            retrieved="2026-08-06",
         ),
         _s(
             "certegy-consumers",
@@ -202,36 +230,57 @@ SOURCES: dict[str, Source] = {
         # --- subprime -------------------------------------------------------
         _s(
             "clarity-consumers",
-            "Clarity Services for Consumers",
-            "https://www.clarityservices.com/consumers/",
+            "Clarity Services — How to Request a Security Freeze",
+            "https://www.clarityservices.com/support/security-freeze/",
             "Clarity Services (Experian)",
+            "official",
+            "fetched",
+            retrieved="2026-08-06",
+        ),
+        _s(
+            "teletrack-consumers",
+            "Teletrack Consumer Assistance",
+            "https://consumers.teletrack.com/",
+            "Teletrack (Equifax)",
             "official",
             "listed",
         ),
         _s(
-            "teletrack-consumers",
-            "Teletrack for Consumers",
-            "https://teletrack.com/consumers/",
-            "Teletrack (TransUnion)",
-            "official",
-            "listed",
+            "cfpb-teletrack",
+            "Teletrack, LLC — CFPB company entry (ownership, phone, address)",
+            "https://www.consumerfinance.gov/consumer-tools/credit-reports-and-scores/consumer-reporting-companies/companies-list/teletrack-llc/",
+            "Consumer Financial Protection Bureau",
+            "government",
+            "fetched",
+            retrieved="2026-08-06",
         ),
         # --- rental ---------------------------------------------------------
         _s(
             "corelogic-consumers",
-            "CoreLogic Consumer Portal",
-            "https://consumers.corelogic.com/",
-            "CoreLogic",
+            "SafeRent Solutions — Consumer Support (formerly CoreLogic Rental Property Solutions)",
+            "https://saferentsolutions.com/consumer-support/",
+            "SafeRent Solutions",
             "official",
-            "listed",
+            "fetched",
+            retrieved="2026-08-06",
+        ),
+        _s(
+            "cfpb-saferent",
+            "SafeRent Solutions, LLC — CFPB company entry (phone and mailing address)",
+            "https://www.consumerfinance.gov/consumer-tools/credit-reports-and-scores/consumer-reporting-companies/companies-list/saferent-solutions-llc/",
+            "Consumer Financial Protection Bureau",
+            "government",
+            "fetched",
+            retrieved="2026-08-06",
         ),
         _s(
             "realpage-consumer",
-            "RealPage Consumer Relations",
-            "https://www.realpage.com/consumer/",
+            "RealPage — Consumer Support and Credit Report Inquiries",
+            "https://www.realpage.com/support/consumer/",
             "RealPage",
             "official",
-            "listed",
+            "fetched",
+            retrieved="2026-08-06",
         ),
         # --- employment -----------------------------------------------------
         _s(
@@ -390,17 +439,17 @@ SOURCES: dict[str, Source] = {
             "fetched",
         ),
         _s(
-            "hibp-subscription",
-            "Have I Been Pwned — subscription tiers",
-            "https://haveibeenpwned.com/Subscription",
+            "hibp",
+            "Have I Been Pwned — check if your email is in a data breach",
+            "https://haveibeenpwned.com/",
             "Have I Been Pwned",
             "official",
             "listed",
         ),
         _s(
-            "hibp-api",
-            "Have I Been Pwned — API v3 documentation",
-            "https://haveibeenpwned.com/api/v3",
+            "hibp-passwords",
+            "Have I Been Pwned — Pwned Passwords checker",
+            "https://haveibeenpwned.com/Passwords",
             "Have I Been Pwned",
             "official",
             "listed",

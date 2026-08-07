@@ -1,4 +1,4 @@
-"""Settings: the HIBP key, passphrase changes, backups, and preferences."""
+"""Settings: passphrase changes, backups, and preferences."""
 
 from __future__ import annotations
 
@@ -13,14 +13,10 @@ from fastapi import APIRouter, Depends, Form, Request
 from .. import db
 from ..config import ensure_data_dir, write_prefs
 from ..crypto import Vault, WrongPassphrase, passphrase_problems
-from ..repo import get_setting, set_setting
 from ..security import Session, set_session_cookie, verify_csrf
-from ..services import hibp
 from ..web import get_conn, get_session, get_vault, redirect, render
 
 router = APIRouter()
-
-HIBP_KEY_SETTING = "hibp_api_key"
 
 
 def _page(
@@ -30,19 +26,15 @@ def _page(
     **flash,
 ):
     settings = request.app.state.settings
-    key = get_setting(conn, vault, HIBP_KEY_SETTING)
     return render(
         request,
         "settings.html",
         {
             "active": "settings",
-            "has_key": bool(key),
-            "key_hint": f"…{key[-4:]}" if key else "",
             "data_dir": str(settings.data_dir),
             "db_path": str(settings.db_path),
             "lock_minutes": settings.lock_timeout_minutes,
             "has_recovery": db.has_recovery(conn),
-            "subscription_url": hibp.SUBSCRIPTION_URL,
             **flash,
         },
     )
@@ -164,30 +156,6 @@ def move_data_dir(
             "confirmed everything looks right in the new location."
         ),
     )
-
-
-@router.post("/settings/hibp")
-def save_hibp_key(
-    request: Request,
-    api_key: str = Form(""),
-    csrf_token: str = Form(""),
-    session: Session = Depends(get_session),
-    conn: sqlite3.Connection = Depends(get_conn),
-    vault: Vault = Depends(get_vault),
-):
-    verify_csrf(session, csrf_token)
-    api_key = api_key.strip()
-
-    if not api_key:
-        set_setting(conn, vault, HIBP_KEY_SETTING, None)
-        return _page(request, conn, vault, message="API key removed.")
-
-    ok, detail = hibp.verify_key(api_key)
-    if not ok:
-        return _page(request, conn, vault, error=detail)
-
-    set_setting(conn, vault, HIBP_KEY_SETTING, api_key)
-    return _page(request, conn, vault, message=detail)
 
 
 @router.post("/settings/passphrase")
