@@ -567,9 +567,13 @@ def seed_reminders_for(
         if exists:
             continue
         due = today + timedelta(days=int(template["offset_days"]))
+        # title/detail explicitly '' — a vault upgraded from a pre-encryption
+        # schema still has those columns as NOT NULL with no default, so an
+        # insert that omits them fails (this is what 500'd when adding a person).
         conn.execute(
-            "INSERT INTO reminders (person_id, kind, title_enc, detail_enc, "
-            "due_date, recurrence, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO reminders (person_id, kind, title, detail, title_enc, "
+            "detail_enc, due_date, recurrence, created_at) "
+            "VALUES (?, ?, '', '', ?, ?, ?, ?, ?)",
             (
                 person_id,
                 template["kind"],
@@ -625,8 +629,9 @@ def create_reminder(
     person_id: int | None = None,
 ) -> int:
     cursor = conn.execute(
-        "INSERT INTO reminders (person_id, kind, title_enc, detail_enc, due_date, "
-        "recurrence, created_at) VALUES (?, 'custom', ?, ?, ?, ?, ?)",
+        "INSERT INTO reminders (person_id, kind, title, detail, title_enc, "
+        "detail_enc, due_date, recurrence, created_at) "
+        "VALUES (?, 'custom', '', '', ?, ?, ?, ?, ?)",
         (
             person_id,
             vault.encrypt(context_for("reminders", "title_enc"), title),
