@@ -90,6 +90,9 @@ def setup_submit(
 
     vault = db.initialize_vault(conn, passphrase)
     seed_agencies(conn)
+    from ..repo import ensure_update_reminder
+
+    ensure_update_reminder(conn, vault)
 
     session = request.app.state.sessions.create(vault)
     session.pending_recovery_code = db.set_recovery(conn, vault.key)
@@ -324,6 +327,9 @@ def unlock_submit(
     # Seal any pre-0.3 plaintext reminder/report fields now that we hold the key.
     try:
         db.migrate_plaintext_fields(conn, vault)
+        from ..repo import ensure_update_reminder
+
+        ensure_update_reminder(conn, vault)  # backfills pre-existing vaults
     except Exception:
         pass
     _maybe_auto_backup(request, conn)

@@ -16,6 +16,7 @@
   --danger-soft: #fbe6e4;
   --ok: #1f6b3f;
   --ok-soft: #e2f0e6;
+  --scrollbar: #97a5b1;      /* dark-grey thumb on the light theme */
   --radius: 7px;
   --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 }
@@ -30,6 +31,7 @@
     --text-dim: #93a6ba;
     --accent: #5aa6ee;         /* brighter blue reads best on dark */
     --accent-soft: #16304a;    /* deep navy tint */
+    --scrollbar: #38434e;
     --warn: #e0ac5a;
     --warn-soft: #33291a;
     --danger: #ef8981;
@@ -54,10 +56,23 @@
   width: min(62vw, 400px);
   filter: drop-shadow(0 0 46px rgba(73,154,232,.45));
 }
-#splash.show { display: grid; animation: splash-in .55s ease forwards; }
+/* The overlay itself is opaque from the first paint (so the page underneath —
+   e.g. the login form — is never glimpsed); only the LOGO fades in. The whole
+   overlay then fades out to reveal the page. */
+#splash.show { display: grid; opacity: 1; }
+#splash.show img { animation: splash-in .7s ease both; }
 #splash.hide { display: grid; animation: splash-out .75s ease forwards; }
-@keyframes splash-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes splash-in  { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: scale(1); } }
 @keyframes splash-out { from { opacity: 1; } to { opacity: 0; } }
+
+/* No scrollbar at all while the splash owns the screen. */
+html.splashing { overflow: hidden; }
+
+/* Everywhere else: thin, theme-dark scrollbar instead of the bright default. */
+html { scrollbar-width: thin; scrollbar-color: var(--scrollbar) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
 @media (prefers-reduced-motion: reduce) {
   /* Respect the OS "reduce motion" setting: no splash at all. */
   #splash { display: none !important; }

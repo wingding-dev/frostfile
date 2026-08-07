@@ -20,9 +20,13 @@
       if (sessionStorage.getItem("ff_splashed")) { s.parentNode.removeChild(s); return; }
       sessionStorage.setItem("ff_splashed", "1");
     } catch (e) { /* private mode: just show it once */ }
+    document.documentElement.classList.add("splashing");
     s.className = "show";
     setTimeout(function () { s.className = "hide"; }, 3000);
-    setTimeout(function () { if (s.parentNode) s.parentNode.removeChild(s); }, 3800);
+    setTimeout(function () {
+      if (s.parentNode) s.parentNode.removeChild(s);
+      document.documentElement.classList.remove("splashing");
+    }, 3800);
   })();
 </script>
 

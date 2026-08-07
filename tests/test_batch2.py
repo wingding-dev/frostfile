@@ -114,3 +114,15 @@ def test_setup_import_refused_once_a_vault_exists(unlocked):
     )
     assert response.status_code == 303
     assert response.headers["location"] == "/unlock"
+
+
+def test_update_reminder_seeded_at_setup(unlocked):
+    # Zero-network update channel: household reminder exists from setup.
+    page = unlocked.get("/reminders").text
+    assert "newer FrostFile at frostfile.org" in page
+
+
+def test_settings_updates_card_is_link_only(unlocked):
+    page = unlocked.get("/settings").text
+    assert "never checks the internet for updates" in page
+    assert 'href="https://frostfile.org"' in page
