@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import socket
 import sys
 import threading
@@ -72,6 +73,14 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # In a windowed (no-console) build, stdout/stderr are None — and uvicorn's
+    # log formatter calls .isatty() on them. The bundle launcher guards this
+    # too; guarding here as well keeps every entry point launch-safe.
+    if sys.stdout is None:
+        sys.stdout = open(os.devnull, "w", encoding="utf-8")
+    if sys.stderr is None:
+        sys.stderr = open(os.devnull, "w", encoding="utf-8")
+
     args = build_parser().parse_args(argv)
 
     settings = load_settings(
