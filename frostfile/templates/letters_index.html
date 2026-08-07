@@ -23,18 +23,37 @@
 {% if mailable %}
 <div class="card">
   <div class="card-head">
-    <h3 style="margin:0">The Whole Stack in One Go</h3>
+    <h3 style="margin:0">Four Ways to Get These on Paper</h3>
     <span class="btn-row" style="margin:0">
       <a class="btn" href="/letters/all">Print Every Packet at Once</a>
       <a class="btn btn-quiet" href="/letters/all.zip">Download as Separate PDFs</a>
     </span>
   </div>
-  <p class="small muted" style="margin-bottom:0">
-    Printing covers every child at every mailable agency in one job — to paper,
-    or to a single combined PDF via &ldquo;Save as PDF&rdquo;. The download
-    button instead makes one PDF <em>per packet</em>, each already named
-    (&ldquo;Equifax freeze packet - Robin.pdf&rdquo;), bundled in a zip.
-  </p>
+  <table class="small" style="margin-top:.6rem">
+    <thead><tr><th>You Want</th><th>Press</th><th>You Get</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>&#128424;&#65039; Paper, one packet</td>
+        <td>A packet's <strong>Print on Paper</strong> button</td>
+        <td>Your printer window opens; print it</td>
+      </tr>
+      <tr>
+        <td>&#128196; A file, one packet</td>
+        <td>A packet's <strong>Save as PDF</strong> button</td>
+        <td>One file, already named (&ldquo;Equifax freeze packet - Robin.pdf&rdquo;)</td>
+      </tr>
+      <tr>
+        <td>&#128424;&#65039; Paper, everything</td>
+        <td><strong>Print Every Packet at Once</strong> (above)</td>
+        <td>The whole stack in one print job</td>
+      </tr>
+      <tr>
+        <td>&#128193; Files, everything</td>
+        <td><strong>Download as Separate PDFs</strong> (above)</td>
+        <td>A zip of named PDFs — one per packet</td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 {% endif %}
 
@@ -82,6 +101,51 @@
 {% endfor %}
 
 {% endif %}
+
+<div class="card">
+  <h3 style="margin-top:0">Never Mailed Anything Like This? Here's Where to Actually Go</h3>
+  <table class="small">
+    <tbody>
+      <tr>
+        <td style="width:32%"><strong>&#128722; Stamps</strong></td>
+        <td>Any post office — or the checkout at most grocery stores and
+          pharmacies sells a book of stamps (just ask the cashier). One
+          first-class stamp per normal envelope; a fat envelope may need two,
+          and the post office counter will weigh it for you.</td>
+      </tr>
+      <tr>
+        <td><strong>&#128424;&#65039; Photocopies</strong></td>
+        <td>Your public library (usually cheapest), a FedEx Office or UPS Store
+          (FedEx Office is what Kinko's became), or an office-supply store.
+          Many home printers copy too — and a clear phone photo printed out is
+          usually accepted as a &ldquo;copy.&rdquo;</td>
+      </tr>
+      <tr>
+        <td><strong>&#128220; Birth certificate</strong></td>
+        <td>Certified copies come from the vital records office of the county
+          or state <em>where the child was born</em> — search
+          &ldquo;<span class="mono">[that county] vital records birth
+          certificate</span>&rdquo;. There's a fee, and many offices let you
+          order online or by mail. Remember: you <em>mail a photocopy</em>,
+          never the certified original.</td>
+      </tr>
+      <tr>
+        <td><strong>&#128179; Social Security card</strong></td>
+        <td>Lost it? Replacements are free from Social Security — through a
+          &ldquo;my Social Security&rdquo; account at
+          <span class="mono">ssa.gov</span>, or at a local Social Security
+          office. Again, you only ever mail a photocopy.</td>
+      </tr>
+      <tr>
+        <td><strong>&#9993;&#65039; Certified mail</strong></td>
+        <td>Ask for &ldquo;certified mail with return receipt&rdquo; at any
+          post office counter — it costs a few dollars extra and gives you
+          proof it arrived. Worth it for envelopes carrying a child's
+          documents.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 {% if blocked %}
 <div class="card">

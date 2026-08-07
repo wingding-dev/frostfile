@@ -128,3 +128,29 @@ def test_data_dir_move_copies_db_and_leaves_pointer(unlocked, settings, tmp_path
         data={"folder": str(target), "csrf_token": csrf_token(unlocked)},
     )
     assert "Already using that folder" in again.text
+
+
+def test_copy_address_from_family_member(unlocked):
+    dana = add_person(
+        unlocked,
+        "Dana Guardian",
+        address_street="12 Elm Street",
+        address_city="Springfield",
+        address_state="IL",
+        address_zip="62704",
+    )
+    kid = add_person(unlocked, "Copied Kid", kind="minor", copy_address_from=str(dana))
+    detail = unlocked.get(f"/people/{kid}").text
+    assert "12 Elm Street" in detail
+    assert "Springfield, IL 62704" in detail
+
+    # Copying wins over typed boxes (picking a person is the deliberate act).
+    kid2 = add_person(
+        unlocked,
+        "Copied Kid Two",
+        kind="minor",
+        address_street="999 Wrong Way",
+        copy_address_from=str(dana),
+    )
+    assert "12 Elm Street" in unlocked.get(f"/people/{kid2}").text
+    assert "999 Wrong Way" not in unlocked.get(f"/people/{kid2}").text

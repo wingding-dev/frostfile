@@ -63,6 +63,18 @@
   <fieldset class="subsection">
     <legend>Mailing Address</legend>
     <p class="hint" style="margin:0 0 .7rem">Used to fill in mailing packets.</p>
+    {% if address_sources %}
+    <div class="form-row">
+      <label for="copy_address_from">Same address as someone already added?</label>
+      <select id="copy_address_from" name="copy_address_from">
+        <option value="">No — I'll type it below</option>
+        {% for source in address_sources %}
+          <option value="{{ source.id }}">Use {{ source.display_name }}'s address</option>
+        {% endfor %}
+      </select>
+      <p class="hint">Families usually share one address — pick a person and their address is copied on save (it wins over the boxes below).</p>
+    </div>
+    {% endif %}
     <div class="form-row">
       <label for="address_street">Street address</label>
       <input type="text" id="address_street" name="address_street" autocomplete="address-line1"
