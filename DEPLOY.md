@@ -11,7 +11,7 @@ tier). One more is needed if you want automated Windows/Mac builds: **GitHub**
 
 | Artifact | Built by | Uploaded to |
 | --- | --- | --- |
-| `FrostFile.exe` (Windows, one file) | `build\build-windows.bat` on a Windows PC, **or** GitHub Actions | R2 bucket |
+| `FrostFile-windows.zip` (Windows, zipped folder) | `build\build-windows.bat` on a Windows PC, **or** GitHub Actions | R2 bucket |
 | `FrostFile-mac.zip` (Mac .app) | `sh build/build-macos.sh` on a Mac, **or** GitHub Actions | R2 bucket |
 | `frostfile-1.0.0.tar.gz` + `.whl` (source — AGPL requires offering it) | `python -m build` anywhere | R2 bucket |
 | `index.html` (the storefront) | `storefront/build.py` (already built) | Cloudflare Pages |
@@ -45,7 +45,7 @@ Actions builds both for free (step 5b).
    (location: automatic).
 2. Upload the built artifacts (step 5) with these EXACT names — the site
    links to them:
-   - `FrostFile.exe`
+   - `FrostFile-windows.zip`
    - `FrostFile-mac.zip`
    - `frostfile-1.0.0.tar.gz`  (source; satisfies the AGPL source offer)
 3. No public access needed — the Worker reads the bucket via a binding.
@@ -89,7 +89,7 @@ person. No third party holds the list — the same promise the app makes.
 
 ### 5a. On your own machines
 - **Windows PC:** clone/copy the repo, run `build\build-windows.bat` from the
-  repo root. Result: `dist\FrostFile.exe`. Run it once — expect the SmartScreen
+  repo root. Result: `dist\FrostFile-windows.zip`. Run it once — expect the SmartScreen
   blue box ("More info → Run anyway") since we're not code-signed yet.
 - **Mac:** `sh build/build-macos.sh`, then
   `cd dist && zip -r FrostFile-mac.zip FrostFile.app`.
@@ -118,7 +118,7 @@ hash is how you prove the file is yours.
 ## 7. Flash drives
 
 Copy onto each drive:
-- `FrostFile.exe`
+- `FrostFile-windows.zip`
 - `FrostFile-mac.zip` (if built)
 - `START-HERE.txt` (in `drive-kit/`)
 - `SHA256SUMS.txt`

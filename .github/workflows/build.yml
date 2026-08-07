@@ -19,7 +19,7 @@ jobs:
         include:
           - os: windows-latest
             artifact: FrostFile-windows
-            binary: dist/FrostFile.exe
+            binary: dist/FrostFile-windows.zip
           - os: macos-latest
             artifact: FrostFile-macos
             binary: dist/FrostFile-mac.zip
@@ -39,6 +39,9 @@ jobs:
           python -m PyInstaller build/frostfile.spec --noconfirm
       - if: runner.os == 'macOS'
         run: cd dist && zip -r FrostFile-mac.zip FrostFile.app
+      - if: runner.os == 'Windows'
+        shell: pwsh
+        run: Compress-Archive -Path dist/FrostFile -DestinationPath dist/FrostFile-windows.zip
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
