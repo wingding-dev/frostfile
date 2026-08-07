@@ -656,6 +656,38 @@ def seed_reminders_for(
     conn.commit()
 
 
+def ensure_update_reminder(conn: sqlite3.Connection, vault: Vault) -> None:
+    """The zero-network update channel: a recurring household reminder to look
+    at frostfile.org. The app itself never checks for updates — by project
+    rule, it makes no connections beyond the explicit lookup buttons."""
+    exists = conn.execute(
+        "SELECT 1 FROM reminders WHERE kind = 'ff_update'"
+    ).fetchone()
+    if exists:
+        return
+    due = date.today() + timedelta(days=182)
+    conn.execute(
+        "INSERT INTO reminders (person_id, kind, title, detail, title_enc, "
+        "detail_enc, due_date, recurrence, created_at) "
+        "VALUES (NULL, 'ff_update', '', '', ?, ?, ?, 'yearly', ?)",
+        (
+            vault.encrypt(
+                context_for("reminders", "title_enc"),
+                "Look for a newer FrostFile at frostfile.org",
+            ),
+            vault.encrypt(
+                context_for("reminders", "detail_enc"),
+                "FrostFile never checks the internet on its own, so updates — "
+                "fixes and corrected agency addresses — only reach you when "
+                "you look. Updating is safe: your data stays put.",
+            ),
+            due.isoformat(),
+            utcnow(),
+        ),
+    )
+    conn.commit()
+
+
 def list_reminders(
     conn: sqlite3.Connection, vault: Vault, include_inactive: bool = False
 ) -> list[Reminder]:
