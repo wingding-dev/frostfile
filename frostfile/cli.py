@@ -137,9 +137,17 @@ def _gui_backend_available() -> bool:
     """
     import os
 
-    if os.name != "nt" and not (
-        os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY")
-    ):
+    # Windows (WebView2) and macOS (Cocoa/WebKit) always have a native
+    # renderer — and probing would be wrong anyway: DISPLAY is an X11
+    # variable no normal Mac sets, and in a PyInstaller bundle
+    # sys.executable is the app itself, so the Qt subprocess probe below
+    # would re-launch FrostFile instead of Python. If pywebview still
+    # fails on these platforms, _run_app_window catches it and falls back
+    # to the browser.
+    if os.name == "nt" or sys.platform == "darwin":
+        return True
+
+    if not (os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY")):
         return False  # headless: no window possible
 
     # GTK/WebKit backend — its failures are catchable Python ImportErrors.
