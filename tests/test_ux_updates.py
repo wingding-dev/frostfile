@@ -97,9 +97,10 @@ def test_data_dir_move_copies_db_and_leaves_pointer(unlocked, settings, tmp_path
 
     # A pointer is left in the OLD folder (never the machine-wide default), and
     # the NEW folder carries no onward pointer that would bounce resolution out.
-    assert str(target) in (old_dir / "prefs.json").read_text()
     import json
 
+    # Compare parsed JSON, not raw text — json.dumps doubles Windows backslashes.
+    assert json.loads((old_dir / "prefs.json").read_text())["data_dir"] == str(target)
     assert "data_dir" not in json.loads((target / "prefs.json").read_text())
 
     from frostfile.config import load_settings

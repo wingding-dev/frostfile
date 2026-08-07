@@ -69,6 +69,7 @@ def test_move_kit_export_and_import_round_trip(
     unlocked, settings, tmp_path, monkeypatch
 ):
     monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path))  # Path.home() on Windows
     add_person(unlocked, "Mover Person")
 
     response = unlocked.post(

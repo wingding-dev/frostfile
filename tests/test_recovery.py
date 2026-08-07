@@ -60,6 +60,7 @@ def test_recovery_code_resets_the_passphrase(unlocked):
 
 def test_recovery_code_saves_to_a_file(unlocked, tmp_path, monkeypatch):
     monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path))  # Path.home() on Windows
     code = _grab_code(unlocked)
     response = unlocked.post(
         "/recovery-code/save", data={"csrf_token": csrf_token(unlocked)}
