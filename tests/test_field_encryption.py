@@ -119,3 +119,38 @@ def test_legacy_plaintext_reminder_is_migrated_on_unlock(unlocked, settings):
     raw = settings.db_path.read_bytes()
     assert b"PLAINTITLE7" not in raw  # but no longer plaintext
     assert b"PLAINDETAIL8" not in raw
+
+
+def test_add_person_on_legacy_reminders_schema(tmp_path):
+    """A vault upgraded from the pre-encryption schema has reminders.title as
+    NOT NULL with no default. Adding a person must still seed reminders without
+    a NOT NULL crash (this 500'd 'after adding a family member')."""
+    from frostfile import db
+    from frostfile.repo import create_person, list_reminders
+    from frostfile.seeds import seed_agencies
+
+    conn = db.connect(tmp_path / "legacy.db")
+    vault = db.initialize_vault(conn, "correct horse battery staple")
+    seed_agencies(conn)
+    # Rebuild reminders with the ORIGINAL constraint: title NOT NULL, no default.
+    conn.executescript(
+        """
+        DROP TABLE reminders;
+        CREATE TABLE reminders (
+          id INTEGER PRIMARY KEY, person_id INTEGER, agency_id INTEGER,
+          kind TEXT NOT NULL DEFAULT 'custom',
+          title TEXT NOT NULL, detail TEXT NOT NULL DEFAULT '',
+          due_date TEXT NOT NULL, recurrence TEXT NOT NULL DEFAULT 'none',
+          last_completed TEXT, is_active INTEGER NOT NULL DEFAULT 1,
+          notes_enc BLOB, created_at TEXT NOT NULL, title_enc BLOB, detail_enc BLOB);
+        """
+    )
+    conn.commit()
+
+    minor = create_person(conn, vault, display_name="Kid", kind="minor")
+    adult = create_person(conn, vault, display_name="Grown Up", kind="adult")
+    # Both got their seeded reminders — no crash, and they read back.
+    titles = {r.title for r in list_reminders(conn, vault)}
+    assert any("child" in t.lower() for t in titles)          # minor template
+    assert any("Social Security" in t for t in titles)         # adult-only template
+    conn.close()
