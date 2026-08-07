@@ -109,8 +109,10 @@ AGENCIES: list[dict[str, Any]] = [
             "all free. Lift online or via the myEquifax app."
         ),
         "notes": (
-            "The minor freeze form covers children under 16. For 16- and "
-            "17-year-olds, ask Equifax about a standard freeze instead."
+            "The minor freeze form covers children under 16. 16- and "
+            "17-year-olds request their own standard freeze by phone or mail "
+            "(online accounts require 18) — FrostFile's Letters page prints a "
+            "teen letter for this."
         ),
         "minor_requirements": {
             "guardian": [
@@ -129,7 +131,7 @@ AGENCIES: list[dict[str, Any]] = [
             "mail_address": ["equifax-minor-form", "ca-ag-child-freeze"],
             "minor_requirements": ["equifax-minor-form", "ca-ag-child-freeze"],
             "thaw_procedure": ["equifax-minor-form"],
-            "notes": ["equifax-minor-form"],
+            "notes": ["equifax-minor-form", "equifax-child-faq", "ftc-minors-under-16"],
             "freeze_url": ["equifax-freeze"],
             "phone": ["equifax-freeze"],
         },

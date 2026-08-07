@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import cite_field, status_pill, person_badge %}
+{% from "_macros.html" import cite, cite_field, status_pill, person_badge %}
 {% block title %}{{ person.display_name }} — FrostFile{% endblock %}
 
 {% block content %}
@@ -18,7 +18,19 @@
   {% if person.notes %}<div class="field"><div class="field-label">Notes</div><div class="field-value">{{ person.notes }}</div></div>{% endif %}
 </div>
 
-{% if person.is_minor %}
+{% if person.is_teen %}
+<div class="notice notice-warn">
+  <p style="margin:0">
+    <strong>{{ person.display_name }} is 16 or 17 — the freeze process changes.</strong>
+    A parent can no longer place the child (&ldquo;protected consumer&rdquo;)
+    freeze; {{ person.display_name }} requests their <em>own</em> standard
+    freeze at each bureau, by phone or by mail — online accounts require being
+    18{{ cite(citer, refs('equifax-child-faq', 'ftc-minors-under-16')) }}.
+    The <a href="/letters">Letters page</a> prints teen letters written in
+    their name. At 18 they can manage everything online themselves.
+  </p>
+</div>
+{% elif person.is_minor %}
 <div class="notice notice-info">
   <p style="margin:0">
     For a child, the goal is that <em>no credit file exists at all</em>. When you

@@ -1,7 +1,96 @@
 {# One complete mailing packet: cover letter, then its enclosure checklist.
-   Expects person, agency, guardian, today (and the page's citer) in context. #}
-{% from "_macros.html" import cite_field %}
+   Expects person, agency, guardian, today (and the page's citer) in context.
+   Branches for teens (16–17), who must request their OWN standard freeze —
+   the parent-placed protected-consumer process only covers children under 16. #}
+{% from "_macros.html" import cite, cite_field %}
 
+{% if person.is_teen %}
+<article class="letter">
+  <div class="letter-head">
+    <address>
+      {{ person.display_name }}
+      {%- if person.address %}
+{{ person.address }}{% elif guardian and guardian.address %}
+{{ guardian.address }}{% endif %}
+    </address>
+    <div>{{ today }}</div>
+  </div>
+
+  <address style="margin-bottom:1.6rem">{{ agency.mail_address }}</address>
+
+  <p><strong>Re: Request for a security freeze on my credit file</strong></p>
+
+  <p>To whom it may concern,</p>
+
+  <p>
+    I am requesting that you place a security freeze on my credit file, and
+    that you create a file for the sole purpose of placing the freeze if none
+    currently exists. Security freezes are free under federal law.
+  </p>
+
+  <table style="margin:1.2rem 0; width:100%">
+    <tbody>
+      <tr><td style="width:38%"><strong>Full name</strong></td><td>{{ person.display_name }}</td></tr>
+      <tr><td><strong>Date of birth</strong></td><td>{{ person.birth_date or '__________________' }}</td></tr>
+      <tr><td><strong>Social Security number</strong></td><td class="mono">{{ person.ssn or '_______ - _____ - __________' }}</td></tr>
+      <tr><td><strong>Current address</strong></td><td style="white-space:pre-line">{{ person.address or (guardian.address if guardian else None) or '__________________' }}</td></tr>
+    </tbody>
+  </table>
+
+  <p>
+    Copies of documents confirming my identity and address are enclosed.
+    Please confirm in writing once the freeze is in place.
+  </p>
+
+  <p style="margin-top:2.5rem">Sincerely,</p>
+  <p style="margin-top:2.5rem">_________________________________________<br>
+    {{ person.display_name }}</p>
+</article>
+
+<div class="page-break"></div>
+
+<article class="letter">
+  <h2 style="margin-top:0">Teen Freeze — Read This First</h2>
+  <p class="small">
+    {{ person.display_name }} is 16 or 17, so the parent-placed child freeze no
+    longer applies — <strong>the teen requests their own freeze</strong>, by
+    phone or by mail; the bureaus' online accounts require being
+    18{{ cite(citer, refs('equifax-child-faq', 'ftc-minors-under-16')) }}.
+  </p>
+  <h3>Fastest Route: One Phone Call</h3>
+  <p class="small">
+    {% if agency.phone %}Have {{ person.display_name }} call
+    <span class="mono">{{ agency.phone }}</span>{{ cite_field(citer, agency, 'phone') }}
+    and ask to place a security freeze. Mailing this letter is the backup.{% else %}
+    Check the agency's official page for its phone number — calling is usually
+    faster than mail.{% endif %}
+  </p>
+  <h3>If Mailing, Enclose Copies Of</h3>
+  <p class="small">
+    The bureaus do not publish one consistent document list for 16- and
+    17-year-olds — <strong>call first to confirm</strong>, or check the
+    official page. Commonly requested:
+  </p>
+  <ul class="checklist">
+    <li>A photo ID (school ID, learner's permit, state ID, or passport)</li>
+    <li>Copy of the Social Security card</li>
+    <li>Proof of address (a bank statement or a parent's utility bill listing the teen)</li>
+  </ul>
+  <h3>Before Mailing</h3>
+  <ul class="checklist">
+    <li>Mailing address compared, line by line, against {{ agency.name }}'s own website — today, by you</li>
+    <li>Every enclosure is a copy, not an original</li>
+    <li>The letter is signed by {{ person.display_name }} (not the parent)</li>
+    <li>Sent with tracking or certified mail</li>
+    <li>Date mailed recorded in the app</li>
+  </ul>
+  <p class="small" style="margin-top:2rem">
+    Mail to:<br>
+    <span style="white-space:pre-line">{{ agency.mail_address }}</span>
+  </p>
+</article>
+
+{% else %}
 <article class="letter">
   <div class="letter-head">
     <address>
@@ -98,3 +187,4 @@ _______________________________
     <span style="white-space:pre-line">{{ agency.mail_address }}</span>
   </p>
 </article>
+{% endif %}

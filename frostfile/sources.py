@@ -109,6 +109,22 @@ SOURCES: dict[str, Source] = {
             "listed",
         ),
         _s(
+            "equifax-child-faq",
+            "Freezing Your Child's Credit Report FAQ",
+            "https://www.equifax.com/personal/education/identity-theft/articles/-/learn/freezing-your-childs-credit-report-faq/",
+            "Equifax",
+            "official",
+            "listed",
+        ),
+        _s(
+            "ftc-minors-under-16",
+            "New protections available for minors under 16",
+            "https://consumer.ftc.gov/consumer-alerts/2019/03/new-protections-available-minors-under-16",
+            "Federal Trade Commission",
+            "government",
+            "listed",
+        ),
+        _s(
             "ca-ag-child-freeze",
             'How to "Freeze" Your Child\'s Credit Files',
             "https://oag.ca.gov/idtheft/facts/freeze-child-credit",

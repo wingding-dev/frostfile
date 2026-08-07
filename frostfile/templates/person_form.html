@@ -39,6 +39,11 @@
     <div class="form-row">
       <label for="birth_date">Date of birth</label>
       <input type="date" id="birth_date" name="birth_date" value="{{ person.birth_date or '' if person else '' }}">
+      <p class="hint">
+        Matters most for kids: the freeze process is different for children
+        under 16 than for 16–17-year-olds, and the birth date is how FrostFile
+        picks the right one.
+      </p>
     </div>
 
     <div class="form-row">
