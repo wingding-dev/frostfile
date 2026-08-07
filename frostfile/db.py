@@ -193,16 +193,23 @@ def connect(path: Path) -> sqlite3.Connection:
     # The connection is still only ever touched by one request, and never by two
     # threads at once, so SQLite's serialized threading mode covers this.
     conn = sqlite3.connect(path, detect_types=0, check_same_thread=False)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")
-    # Default (rollback journal) rather than WAL: this database is tiny and
-    # single-user, and it means "copy the .db file while the app is closed" is
-    # a complete backup — which is the instruction most people will follow.
-    conn.execute("PRAGMA journal_mode = DELETE")
-    conn.execute("PRAGMA synchronous = FULL")
-    # Overwrite freed content instead of leaving it in freelist pages, so a
-    # deleted SSN or a migrated-away plaintext value does not linger in the file.
-    conn.execute("PRAGMA secure_delete = ON")
+    try:
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA foreign_keys = ON")
+        # Default (rollback journal) rather than WAL: this database is tiny and
+        # single-user, and it means "copy the .db file while the app is closed"
+        # is a complete backup — which is the instruction most people follow.
+        conn.execute("PRAGMA journal_mode = DELETE")
+        conn.execute("PRAGMA synchronous = FULL")
+        # Overwrite freed content instead of leaving it in freelist pages, so a
+        # deleted SSN or migrated-away plaintext does not linger in the file.
+        conn.execute("PRAGMA secure_delete = ON")
+    except BaseException:
+        # sqlite3.connect() succeeds lazily even on a non-database file; the
+        # first PRAGMA is what fails. Close before re-raising, or the leaked
+        # handle keeps the file locked on Windows and it can't be deleted.
+        conn.close()
+        raise
     return conn
 
 
