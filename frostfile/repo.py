@@ -46,6 +46,27 @@ class Person:
         return self.kind == "minor"
 
     @property
+    def age(self) -> int | None:
+        if not self.birth_date:
+            return None
+        try:
+            born = date.fromisoformat(self.birth_date)
+        except ValueError:
+            return None
+        today = date.today()
+        return today.year - born.year - (
+            (today.month, today.day) < (born.month, born.day)
+        )
+
+    @property
+    def is_teen(self) -> bool:
+        """A 16–17-year-old. Federal law's protected-consumer (parent-placed)
+        freeze covers only children under 16; at 16–17 the teen requests their
+        OWN standard freeze, by phone or mail (online accounts require 18)."""
+        age = self.age
+        return self.is_minor and age is not None and 16 <= age < 18
+
+    @property
     def masked_ssn(self) -> str:
         if self.ssn_last4:
             return f"•••-••-{self.ssn_last4}"
@@ -132,7 +153,9 @@ def create_person(conn: sqlite3.Connection, vault: Vault, **values: Any) -> int:
     conn.commit()
 
     ensure_freeze_records(conn, person_id)
-    seed_reminders_for(conn, vault, person_id, values.get("kind", "adult"))
+    seed_reminders_for(
+        conn, vault, person_id, values.get("kind", "adult"), values.get("birth_date")
+    )
     return person_id
 
 
@@ -552,9 +575,53 @@ _RECURRENCE_DAYS = {"yearly": 365, "quarterly": 91, "monthly": 30, "weekly": 7}
 
 
 def seed_reminders_for(
-    conn: sqlite3.Connection, vault: Vault, person_id: int, kind: str
+    conn: sqlite3.Connection,
+    vault: Vault,
+    person_id: int,
+    kind: str,
+    birth_date: str | None = None,
 ) -> None:
     today = date.today()
+
+    # A child's freeze process changes at 16: the parent-placed protected-
+    # consumer freeze stops applying, and the teen requests their own standard
+    # freeze by phone or mail. Remind the family when that switch arrives.
+    if kind == "minor" and birth_date:
+        try:
+            born = date.fromisoformat(birth_date)
+        except ValueError:
+            born = None
+        if born is not None:
+            sixteenth = born.replace(year=born.year + 16)
+            due = sixteenth if sixteenth > today else today + timedelta(days=3)
+            eighteenth = born.replace(year=born.year + 18)
+            exists = conn.execute(
+                "SELECT 1 FROM reminders WHERE person_id = ? AND kind = 'teen_transition'",
+                (person_id,),
+            ).fetchone()
+            if not exists and today < eighteenth:
+                conn.execute(
+                    "INSERT INTO reminders (person_id, kind, title, detail, "
+                    "title_enc, detail_enc, due_date, recurrence, created_at) "
+                    "VALUES (?, 'teen_transition', '', '', ?, ?, ?, 'none', ?)",
+                    (
+                        person_id,
+                        vault.encrypt(
+                            context_for("reminders", "title_enc"),
+                            "Turning 16 — switch to the teen freeze process",
+                        ),
+                        vault.encrypt(
+                            context_for("reminders", "detail_enc"),
+                            "At 16, a parent can no longer place the protected-"
+                            "consumer freeze. The teen requests their own "
+                            "standard freeze by phone or mail (online needs 18). "
+                            "See their page under Family.",
+                        ),
+                        due.isoformat(),
+                        utcnow(),
+                    ),
+                )
+
     for template in REMINDER_TEMPLATES:
         if template.get("adults_only") and kind != "adult":
             continue

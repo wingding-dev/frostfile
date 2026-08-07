@@ -183,6 +183,41 @@ def letters_mark_all_mailed(
     return redirect("/matrix")
 
 
+# Registered before the bare route so "…/5.pdf" isn't parsed as agency_id="5.pdf".
+@router.get("/letters/{person_id}/{agency_id}.pdf")
+def letter_pdf(
+    person_id: int,
+    agency_id: int,
+    request: Request,
+    conn: sqlite3.Connection = Depends(get_conn),
+    vault: Vault = Depends(get_vault),
+):
+    """One packet as a downloadable, self-named PDF.
+
+    This also covers environments where the browser print dialog is
+    unavailable (the app window's engine ignores window.print())."""
+    person = get_person(conn, vault, person_id)
+    agency = get_agency(conn, agency_id)
+    if person is None or agency is None:
+        raise HTTPException(status_code=404, detail="No such person or agency.")
+    if not agency.can_generate_letter:
+        raise HTTPException(status_code=400, detail="No verified mailing address.")
+    guardians = [p for p in list_people(conn, vault) if not p.is_minor]
+    payload = pdfletters.build_packet_pdf(
+        person, agency, _pick_guardian(request, guardians), _long_date()
+    )
+    filename = f"{agency.name} freeze packet - {person.display_name}.pdf"
+    filename = pdfletters._safe_filename(filename)
+    return Response(
+        content=payload,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Cache-Control": "no-store",
+        },
+    )
+
+
 @router.get("/letters/{person_id}/{agency_id}")
 def letter_print(
     person_id: int,

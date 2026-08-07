@@ -7,14 +7,18 @@
 <div class="no-print">
   <p class="small muted"><a href="/letters">← Mailing packets</a></p>
   <div class="card-head">
-    <h1>{{ agency.name }} packet for {{ person.display_name }}</h1>
-    <button class="btn" onclick="window.print()">Print</button>
+    <h1>{{ agency.name }} {{ 'teen letter' if person.is_teen else 'packet' }} for {{ person.display_name }}</h1>
+    <span class="btn-row" style="margin:0">
+      <a class="btn" href="/letters/{{ person.id }}/{{ agency.id }}.pdf{{ '?guardian=' + guardian.id|string if guardian else '' }}">Save as PDF</a>
+      <button class="btn btn-quiet" onclick="window.print()">Print on Paper</button>
+    </span>
   </div>
   <p class="small muted">
-    The Print button works for paper or for a file: in the print window, choose
-    your printer for paper, or choose &ldquo;Save as PDF&rdquo; to get a file.
-    The file will already be named
-    &ldquo;{{ agency.name }} freeze packet - {{ person.display_name }}&rdquo;.
+    <strong>Save as PDF</strong> downloads a ready-to-print file already named
+    &ldquo;{{ agency.name }} freeze packet - {{ person.display_name }}&rdquo; —
+    open it and print, or send it to whoever has the printer.
+    <strong>Print on Paper</strong> opens your printer window directly (works
+    in a web browser; if nothing happens, use Save as PDF instead).
   </p>
 
   {% if guardians|length > 1 %}

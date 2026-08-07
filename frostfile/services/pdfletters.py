@@ -95,6 +95,81 @@ def _checklist(items: list[str]) -> Table:
     return table
 
 
+def _teen_packet_story(person, agency, guardian, today: str) -> list:
+    """A 16-17-year-old requests their OWN standard freeze (phone or mail;
+    online requires 18) — the parent-placed protected-consumer letter would be
+    the wrong instrument, so teens get a letter in their own name."""
+    address = person.address or (guardian.address if guardian else None)
+    sender_lines = [person.display_name] + ([address] if address else [])
+    head = Table(
+        [[_p("\n".join(sender_lines)), _p(today)]],
+        colWidths=[4.4 * inch, 2.0 * inch],
+    )
+    head.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP")]))
+    rows = [
+        ("Full name", person.display_name),
+        ("Date of birth", person.birth_date or _BLANK),
+        ("Social Security number", person.ssn or _SSN_BLANK),
+        ("Current address", address or _BLANK),
+    ]
+    info = Table(
+        [[_p(label, _BOLD), _p(value)] for label, value in rows],
+        colWidths=[2.4 * inch, 4.0 * inch],
+    )
+    info.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("LINEBELOW", (0, 0), (-1, -2), 0.4, colors.Color(0.8, 0.8, 0.8)),
+        ("TOPPADDING", (0, 0), (-1, -1), 4),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+    ]))
+    story = [
+        head, Spacer(1, 24), _p(agency.mail_address), Spacer(1, 22),
+        _p("Re: Request for a security freeze on my credit file", _BOLD),
+        Spacer(1, 12), _p("To whom it may concern,"), Spacer(1, 10),
+        _p("I am requesting that you place a security freeze on my credit "
+           "file, and that you create a file for the sole purpose of placing "
+           "the freeze if none currently exists. Security freezes are free "
+           "under federal law."),
+        Spacer(1, 14), info, Spacer(1, 14),
+        _p("Copies of documents confirming my identity and address are "
+           "enclosed. Please confirm in writing once the freeze is in place."),
+        Spacer(1, 30), _p("Sincerely,"), Spacer(1, 40),
+        _p("_________________________________________"),
+        _p(person.display_name),
+        PageBreak(),
+        _p("Teen Freeze — Read This First", _HEAD),
+        _p(f"{person.display_name} is 16 or 17, so the parent-placed child "
+           "freeze no longer applies — the teen requests their own freeze, by "
+           "phone or by mail (online accounts require being 18).", _SMALL),
+        Spacer(1, 10), _p("Fastest Route: One Phone Call", _BOLD), Spacer(1, 4),
+        _p((f"Have {person.display_name} call {agency.phone} and ask to place "
+            "a security freeze. Mailing this letter is the backup.")
+           if agency.phone else
+           "Check the agency's official page for its phone number — calling "
+           "is usually faster than mail.", _SMALL),
+        Spacer(1, 10), _p("If Mailing, Enclose Copies Of", _BOLD), Spacer(1, 4),
+        _p("The bureaus do not publish one consistent document list for 16- "
+           "and 17-year-olds — call first to confirm. Commonly requested:", _SMALL),
+        Spacer(1, 4),
+        _checklist([
+            "A photo ID (school ID, learner's permit, state ID, or passport)",
+            "Copy of the Social Security card",
+            "Proof of address (bank statement, or a parent's bill listing the teen)",
+        ]),
+        Spacer(1, 10), _p("Before Mailing", _BOLD), Spacer(1, 4),
+        _checklist([
+            f"Mailing address compared, line by line, against {agency.name}'s "
+            "own website — today, by you",
+            "Every enclosure is a copy, not an original",
+            f"The letter is signed by {person.display_name} (not the parent)",
+            "Sent with tracking or certified mail",
+            "Date mailed recorded in the app",
+        ]),
+        Spacer(1, 14), _p("Mail to:", _BOLD), Spacer(1, 4), _p(agency.mail_address),
+    ]
+    return story
+
+
 def build_packet_pdf(person, agency, guardian, today: str) -> bytes:
     """Cover letter (page 1) and enclosure checklist (page 2)."""
     buffer = BytesIO()
@@ -107,6 +182,10 @@ def build_packet_pdf(person, agency, guardian, today: str) -> bytes:
         bottomMargin=1 * inch,
         title=f"{agency.name} freeze packet - {person.display_name}",
     )
+
+    if getattr(person, "is_teen", False):
+        doc.build(_teen_packet_story(person, agency, guardian, today))
+        return buffer.getvalue()
 
     if guardian:
         sender_lines = [guardian.display_name]

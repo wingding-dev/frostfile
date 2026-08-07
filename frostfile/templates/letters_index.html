@@ -41,9 +41,22 @@
 {% for child in minors %}
 <div class="card">
   <div class="card-head">
-    <h2 style="margin:0">{{ child.display_name }}</h2>
+    <h2 style="margin:0">{{ child.display_name }}{% if child.is_teen %} <span class="badge badge-minor">Teen — 16/17</span>{% endif %}</h2>
     <span class="small muted">{{ child.masked_ssn }}</span>
   </div>
+
+  {% if child.is_teen %}
+  <div class="notice notice-info">
+    <p style="margin:0">
+      <strong>{{ child.display_name }} is 16 or 17, so the process changes:</strong>
+      the parent-placed child freeze no longer applies — the teen requests
+      their <em>own</em> standard freeze, by phone or by mail (the bureaus'
+      online accounts require being 18){{ cite(citer, refs('equifax-child-faq', 'ftc-minors-under-16')) }}.
+      Fastest: they call each bureau. The letters below are the mail backup —
+      written in their name, signed by them.
+    </p>
+  </div>
+  {% endif %}
 
   {% if not adults %}
     <div class="notice notice-warn">
@@ -59,7 +72,7 @@
         <td>{{ agency.name }}</td>
         <td class="small muted">{{ agency.mail_address.split('\n')[-1] }}</td>
         <td style="text-align:right">
-          <a class="btn btn-small" href="/letters/{{ child.id }}/{{ agency.id }}">Prepare packet</a>
+          <a class="btn btn-small" href="/letters/{{ child.id }}/{{ agency.id }}">{{ 'Teen letter' if child.is_teen else 'Prepare packet' }}</a>
         </td>
       </tr>
       {% endfor %}

@@ -51,7 +51,7 @@
 {%- endmacro %}
 
 {% macro person_badge(person) -%}
-  <span class="badge badge-{{ person.kind }}">{{ 'Child' if person.is_minor else 'Adult' }}</span>
+  <span class="badge badge-{{ person.kind }}">{{ 'Teen' if person.is_teen else ('Child' if person.is_minor else 'Adult') }}</span>
 {%- endmacro %}
 
 {% macro field_row(label, value, refs, citer) -%}
