@@ -29,9 +29,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: python -m pip install . pyinstaller
-      - run: python -m pytest tests -q
-      - run: pyinstaller build/frostfile.spec --noconfirm
+      # One step, one shell, one interpreter: the runners have several Pythons
+      # on PATH and split steps have resolved different ones ("No module named
+      # pytest"). `python -m` everything so tests and build share the install.
+      - shell: bash
+        run: |
+          python -m pip install ".[dev]" pyinstaller
+          python -m pytest tests -q
+          python -m PyInstaller build/frostfile.spec --noconfirm
       - if: runner.os == 'macOS'
         run: cd dist && zip -r FrostFile-mac.zip FrostFile.app
       - uses: actions/upload-artifact@v4
