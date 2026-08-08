@@ -1,11 +1,11 @@
-# FrostFile v1.0.0 — SHA-256 checksums
-# All files built from git tag v1.0.0 by GitHub Actions;
+# FrostFile v1.0.1 — SHA-256 checksums
+# All files built from git tag v1.0.1 by GitHub Actions;
 # source repository: https://github.com/wingding-dev/frostfile
 #
 # Verify on Windows:  certutil -hashfile FrostFile-windows.zip SHA256
 # Verify on Mac:      shasum -a 256 FrostFile-mac.zip
 
-171f6e5d5ff26e1fe529ea249eb170820674552879b0cf9c6cb8063bcc01a2b5  FrostFile-windows.zip
-b2dfba47a33643cc60272ef7c36a909302d2ebf9b2f03ab92476b50db2e1d746  FrostFile-mac.zip
-ed3a11b607295339f4eb2721aff73fc3f8a22dab118887fc5c164a2a49eac306  frostfile-1.0.0.tar.gz
-700195be127da8ae9ff7456598e5d39ab038eb273b243adf6b7299234544f193  frostfile-1.0.0-py3-none-any.whl
+6003b94b6c9deae91247b283aa0a911b9d20d9cd5d5cc5c63b33422224dc4439  FrostFile-windows.zip
+7acf12926bc9bce5fb1f3a0d5f3f076df0dc7681c46c116c7ee0718438ed3a9b  FrostFile-mac.zip
+c98625ad0cd4e24ff8a326b05483a6410875a2403cfb66e67a496af799308555  frostfile-1.0.1.tar.gz
+36b0d5bcf07fc39c0adfac51a7dc02dfb62298b458f75ff1c4b56c4e11f5a1c8  frostfile-1.0.1-py3-none-any.whl
