@@ -2,8 +2,8 @@
 # worse with antivirus heuristics than one that says what it is.
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(1, 0, 0, 0),
-    prodvers=(1, 0, 0, 0),
+    filevers=(1, 0, 1, 0),
+    prodvers=(1, 0, 1, 0),
     mask=0x3F,
     flags=0x0,
     OS=0x40004,
@@ -18,9 +18,9 @@ VSVersionInfo(
         [
           StringStruct("CompanyName", "FrostFile (open source, AGPL)"),
           StringStruct("FileDescription", "FrostFile — family credit-freeze tracker"),
-          StringStruct("FileVersion", "1.0.0.0"),
+          StringStruct("FileVersion", "1.0.1.0"),
           StringStruct("ProductName", "FrostFile"),
-          StringStruct("ProductVersion", "1.0.0.0"),
+          StringStruct("ProductVersion", "1.0.1.0"),
           StringStruct("OriginalFilename", "FrostFile.exe"),
           StringStruct("LegalCopyright", "AGPL-3.0-or-later — github.com/wingding-dev/frostfile"),
         ],

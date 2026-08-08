@@ -37,8 +37,47 @@ jobs:
           python -m pip install ".[dev]" pyinstaller
           python -m pytest tests -q
           python -m PyInstaller build/frostfile.spec --noconfirm
+      # ditto, not zip. Plain zip (and Finder's Compress) mangle symlinks and
+      # extended attributes, which corrupts the .app's _CodeSignature. On Apple
+      # Silicon an INVALID signature is worse than none: the app lands in the
+      # "damaged" state where macOS registers no block event, so no "Open
+      # Anyway" option ever appears and the user cannot run it by any means.
+      # `ditto -c -k --keepParent` is Apple's own prescribed command.
       - if: runner.os == 'macOS'
-        run: cd dist && zip -r FrostFile-mac.zip FrostFile.app
+        run: cd dist && ditto -c -k --keepParent FrostFile.app FrostFile-mac.zip
+      # Guard against the v1.0.0 bug shipping again. v1.0.0 was packed with
+      # `zip -r`, which flattened all 56 symlinks the bundle's own
+      # _CodeSignature seals — producing an app that macOS reports as "damaged"
+      # with no way for the user to override, and a download 3x larger than it
+      # needed to be. Verify the ROUND TRIP, not the source tree: the bug lived
+      # entirely in the packaging step, so checking dist/FrostFile.app would
+      # have passed while the shipped zip was broken.
+      - if: runner.os == 'macOS'
+        name: Verify the packaged Mac app is intact
+        run: |
+          set -euo pipefail
+          cd dist
+          rm -rf _verify && mkdir _verify
+          ditto -x -k FrostFile-mac.zip _verify
+          APP="_verify/FrostFile.app"
+
+          links=$(find "$APP" -type l | wc -l | tr -d ' ')
+          echo "symlinks preserved: $links"
+          if [ "$links" -eq 0 ]; then
+            echo "FAIL: no symlinks survived packaging — the bundle seal is broken."
+            exit 1
+          fi
+
+          # The real test: does the signature still validate after the round trip?
+          codesign --verify --deep --strict --verbose=2 "$APP"
+
+          # Apple Silicon refuses to execute unsigned arm64 code at the kernel
+          # level, below Gatekeeper, so an absent signature is fatal too.
+          codesign -dv "$APP" 2>&1 | grep -q "Signature=" \
+            || { echo "FAIL: main executable carries no signature."; exit 1; }
+
+          echo "OK: signature valid and symlinks intact after packaging."
+          rm -rf _verify
       - if: runner.os == 'Windows'
         shell: pwsh
         run: Compress-Archive -Path dist/FrostFile -DestinationPath dist/FrostFile-windows.zip

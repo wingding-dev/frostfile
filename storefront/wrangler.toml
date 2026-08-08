@@ -6,15 +6,40 @@ name = "frostfile-api"
 main = "worker.js"
 compatibility_date = "2026-08-01"
 
+# Both default to true, and both open a second public door to this Worker on a
+# *.workers.dev hostname. That hostname is in Cloudflare's zone, not ours, so
+# the frostfile.org rate-limiting rule does not apply to it — verified: the
+# workers.dev URL happily served the full 32MB download while the WAF rule was
+# live. Anything spent protecting frostfile.org is wasted while a second
+# unprotected route to the same Worker exists.
+workers_dev = false
+preview_urls = false
+
 kv_namespaces = [
   { binding = "COUNTS", id = "50fd549c07cd478db33b71bd82b4eb11" },
 ]
 
+# ROUTES ARE MANAGED IN THE DASHBOARD, NOT HERE. Both are live and correct:
+#   frostfile.org/download/*   frostfile.org/api/*
+#
+# Left commented deliberately. The deploy token has Workers/KV/R2 access but
+# not zone route permissions, so with these uncommented every `wrangler deploy`
+# ends in "Authentication error [code: 10000]" on the trigger update — noisy,
+# and it makes a real failure easy to miss. The script still deploys either
+# way; only the trigger update fails.
+#
+# Two traps if you ever do re-enable them. They must sit ABOVE [[r2_buckets]]:
+# in TOML every key after a table header belongs to that table, so below it
+# they silently parse as `r2_buckets[0].routes` and manage nothing. And the
+# token needs Zone > Workers Routes > Edit, which is a permanent widening of
+# what that stored credential can do — worth weighing against never touching
+# routes anyway.
+#
+# routes = [
+#   { pattern = "frostfile.org/download/*", zone_name = "frostfile.org" },
+#   { pattern = "frostfile.org/api/*", zone_name = "frostfile.org" },
+# ]
+
 [[r2_buckets]]
 binding = "BUCKET"
 bucket_name = "frostfile-downloads"
-
-routes = [
-  { pattern = "frostfile.org/download/*", zone_name = "frostfile.org" },
-  { pattern = "frostfile.org/api/*", zone_name = "frostfile.org" },
-]

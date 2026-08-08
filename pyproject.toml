@@ -1,6 +1,6 @@
 [project]
 name = "frostfile"
-version = "1.0.0"
+version = "1.0.1"
 description = "Local-only tracker for credit freezes, identity controls, and breach exposure across a family."
 readme = "README.md"
 requires-python = ">=3.10"
