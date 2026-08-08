@@ -178,7 +178,11 @@ So the correct order is: **claim the accounts, then throw the freezes.**
       `p=none` → `quarantine` → `reject`. See `docs/REPUTATION.md`.
 - [ ] Worker: `Content-Disposition` filename sanitising, `Content-Length` and
       `nosniff` are fixed in-repo but **not deployed** — needs a Worker redeploy.
-- [ ] Consider sampling the KV counter write. See `docs/COSTS.md`.
+- [ ] **Cloudflare abuse mitigation — agreed 2026-08-08, remind until done.**
+      Two parts: spend the one free rate-limiting rule on `/api/hit`, and
+      sample the KV counter write (once per N hits, increment by N). KV writes
+      are ~94% of the exposure, and Cloudflare has no hard spend cap. Also cuts
+      the viral-traffic bill from ~$31/mo to ~$5.55. See `docs/COSTS.md`.
 - [ ] Data directory: `%LOCALAPPDATA%` on Windows is vulnerable to users
       "cleaning up" AppData. Lower priority now the Store path is dropped, but
       the risk of silent data loss is real either way.
