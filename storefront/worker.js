@@ -14,6 +14,16 @@
  *      (the static site itself stays on Pages / your existing hosting)
  */
 
+// Write one hit in SAMPLE and count it as SAMPLE. A KV write costs 10x a read
+// and is ~94% of what abuse would bill us, and Cloudflare has no hard spend
+// cap. The free tier also allows only 1,000 writes/day and caps same-key
+// writes at 1/sec — which a launch-day spike blows through regardless, so the
+// exact count was never going to survive the moment you'd most want it.
+// Sampling is unbiased in expectation; an odometer that advances in steps of
+// 100 is honest enough for decoration.
+const SAMPLE = 100;
+const sampled = () => Math.random() * SAMPLE < 1;
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -24,8 +34,11 @@ export default {
     if (url.pathname === "/api/hit" && request.method === "POST") {
       let visits = 0, downloads = 0;
       try {
-        visits = (parseInt(await env.COUNTS.get("visits")) || 0) + 1;
-        await env.COUNTS.put("visits", String(visits));
+        visits = parseInt(await env.COUNTS.get("visits")) || 0;
+        if (sampled()) {
+          visits += SAMPLE;
+          await env.COUNTS.put("visits", String(visits));
+        }
         downloads = parseInt(await env.COUNTS.get("downloads")) || 0;
       } catch (e) { /* counter paused; page hides it on bad data */ }
       return json({ visits, downloads });
@@ -54,9 +67,13 @@ export default {
       if (object === null) return new Response("Not found.", { status: 404 });
 
       // A download must NEVER fail because the odometer couldn't tick.
+      // Sampling also means most downloads now cost zero KV operations at all,
+      // not just zero writes.
       try {
-        const downloads = (parseInt(await env.COUNTS.get("downloads")) || 0) + 1;
-        await env.COUNTS.put("downloads", String(downloads));
+        if (sampled()) {
+          const downloads = (parseInt(await env.COUNTS.get("downloads")) || 0) + SAMPLE;
+          await env.COUNTS.put("downloads", String(downloads));
+        }
       } catch (e) { /* counter paused */ }
 
       // no-store: when a release is re-cut, a browser that cached the old
