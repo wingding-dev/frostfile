@@ -10,4 +10,4 @@ by a human running tools/linkcheck.py before each release.
 Do not add an outbound call, however benign. It erodes the core promise.
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
