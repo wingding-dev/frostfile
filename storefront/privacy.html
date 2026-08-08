@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy — FrostFile</title>
+<meta name="description" content="What FrostFile collects: nothing from the app, and almost nothing from the website. The plain-language version.">
+<style>
+  :root{
+    --ground:#090f15; --ground-2:#0c141c;
+    --panel:rgba(255,255,255,.035);
+    --frost:rgba(90,166,238,.16); --frost-2:rgba(90,166,238,.28);
+    --cyan:#83b9ff; --ice:#489ae8;
+    --text:#e9f2f8; --text-dim:#93a7b6; --text-faint:#64798a;
+    --ok:#74c58e;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--ground); color:var(--text);
+    font-family:var(--sans); font-size:16px; line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:720px; margin:0 auto; padding:0 26px;}
+  a{color:var(--cyan);}
+  a:focus-visible{outline:2px solid var(--cyan); outline-offset:3px; border-radius:2px;}
+  header{border-bottom:1px solid var(--frost); background:linear-gradient(180deg,var(--ground-2),transparent);}
+  header .wrap{padding:34px 26px 30px;}
+  .back{
+    font-family:var(--mono); font-size:.78rem; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--text-faint); text-decoration:none; display:inline-block; margin-bottom:18px;
+  }
+  .back:hover{color:var(--cyan);}
+  h1{font-size:clamp(1.8rem,4vw,2.4rem); font-weight:700; letter-spacing:-.02em; margin:0; text-wrap:balance;}
+  .lede{color:var(--text-dim); margin:14px 0 0; font-size:1.06rem;}
+  main .wrap{padding-top:12px; padding-bottom:70px;}
+  h2{font-size:1.16rem; font-weight:650; letter-spacing:-.01em; margin:38px 0 10px; text-wrap:balance;}
+  p{margin:0 0 14px;}
+  ul{margin:0 0 14px; padding-left:22px;} li{margin:0 0 7px;}
+  strong{color:#fff; font-weight:640;}
+  .headline{
+    border:1px solid var(--frost-2); border-radius:16px; padding:22px 24px; margin:26px 0 8px;
+    background:linear-gradient(180deg,rgba(72,154,232,.10),transparent);
+  }
+  .headline p{margin:0; font-size:1.06rem;}
+  .headline p + p{margin-top:10px; color:var(--text-dim); font-size:.96rem;}
+  .note{border-left:2px solid var(--frost-2); padding:2px 0 2px 16px; color:var(--text-dim); margin:0 0 14px;}
+  footer{border-top:1px solid var(--frost); color:var(--text-faint); font-size:.86rem; padding:22px 0 60px;}
+  footer .wrap{padding-top:22px;}
+  code{font-family:var(--mono); font-size:.9em; color:var(--text-dim);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="back" href="/">&larr; FrostFile</a>
+    <h1>Privacy</h1>
+    <p class="lede">The short version: the app collects nothing, and the website collects almost nothing. Here is the whole of it, in plain language.</p>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <div class="headline">
+      <p><strong>The FrostFile application sends nothing anywhere. Ever.</strong></p>
+      <p>Everything you type stays on your own computer. There is no account, no sign-in, no sync, no cloud, no analytics and no telemetry. You can disconnect from the internet entirely and the program works exactly the same — which is the easiest way to check that this is true rather than take our word for it.</p>
+    </div>
+
+    <h2>What the app stores, and where</h2>
+    <p>FrostFile keeps what you enter in a file on your own machine: names, dates of birth, Social Security numbers, email addresses, phone numbers, postal addresses, freeze confirmation numbers and PINs, reminders, notes, and any credit-report text you choose to import.</p>
+    <p>All of that is encrypted with a key made from the passphrase you choose. We never see it, because it never leaves your computer, and the passphrase itself is never stored anywhere — not even on your own machine. There is no recovery key and no back door. That is deliberate, and it has a real cost: <strong>if you lose your passphrase, nobody can get your records back, including us.</strong></p>
+    <p class="note">Entering a full Social Security number is optional and switched off by default. A last-four field is offered instead, which is enough for most of what the app helps you do.</p>
+
+    <h2>What the website collects</h2>
+    <p>The site is a single page. It has no accounts, no sign-up, no forms, no advertising, no third-party scripts and no cookies.</p>
+    <p>There is an old-fashioned counter showing visits and downloads. It is <strong>two whole numbers</strong> — one that goes up when the page is opened and one that goes up when a file is downloaded. No cookie is set, no identifier is created, and nothing about who you are is stored. We cannot tell one visit from another, and we would not be able to reconstruct your visit if we wanted to.</p>
+    <p>The site and downloads are served through Cloudflare, which like any web host handles the requests needed to deliver a page. We do not add any tracking on top of that, and we do not use Cloudflare's analytics products.</p>
+
+    <h2>Email</h2>
+    <p>If you email us to hear about new versions, we keep your address in a folder in a mailbox, and we use it for exactly that. Update emails are sent with everyone else's address hidden, so recipients never see each other. The list is not shared with, sold to, or stored by any third party — it is the same promise the app makes.</p>
+    <p>Reply with "stop" at any time and you come off it. No form, no login, no waiting.</p>
+
+    <h2>Children</h2>
+    <p>FrostFile is built partly to help parents freeze their children's credit, so it holds children's details by design. That information is entered by the parent or guardian, is encrypted like everything else, and stays on the family's own computer. It is never transmitted to us or anyone else.</p>
+
+    <h2>How to check any of this</h2>
+    <p>You do not have to trust us. The complete source code is public at <a href="https://github.com/wingding-dev/frostfile" target="_blank" rel="noopener noreferrer">github.com/wingding-dev/frostfile</a>, so anyone able to read it can confirm what the program does. There is an automated test that fails the build if anyone ever adds the ability to make an internet connection — the promise is enforced by the code, not just written down here.</p>
+    <p>And the simplest check needs no technical skill at all: turn off your Wi-Fi and use the app normally.</p>
+
+    <h2>If this ever changes</h2>
+    <p>If the app ever needed to send anything anywhere, that would be a different program, and it would say so plainly and loudly before doing it — not in an updated policy page. This page will record the date of any change.</p>
+
+    <h2>Contact</h2>
+    <p>Questions about any of this: <a href="mailto:support@frostfile.org">support@frostfile.org</a>.</p>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    FrostFile is free and open source under the AGPL-3.0-or-later licence.<br>
+    Last updated 8 August 2026 · first published 8 August 2026.
+  </div>
+</footer>
+
+</body>
+</html>
