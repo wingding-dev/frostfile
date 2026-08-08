@@ -1,0 +1,306 @@
+{
+  "schema": 1,
+  "current": "1.0.0",
+  "releases": {
+    "1.0.0": {
+      "artifacts": {
+        "FrostFile-windows.zip": "171f6e5d5ff26e1fe529ea249eb170820674552879b0cf9c6cb8063bcc01a2b5",
+        "FrostFile-mac.zip": "b2dfba47a33643cc60272ef7c36a909302d2ebf9b2f03ab92476b50db2e1d746",
+        "frostfile-1.0.0.tar.gz": "ed3a11b607295339f4eb2721aff73fc3f8a22dab118887fc5c164a2a49eac306",
+        "frostfile-1.0.0-py3-none-any.whl": "700195be127da8ae9ff7456598e5d39ab038eb273b243adf6b7299234544f193"
+      },
+      "signed_windows": false,
+      "notarized_mac": false,
+      "targets": {
+        "drweb": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "emsisoft": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "webroot": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "gen-digital-whitelist": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "gen-digital-fp": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "microsoft-defender": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "eset-whitelist": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "eset-fp": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "kaspersky": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "bitdefender": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "sophos": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "mcafee": {
+          "status": "todo",
+          "date": "2026-08-08",
+          "ref": null,
+          "notes": "Approved on a previous build; resubmit, hash changed."
+        },
+        "malwarebytes": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "f-secure": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "gdata": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "trendmicro": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "k7": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "fortinet-av": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "fortinet-classification": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "xcitium": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "panda": {
+          "status": "n/a",
+          "date": "2026-08-08",
+          "ref": null,
+          "notes": "No public channel; see target notes."
+        },
+        "crowdstrike": {
+          "status": "n/a",
+          "date": "2026-08-08",
+          "ref": null,
+          "notes": "No public channel; see target notes."
+        },
+        "sentinelone": {
+          "status": "n/a",
+          "date": "2026-08-08",
+          "ref": null,
+          "notes": "No public channel; see target notes."
+        },
+        "azure-artifact-signing": {
+          "status": "submitted",
+          "date": "2026-08-08",
+          "ref": null,
+          "notes": "Identity validation in progress; waiting for status to flip to Action Required."
+        },
+        "certum-signing": {
+          "status": "blocked",
+          "date": "2026-08-08",
+          "ref": null,
+          "notes": "Payment status unclear after 3 attempts; check My orders, likely the out-of-stock card SKU."
+        },
+        "microsoft-store": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "apple-notarization": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "macos-adhoc-signing": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "smartscreen-reputation": {
+          "status": "n/a",
+          "date": "2026-08-08",
+          "ref": null,
+          "notes": "No public channel; see target notes."
+        },
+        "opentext-brightcloud": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "fortiguard-web": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "symantec-sitereview": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "cisco-talos": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "trellix-trustedsource": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "mcafee-sitelookup": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "smartscreen-url": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "google-search-console": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "netcraft": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "barracuda": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "paloalto": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "zscaler": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "sophos-web": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "chrome-download-warning": {
+          "status": "n/a",
+          "date": "2026-08-08",
+          "ref": null,
+          "notes": "No public channel; see target notes."
+        },
+        "forcepoint": {
+          "status": "n/a",
+          "date": "2026-08-08",
+          "ref": null,
+          "notes": "No public channel; see target notes."
+        },
+        "dmarc-reports": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "dmarc-enforcement": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "google-postmaster": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        },
+        "presend-check": {
+          "status": "todo",
+          "date": null,
+          "ref": null,
+          "notes": ""
+        }
+      }
+    }
+  }
+}

@@ -7,7 +7,7 @@
  *   1. Workers & Pages -> Create Worker -> paste this file -> Deploy.
  *   2. Storage & Databases -> KV -> create a namespace named COUNTS.
  *      Worker -> Settings -> Bindings -> KV namespace: variable COUNTS.
- *   3. R2 -> your bucket (holding FrostFile-Setup.exe / FrostFile.dmg).
+ *   3. R2 -> your bucket (holding FrostFile-windows.zip / FrostFile-mac.zip).
  *      Worker -> Settings -> Bindings -> R2 bucket: variable BUCKET.
  *   4. Worker -> Settings -> Domains & Routes -> add route:
  *         frostfile.org/download/*  and  frostfile.org/api/*
@@ -44,6 +44,12 @@ export default {
     // ---- downloads: serve from R2 and count ----
     if (url.pathname.startsWith("/download/")) {
       const key = url.pathname.slice("/download/".length);
+      // The key lands in a Content-Disposition header, so it must be a plain
+      // filename — no quotes, no separators, no traversal. Anything else is
+      // not one of our four artifacts and gets the same 404 as a typo.
+      if (!/^[A-Za-z0-9._-]+$/.test(key)) {
+        return new Response("Not found.", { status: 404 });
+      }
       const object = await env.BUCKET.get(key);
       if (object === null) return new Response("Not found.", { status: 404 });
 
@@ -55,13 +61,17 @@ export default {
 
       // no-store: when a release is re-cut, a browser that cached the old
       // bytes would silently serve a stale build — worse than the bandwidth.
-      return new Response(object.body, {
-        headers: {
-          "Content-Type": "application/octet-stream",
-          "Content-Disposition": `attachment; filename="${key}"`,
-          "Cache-Control": "no-store",
-        },
-      });
+      // Content-Length lets the browser draw a real progress bar and show the
+      // size up front; a download of unknown length that sits at "0 bytes" is
+      // exactly what a nervous first-time user aborts.
+      const headers = {
+        "Content-Type": key.endsWith(".zip") ? "application/zip" : "application/octet-stream",
+        "Content-Disposition": `attachment; filename="${key}"`,
+        "X-Content-Type-Options": "nosniff",
+        "Cache-Control": "no-store",
+      };
+      if (object.size !== undefined) headers["Content-Length"] = String(object.size);
+      return new Response(object.body, { headers });
     }
 
     return new Response("FrostFile API", { status: 200 });

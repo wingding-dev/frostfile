@@ -134,14 +134,30 @@ One-time setup, then signing is one script per release:
 2. **On your Windows PC**: install the SimplySign Desktop app + the
    SimplySign mobile app (the phone app is the 2FA that unlocks the cloud
    card). Install "Windows SDK Signing Tools" if `signtool` is missing.
-3. **Every release**: download the CI-built FrostFile-windows.zip, then
+3. **Set `CERTUM_THUMBPRINT` once** to the certificate's SHA-1 thumbprint
+   (SimplySign Desktop → Manage certificates → Details → Thumbprint, spaces
+   stripped). Certum's own manual selects the cert by `/sha1 <thumbprint>`,
+   not by subject name.
+4. **Every release**: download the CI-built FrostFile-windows.zip, then
    `build\sign-windows.bat FrostFile-windows.zip` — it extracts, signs
    FrostFile.exe with a Certum timestamp, verifies, re-zips, and prints
    the new SHA-256. Upload the signed zip to R2 under the usual name and
    update SHA256SUMS.txt.
-4. Reputation note: signing kills the "unknown publisher" class of warning
+5. **Signing stays a local, manual step.** SimplySign has no headless mode,
+   no API key, and no service account; the session is unlocked by the phone
+   app and lapses after roughly two hours. Hosted GitHub Actions runners
+   therefore cannot sign. Don't design a pipeline around automating this.
+6. Reputation note: signing kills the "unknown publisher" class of warning
    immediately; SmartScreen/AV *reputation* still accrues over the first
    days-to-weeks of downloads. Fewer warnings right away, near-zero later.
+
+**Do not buy an EV certificate for SmartScreen.** Microsoft's own
+documentation now states that "EV certificates no longer bypass SmartScreen"
+and that "paying a premium for EV solely to avoid SmartScreen warnings is no
+longer justified" — OV and EV are collapsed into one row in their table. EV is
+also issued only to registered organizations, so it isn't available to an
+individual developer at any price. The €49 Certum Open Source (OV) cert is the
+correct and sufficient purchase.
 
 ## 8b. Still parked, deliberately
 - **Custom R2 domain / caching tweaks** — the Worker route is enough.
@@ -156,6 +172,11 @@ One-time setup, then signing is one script per release:
    real browser; update `LINKS_VERIFIED_ON` in `frostfile/sources.py`.
 3. Bump version in `pyproject.toml` AND `frostfile/__init__.py`.
 4. Build (5a or 5b), test the exe on a real machine, checksum, upload to R2
-   under the same names.
-5. Update the site's changelog/version line and redeploy Pages.
-6. Fresh drives for anyone who asks.
+   under the same names, and update `drive-kit/SHA256SUMS.txt`.
+5. Clear the warnings — see `docs/REPUTATION.md`:
+   - `python tools/reputation.py release <version> --signed`
+   - `python tools/reputation.py scan` (needs a free `VT_API_KEY`) to see which
+     engines flag this build, then `packet` / `mark` only those.
+   - `python tools/reputation.py md` and commit the refreshed status table.
+6. Update the site's changelog/version line and redeploy Pages.
+7. Fresh drives for anyone who asks.
