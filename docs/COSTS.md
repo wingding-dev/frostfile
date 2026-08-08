@@ -108,6 +108,15 @@ The tradeoff is that the odometer becomes approximate. Given it's already
 decoration that degrades gracefully, and already undercounts during spikes
 because of the 1/sec cap, that seems an easy trade — but it's a product call.
 
+**1b. Keep `workers_dev = false`.** Found the hard way on 2026-08-08: a Worker
+is published to a `*.workers.dev` hostname by default, and that hostname lives
+in Cloudflare's zone, not ours — so a rate-limiting rule on `frostfile.org`
+does not apply to it. With the rule live, the workers.dev URL still served the
+full 32MB download on request. A second unprotected door to the same Worker
+makes anything spent protecting the front door pointless. Both `workers_dev`
+and `preview_urls` are now pinned off in `wrangler.toml`; if you ever see them
+re-enabled in a deploy warning, that is a regression worth stopping for.
+
 **2. Spend the one free rate-limiting rule on `/api/hit`.** The free plan
 includes exactly one rule, counting by IP with a 10-second window. That's weak
 against a distributed script, but it raises the cost of casual abuse for $0.
