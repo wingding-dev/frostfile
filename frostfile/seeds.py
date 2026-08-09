@@ -56,6 +56,10 @@ CATEGORY_LABELS = {
 # ignore it.
 ACTION_KIND_LABELS = {
     "act": "Something to do",
+    # Claiming an account is a race, not a chore: whoever registers first owns
+    # it, and the questions asked to prove identity draw on the same records a
+    # breach exposes. These sort above the freezes for that reason.
+    "claim_first": "Claim this first",
     "covered": "Covered elsewhere",
     "fyi": "FYI only",
 }
@@ -653,7 +657,11 @@ AGENCIES: list[dict[str, Any]] = [
             "notes": ["irs-ip-pin", "irs-ip-pin-faq"],
             "freeze_url": ["irs-ip-pin"],
         },
-        "sort_order": 80,
+        "action_kind": "claim_first",
+        "action_note": (
+            "Do this before the freezes. Once the PIN is yours, nobody else can file a return in your name — but only if you register first."
+        ),
+        "sort_order": 1,
     },
     {
         "slug": "ssa_account",
@@ -677,7 +685,11 @@ AGENCIES: list[dict[str, Any]] = [
         "thaw_procedure": "Not applicable.",
         "notes": "Check the earnings record once a year for employers you do not recognize.",
         "citations": {"freeze_url": ["ssa-myaccount"]},
-        "sort_order": 81,
+        "action_kind": "claim_first",
+        "action_note": (
+            "Do this before the freezes. Creating your own account is what stops someone else creating one as you."
+        ),
+        "sort_order": 2,
     },
     {
         "slug": "everify_self_lock",
@@ -699,7 +711,11 @@ AGENCIES: list[dict[str, Any]] = [
         "thaw_procedure": "Unlock yourself before starting a new job.",
         "notes": "Remember to unlock before a legitimate employer runs E-Verify on you.",
         "citations": {"freeze_url": ["everify-self-lock"]},
-        "sort_order": 82,
+        "action_kind": "claim_first",
+        "action_note": (
+            "Do this before the freezes. Enrolling needs an identity check; if it ever fails, temporarily lifting your credit freeze and retrying is the usual fix."
+        ),
+        "sort_order": 3,
     },
     {
         "slug": "usps_informed_delivery",
@@ -722,7 +738,11 @@ AGENCIES: list[dict[str, Any]] = [
         "thaw_procedure": "Not applicable.",
         "notes": "One account per address, so claim it before someone else does.",
         "citations": {"freeze_url": ["usps-informed-delivery"]},
-        "sort_order": 83,
+        "action_kind": "claim_first",
+        "action_note": (
+            "Do this before the freezes. Claiming your address first is what stops someone else enrolling and seeing your mail before it arrives."
+        ),
+        "sort_order": 4,
     },
     # -------------------------------------------------------- other controls
     {

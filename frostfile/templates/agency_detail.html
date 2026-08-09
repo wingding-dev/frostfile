@@ -12,7 +12,7 @@
 
 {% if agency.action_kind != 'act' and agency.action_note %}
 <div class="notice notice-info">
-  <p style="margin:0"><strong>{{ 'Already covered.' if agency.action_kind == 'covered' else 'Nothing for you to do here.' }}</strong> {{ agency.action_note }}</p>
+  <p style="margin:0"><strong>{% if agency.action_kind == 'covered' %}Already covered.{% elif agency.action_kind == 'claim_first' %}Do this one before the freezes.{% else %}Nothing for you to do here.{% endif %}</strong> {{ agency.action_note }}</p>
 </div>
 {% endif %}
 

@@ -284,10 +284,19 @@ class Agency:
         return self.action_kind == "fyi"
 
     @property
+    def is_claim_first(self) -> bool:
+        """Register before someone else can. Ordering matters here, not just
+        doing it: whoever creates the account owns it, and the identity
+        questions asked to prove it draw on the very records a breach exposes.
+        These sort above the freezes so the list cannot walk someone past them.
+        """
+        return self.action_kind == "claim_first"
+
+    @property
     def effort_label(self) -> str:
         """Honest setup cost, derived from how the agency actually takes
         requests rather than from a separate (and uncited) estimate."""
-        if self.action_kind != "act":
+        if self.action_kind not in ("act", "claim_first"):
             return ""
         if self.supports_online:
             return "Minutes, online"

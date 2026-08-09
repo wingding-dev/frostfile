@@ -30,7 +30,9 @@
   UI must never blur: "you can do something here" vs "this exists, that's all".
 #}
 {% macro action_pill(agency) -%}
-  {%- if agency.action_kind == 'covered' -%}
+  {%- if agency.action_kind == 'claim_first' -%}
+    <span class="pill pill-active" title="{{ agency.action_note }}">do this first</span>
+  {%- elif agency.action_kind == 'covered' -%}
     <span class="pill pill-in_progress" title="{{ agency.action_note }}">covered elsewhere</span>
   {%- elif agency.action_kind == 'fyi' -%}
     <span class="pill pill-not_applicable" title="{{ agency.action_note }}">FYI — nothing to do</span>
