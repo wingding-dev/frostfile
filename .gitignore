@@ -6,3 +6,16 @@ __pycache__/
 dist/
 *.egg-info/
 *.import-tmp
+
+# Credentials never belong here — this repo is public. Real secrets live in
+# ~/.config/identilock-dev/ (mode 600). These patterns are a backstop against
+# a stray copy, not the storage mechanism.
+*.pem
+*.p8
+*.p12
+*.pfx
+*-sftp
+*credentials*
+*secret*
+.env
+.env.*
