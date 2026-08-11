@@ -19,3 +19,11 @@ dist/
 *secret*
 .env
 .env.*
+
+# Process material stays local — trackers, runbooks, dev tooling, and brand
+# source are working files, not part of the published project.
+/docs/
+/DEPLOY.md
+/brand/
+/tools/
+/splash--splash-d_cropped.svg
