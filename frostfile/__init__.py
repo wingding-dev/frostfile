@@ -5,7 +5,7 @@ requirement, not an accident: the app makes ZERO outbound connections — no
 breach lookups, no link checks, no telemetry, no update checks. Anything that
 needs the internet is a plain <a> link that opens in the user's own browser
 (agency sites, haveibeenpwned.com, frostfile.org). Source links are verified
-by a human running tools/linkcheck.py before each release.
+by a human, with a link-checking script, before each release.
 
 Do not add an outbound call, however benign. It erodes the core promise.
 """

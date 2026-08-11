@@ -28,7 +28,7 @@ from dataclasses import dataclass
 
 COMPILED_ON = "2026-08-03"
 
-# Stamped by a human running tools/linkcheck.py as part of cutting a release.
+# Stamped by a human link-check pass as part of cutting a release.
 # The app itself never checks links at runtime — it makes zero connections.
 LINKS_VERIFIED_ON = "2026-08-06"
 

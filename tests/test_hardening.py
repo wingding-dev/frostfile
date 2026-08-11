@@ -65,8 +65,8 @@ def test_zero_network_rule_no_http_client_in_app_code():
 
     Anything needing the internet must be a plain link the user clicks.
     This scans every shipped module for HTTP-client imports so a violation
-    fails CI instead of eroding the promise quietly. (tools/ is exempt —
-    tools/linkcheck.py is a release-time dev script, never shipped.)
+    fails CI instead of eroding the promise quietly. (Release-time dev
+    scripts are exempt — they are never shipped inside the app.)
     """
     from pathlib import Path
 
