@@ -659,7 +659,10 @@ AGENCIES: list[dict[str, Any]] = [
         },
         "action_kind": "claim_first",
         "action_note": (
-            "Do this before the freezes. Once the PIN is yours, nobody else can file a return in your name — but only if you register first."
+            "Claiming comes before freezing — sign-up has to verify your "
+            "identity, which is simplest before the locks go on. Once the PIN "
+            "is yours, a return filed without it is refused; whoever registers "
+            "first owns the account."
         ),
         "sort_order": 1,
     },
@@ -687,7 +690,10 @@ AGENCIES: list[dict[str, Any]] = [
         "citations": {"freeze_url": ["ssa-myaccount"]},
         "action_kind": "claim_first",
         "action_note": (
-            "Do this before the freezes. Creating your own account is what stops someone else creating one as you."
+            "Claiming comes before freezing — sign-up has to verify your "
+            "identity, which is simplest before the locks go on. An account "
+            "that already exists can't be opened again by someone pretending "
+            "to be you."
         ),
         "sort_order": 2,
     },
@@ -713,7 +719,9 @@ AGENCIES: list[dict[str, Any]] = [
         "citations": {"freeze_url": ["everify-self-lock"]},
         "action_kind": "claim_first",
         "action_note": (
-            "Do this before the freezes. Enrolling needs an identity check; if it ever fails, temporarily lifting your credit freeze and retrying is the usual fix."
+            "Claiming comes before freezing — enrolling runs an identity "
+            "quiz, and a credit freeze can make it fail. If that happens, "
+            "temporarily lifting the freeze and retrying is the usual fix."
         ),
         "sort_order": 3,
     },
@@ -740,7 +748,10 @@ AGENCIES: list[dict[str, Any]] = [
         "citations": {"freeze_url": ["usps-informed-delivery"]},
         "action_kind": "claim_first",
         "action_note": (
-            "Do this before the freezes. Claiming your address first is what stops someone else enrolling and seeing your mail before it arrives."
+            "Claiming comes before freezing — sign-up has to verify your "
+            "identity, which is simplest before the locks go on. An address "
+            "that's already claimed can't be enrolled by a stranger watching "
+            "for your mail."
         ),
         "sort_order": 4,
     },
@@ -812,8 +823,9 @@ AGENCIES: list[dict[str, Any]] = [
         "minor_mail_only": True,
         "thaw_procedure": "Not applicable.",
         "notes": (
-            "Doing this by hand is tedious and never finishes. A paid service "
-            "(DeleteMe, Optery, EasyOptOuts) is usually a better use of the time."
+            "Doing this by hand takes hours and doesn't stay done — paid "
+            "opt-out services exist for exactly this gap. FrostFile has no "
+            "relationship with any of them; compare before paying."
         ),
         "citations": {"freeze_url": ["privacyrights-databrokers"]},
         "sort_order": 92,
@@ -857,8 +869,10 @@ REMINDER_TEMPLATES: list[dict[str, Any]] = [
         "kind": "minor_file_check",
         "title": "Check whether a credit file exists for this child",
         "detail": (
-            "A child should have no credit file. 'No file found' is the all-clear; "
-            "a file existing means someone has used their SSN."
+            "A child should have no credit file. 'No file found' is the answer "
+            "you want. A file that exists is worth chasing — sometimes it's "
+            "fraud, sometimes a benign mix-up like an authorized-user account "
+            "or a bureau error. The bureau's response will say what's in it."
         ),
         "recurrence": "yearly",
         "offset_days": 14,
