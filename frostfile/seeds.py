@@ -190,10 +190,7 @@ AGENCIES: list[dict[str, Any]] = [
         "name": "TransUnion",
         "category": "credit_bureau",
         "description": "One of the three nationwide credit bureaus.",
-        "why_it_matters": (
-            "Freezing here blocks most new credit accounts. TransUnion also owns "
-            "Teletrack, which is frozen separately."
-        ),
+        "why_it_matters": "Freezing here blocks most new credit accounts.",
         "freeze_url": "https://www.transunion.com/credit-freeze",
         "phone": "1-800-916-8800",
         "mail_address": "TransUnion\nP.O. Box 380\nWoodlyn, PA 19094",
@@ -535,7 +532,7 @@ AGENCIES: list[dict[str, Any]] = [
         "slug": "teletrack",
         "name": "Teletrack",
         "category": "subprime",
-        "description": "Subprime lending bureau, owned by Equifax.",
+        "description": "Subprime lending bureau — now part of DataX (Equifax).",
         "why_it_matters": "Same exposure as Clarity, different lender network.",
         "freeze_url": "https://consumers.teletrack.com/",
         "phone": "877-309-5226",
@@ -545,14 +542,57 @@ AGENCIES: list[dict[str, Any]] = [
         "supports_online": True,
         "supports_minor": False,
         "minor_mail_only": True,
-        "thaw_procedure": "Contact directly.",
-        "notes": "Separate from the main Equifax freeze.",
+        "thaw_procedure": "Handled at DataX.",
+        "notes": (
+            "Teletrack's consumer portal now announces it is part of DataX and "
+            "directs consumers there — the DataX freeze is the one that counts."
+        ),
+        "action_kind": "covered",
+        "action_note": (
+            "Nothing separate to do here: Teletrack was folded into DataX, so "
+            "the DataX freeze covers it. This row exists so you can confirm "
+            "that rather than assume it."
+        ),
         "citations": {
-            "freeze_url": ["cfpb-teletrack", "teletrack-consumers"],
+            "freeze_url": ["teletrack-consumers"],
             "phone": ["cfpb-teletrack"],
-            "notes": ["cfpb-teletrack"],
+            "notes": ["teletrack-consumers"],
         },
         "sort_order": 51,
+    },
+    {
+        "slug": "datax",
+        "name": "DataX",
+        "category": "subprime",
+        "description": "Payday and installment lending bureau, owned by Equifax.",
+        "why_it_matters": (
+            "Payday and installment lenders that never touch the big three "
+            "report here. Teletrack now lives inside it too, so this one "
+            "freeze covers both networks."
+        ),
+        "freeze_url": "https://consumers.dataxltd.com/consumerCreditFreeze",
+        "phone": "800-295-4790",
+        "mail_address": "DataX, an Equifax Company\nConsumer Reporting Division\nP.O. Box 740124\nAtlanta, GA 30374",
+        "address_verified": True,
+        "source_url": "https://consumers.dataxltd.com/consumerCreditFreeze",
+        "supports_online": True,
+        "supports_minor": False,
+        "minor_mail_only": True,
+        "thaw_procedure": "Lift or remove free of charge, online or by mail.",
+        "notes": (
+            "Freezing is free, online or by mail. Phone hours are limited "
+            "(Mon-Thu 7am-4pm, Fri 7am-noon, Pacific). The CFPB lists a "
+            "neighboring P.O. Box (740125) for this company — the freeze "
+            "request form itself says 740124, so that is the one to use."
+        ),
+        "citations": {
+            "freeze_url": ["datax-freeze"],
+            "phone": ["datax-freeze", "cfpb-datax"],
+            "mail_address": ["datax-freeze"],
+            "why_it_matters": ["cfpb-datax", "teletrack-consumers"],
+            "notes": ["datax-freeze", "cfpb-datax"],
+        },
+        "sort_order": 52,
     },
     # ----------------------------------------------------------------- rental
     {
@@ -647,7 +687,8 @@ AGENCIES: list[dict[str, Any]] = [
         "notes": (
             "A new IP PIN is generated each year and must be retrieved before "
             "filing; it is available from mid-January through mid-November. The "
-            "fastest route is an IRS online account. Dependents under 18 cannot "
+            "fastest route is an IRS online account — identity checks there run "
+            "through ID.me. Dependents under 18 cannot "
             "use the online method — file Form 15227 (available below an income "
             "threshold) or book an in-person appointment at a Taxpayer Assistance "
             "Center."
@@ -916,6 +957,7 @@ PROTECTS: dict[str, str] = {
     "nctue": "Blocks new phone, cable & utility accounts",
     "clarity": "Blocks payday & quick-cash loans",
     "teletrack": "Blocks payday & quick-cash loans",
+    "datax": "Blocks payday & quick-cash loans",
     "corelogic": "Blocks apartment applications in your name",
     "realpage": "Blocks apartment applications in your name",
     "work_number": "Limits who sees your salary & job history",
@@ -945,6 +987,7 @@ IMPACT: dict[str, int] = {
     "nctue": 2,
     "clarity": 2,
     "teletrack": 2,
+    "datax": 2,
     "corelogic": 1,
     "realpage": 1,
     "work_number": 2,
