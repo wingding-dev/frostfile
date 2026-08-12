@@ -147,7 +147,7 @@ you set `FROSTFILE_ALLOW_REMOTE=1` — there's no TLS and no multi-user access
 control, so exposing it would be a mistake. Outbound traffic: **none, ever.**
 The app contains no HTTP client (a test enforces this). Breach checking,
 update checking, and source-link verification all happen either in your own
-browser via plain links, or by a human as part of cutting a release.
+browser via plain links — the app itself checks nothing.
 
 **Auto-lock** after 15 minutes idle (`FROSTFILE_LOCK_MINUTES` to change). The
 key lives only in the server process's memory; locking drops it. Restarting

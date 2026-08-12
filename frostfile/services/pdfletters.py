@@ -292,6 +292,16 @@ def build_packet_pdf(person, agency, guardian, today: str) -> bytes:
                 )
             )
 
+    story += [
+        Spacer(1, 8),
+        _p(
+            "FrostFile is a record-keeping tool, not legal advice. If this "
+            f"page and {agency.name}'s own website ever disagree, the "
+            "website wins.",
+            _SMALL,
+        ),
+    ]
+
     doc.build(story)
     return buffer.getvalue()
 
