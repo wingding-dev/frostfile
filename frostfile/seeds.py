@@ -594,6 +594,39 @@ AGENCIES: list[dict[str, Any]] = [
         },
         "sort_order": 52,
     },
+    {
+        "slug": "factortrust",
+        "name": "FactorTrust",
+        "category": "subprime",
+        "description": "Nonprime and short-term lending bureau, owned by TransUnion.",
+        "why_it_matters": (
+            "Payday, installment and nonprime auto lenders report here instead "
+            "of the big three. Same exposure as Clarity and DataX, TransUnion's "
+            "network."
+        ),
+        "freeze_url": "https://www.factortrust.com/Consumer/CreditFreeze/Landing.aspx",
+        "phone": "833-806-1627",
+        "mail_address": "FactorTrust, Inc.\nAttn: Consumer Inquiries\nP.O. Box 390\nWoodlyn, PA 19094",
+        "address_verified": False,
+        "source_url": "https://www.factortrust.com/Consumer/CreditFreeze/Landing.aspx",
+        "supports_online": True,
+        "supports_minor": False,
+        "minor_mail_only": True,
+        "thaw_procedure": "Free to freeze and unfreeze through the portal.",
+        "notes": (
+            "Freezing is free. The portal shows 833-806-1627; the CFPB entry "
+            "lists 844-773-3321. Support ultimately routes through TransUnion, "
+            "and the site hands you off to TransUnion pages along the way."
+        ),
+        "citations": {
+            "freeze_url": ["factortrust-freeze"],
+            "phone": ["factortrust-freeze", "cfpb-factortrust"],
+            "mail_address": ["cfpb-factortrust"],
+            "why_it_matters": ["cfpb-factortrust"],
+            "notes": ["factortrust-freeze", "cfpb-factortrust", "transunion-support"],
+        },
+        "sort_order": 53,
+    },
     # ----------------------------------------------------------------- rental
     {
         "slug": "corelogic",
@@ -958,6 +991,7 @@ PROTECTS: dict[str, str] = {
     "clarity": "Blocks payday & quick-cash loans",
     "teletrack": "Blocks payday & quick-cash loans",
     "datax": "Blocks payday & quick-cash loans",
+    "factortrust": "Blocks payday & quick-cash loans",
     "corelogic": "Blocks apartment applications in your name",
     "realpage": "Blocks apartment applications in your name",
     "work_number": "Limits who sees your salary & job history",
@@ -988,6 +1022,7 @@ IMPACT: dict[str, int] = {
     "clarity": 2,
     "teletrack": 2,
     "datax": 2,
+    "factortrust": 2,
     "corelogic": 1,
     "realpage": 1,
     "work_number": 2,
