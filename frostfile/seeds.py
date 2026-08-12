@@ -243,16 +243,23 @@ AGENCIES: list[dict[str, Any]] = [
         "supports_online": True,
         "supports_minor": False,
         "minor_mail_only": True,
-        "thaw_procedure": "Lift online or by phone at no charge.",
+        "thaw_procedure": (
+            "Lift online, by phone, or by mail at no charge — but plan ahead: "
+            "Innovis says most state laws give it up to three business days to "
+            "lift a freeze, so thaw a few days before you apply for anything."
+        ),
         "notes": (
-            "General consumer assistance is 1-800-540-2505. Minor freeze handling "
+            "General consumer assistance is 1-800-540-2505. Adding a freeze "
+            "also takes up to three business days, and you will get a 10-digit "
+            "PIN to keep with your records. Minor freeze handling "
             "was not documented on the freeze page — call before mailing anything."
         ),
         "citations": {
             "mail_address": ["innovis-freeze"],
             "phone": ["innovis-freeze"],
             "freeze_url": ["innovis-freeze"],
-            "notes": ["innovis-freeze"],
+            "thaw_procedure": ["innovis-freeze-faq"],
+            "notes": ["innovis-freeze", "innovis-freeze-faq"],
         },
         "sort_order": 13,
     },

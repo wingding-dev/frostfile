@@ -158,6 +158,15 @@ SOURCES: dict[str, Source] = {
             "official",
             "fetched",
         ),
+        _s(
+            "innovis-freeze-faq",
+            "Security Freeze FAQ (placement and lift timing)",
+            "https://www.innovis.com/personal/lc_securityFreeze",
+            "Innovis",
+            "official",
+            "fetched",
+            retrieved="2026-08-12",
+        ),
         # --- specialty ------------------------------------------------------
         _s(
             "lexisnexis-freeze",
