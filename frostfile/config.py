@@ -68,6 +68,109 @@ def default_data_dir() -> Path:
     return base / "frostfile"
 
 
+def documents_dir() -> Path:
+    """The user's Documents folder as the OS understands it.
+
+    On Windows this must go through the known-folder API: OneDrive's folder
+    backup relocates Documents into the OneDrive tree, and ~/Documents keeps
+    existing at the old path — writing there would put the spare copies in a
+    folder the user's own Explorer no longer shows as Documents.
+    """
+    if os.name == "nt":
+        try:
+            import ctypes
+            from ctypes import wintypes
+
+            # FOLDERID_Documents
+            fid = (ctypes.c_ubyte * 16).from_buffer_copy(
+                bytes.fromhex("D09AD3FD8F23AF46ADB46C85480369C7")
+            )
+            out = ctypes.c_wchar_p()
+            if (
+                ctypes.windll.shell32.SHGetKnownFolderPath(
+                    ctypes.byref(fid), 0, wintypes.HANDLE(0), ctypes.byref(out)
+                )
+                == 0
+            ):
+                path = Path(out.value)
+                ctypes.windll.ole32.CoTaskMemFree(out)
+                return path
+        except (OSError, AttributeError, ValueError):
+            pass
+    return Path.home() / "Documents"
+
+
+def default_mirror_dir() -> Path | None:
+    """Where spare backup copies go, or None when there is no Documents.
+
+    The data directory lives in the OS's app-data location, which cleanup
+    tools treat as disposable — and the live database must stay there, because
+    app-data is also the one place cloud sync never touches a file mid-write.
+    The mirror puts the *closed* backup files where the user can see them and
+    where folder backup, if they have it, carries a copy off the machine.
+    """
+    docs = documents_dir()
+    if not docs.is_dir():
+        return None
+    return docs / f"{APP_NAME} Backups"
+
+
+MIRROR_README = """What is this folder?
+
+FrostFile (the program that keeps track of your family's credit freezes)
+keeps its working data in a hidden folder that disk-cleanup tools
+sometimes clear out. The files here are spare copies of that data, kept
+somewhere safer, just in case.
+
+You don't need to do anything with them. If FrostFile ever starts up
+empty, it finds these copies itself and offers to bring your
+information back.
+
+Everything in these files is scrambled (encrypted). Without your
+passphrase they cannot be read — by a person, a program, or anyone a
+copy might reach. It is safe to leave them here, and safe if a service
+like OneDrive backs them up.
+
+Deleting this folder will not break FrostFile today — but it throws
+away the safety net.
+"""
+
+# Spare copies pruned in the mirror; matches the auto-backup retention.
+MIRROR_KEEP = 10
+
+
+def mirror_backups(settings: Settings) -> None:
+    """Copy backup files into the mirror folder. Never raises.
+
+    Copies go through a temp file and an atomic rename so a cloud-sync client
+    watching the folder can never pick up a half-written file. Only automatic
+    copies are pruned; anything the user put here themselves is not ours to
+    delete.
+    """
+    mirror = settings.mirror_dir
+    if mirror is None:
+        return
+    try:
+        mirror.mkdir(parents=True, exist_ok=True)
+        readme = mirror / "READ ME - what is this folder.txt"
+        if not readme.exists():
+            readme.write_text(MIRROR_README, encoding="utf-8")
+        for src in sorted(settings.backup_dir.glob("frostfile-*.db")):
+            dst = mirror / src.name
+            if dst.exists():
+                continue
+            tmp = mirror / (src.name + ".tmp")
+            tmp.write_bytes(src.read_bytes())
+            os.replace(tmp, dst)
+        automatic = sorted(mirror.glob("frostfile-auto-*.db"))
+        for old in automatic[:-MIRROR_KEEP]:
+            old.unlink()
+    except OSError:
+        # A full disk, a permissions oddity, a synced folder mid-move — none
+        # of it may ever interfere with the app actually running.
+        pass
+
+
 @dataclass(frozen=True)
 class Settings:
     data_dir: Path
@@ -78,6 +181,14 @@ class Settings:
     # unplugged drive, a deleted/renamed folder). The app must warn rather than
     # silently offer a fresh setup screen over the user's real, absent data.
     data_unreachable: bool = False
+    # Where spare backup copies go. None when the user turned the mirror off,
+    # when there is no Documents folder, or when the data location was set
+    # explicitly (--data-dir / env) — an explicit location says "keep my data
+    # exactly here", and scattering copies elsewhere would betray that.
+    mirror_dir: Path | None = None
+    # Distinguishes "user said no" from "not available", so the Settings page
+    # can offer to turn the mirror back on.
+    mirror_off_by_pref: bool = False
 
     @property
     def db_path(self) -> Path:
@@ -135,12 +246,22 @@ def load_settings(
     except (TypeError, ValueError):
         timeout = DEFAULT_LOCK_TIMEOUT_MINUTES
 
+    explicit_location = data_dir is not None or bool(
+        os.environ.get("FROSTFILE_DATA_DIR")
+    )
+    mirror_off = prefs.get("mirror_backups") is False
+    mirror = None
+    if not explicit_location and not mirror_off:
+        mirror = default_mirror_dir()
+
     settings = Settings(
         data_dir=resolved_dir,
         host=resolved_host,
         port=resolved_port,
         lock_timeout_minutes=max(1, timeout),
         data_unreachable=data_unreachable,
+        mirror_dir=mirror,
+        mirror_off_by_pref=mirror_off,
     )
 
     # Binding to anything but loopback would expose SSNs and freeze PINs to the

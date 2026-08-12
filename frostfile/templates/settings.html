@@ -20,6 +20,35 @@
   </p>
   <div class="field"><div class="field-label">Folder</div><div class="field-value mono small">{{ data_dir }}</div></div>
   <div class="field"><div class="field-label">Database</div><div class="field-value mono small">{{ db_path }}</div></div>
+  {% if mirror_dir %}
+    {% if mirror_on %}
+  <div class="field"><div class="field-label">Spare copies</div><div class="field-value mono small">{{ mirror_dir }}</div></div>
+  <p class="small muted">
+    The folder above is hidden, and disk-cleanup tools sometimes clear it out.
+    So each weekly backup also gets a spare copy in your Documents, where you
+    can see it. The copies are scrambled like everything else — safe to leave
+    there, and safe if something like OneDrive backs your Documents up. If
+    FrostFile ever starts up empty, it finds these copies and offers to bring
+    your information back.
+  </p>
+  <form method="post" action="/settings/mirror">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="enable" value="0">
+    <button type="submit" class="btn btn-quiet">Stop Keeping Spare Copies</button>
+  </form>
+    {% else %}
+  <p class="small muted">
+    Spare copies are turned off. FrostFile can keep a second copy of each
+    weekly backup in <span class="mono">{{ mirror_dir }}</span> — a safety net
+    in case this folder is ever cleared out by a disk cleanup.
+  </p>
+  <form method="post" action="/settings/mirror">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="enable" value="1">
+    <button type="submit" class="btn btn-quiet">Keep Spare Copies in Documents</button>
+  </form>
+    {% endif %}
+  {% endif %}
   <form method="post" action="/settings/data-dir" style="margin-top:.9rem">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <div class="form-row">

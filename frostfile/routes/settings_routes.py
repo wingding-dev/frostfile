@@ -11,7 +11,12 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, Form, Request
 
 from .. import db
-from ..config import ensure_data_dir, write_prefs
+from ..config import (
+    default_mirror_dir,
+    ensure_data_dir,
+    mirror_backups,
+    write_prefs,
+)
 from ..crypto import Vault, WrongPassphrase, passphrase_problems
 from ..security import Session, set_session_cookie, verify_csrf
 from ..web import get_conn, get_session, get_vault, redirect, render
@@ -26,6 +31,13 @@ def _page(
     **flash,
 ):
     settings = request.app.state.settings
+    # When the mirror is off by choice, still show where copies WOULD go so
+    # the page can offer to turn it back on. None in both slots means the
+    # mirror is not available here at all (explicit --data-dir, no Documents
+    # folder) and the section is hidden entirely.
+    mirror_display = settings.mirror_dir
+    if mirror_display is None and settings.mirror_off_by_pref:
+        mirror_display = default_mirror_dir()
     return render(
         request,
         "settings.html",
@@ -33,6 +45,8 @@ def _page(
             "active": "settings",
             "data_dir": str(settings.data_dir),
             "db_path": str(settings.db_path),
+            "mirror_dir": str(mirror_display) if mirror_display else "",
+            "mirror_on": settings.mirror_dir is not None,
             "lock_minutes": settings.lock_timeout_minutes,
             "has_recovery": db.has_recovery(conn),
             **flash,
@@ -80,6 +94,46 @@ def save_lock_timeout(
         vault,
         message=f"Done — FrostFile now locks itself after {value} minutes idle.",
     )
+
+
+@router.post("/settings/mirror")
+def toggle_backup_mirror(
+    request: Request,
+    enable: str = Form(""),
+    csrf_token: str = Form(""),
+    session: Session = Depends(get_session),
+    conn: sqlite3.Connection = Depends(get_conn),
+    vault: Vault = Depends(get_vault),
+):
+    verify_csrf(session, csrf_token)
+    settings = request.app.state.settings
+    turn_on = enable == "1"
+    mirror = default_mirror_dir() if turn_on else None
+    if turn_on and mirror is None:
+        return _page(
+            request,
+            conn,
+            vault,
+            error="No Documents folder was found on this computer, so there "
+            "is nowhere to keep the spare copies.",
+        )
+
+    write_prefs(settings.data_dir, mirror_backups=turn_on)
+    new_settings = dataclasses.replace(
+        settings, mirror_dir=mirror, mirror_off_by_pref=not turn_on
+    )
+    request.app.state.settings = new_settings
+    if turn_on:
+        # Catch the mirror up right away so the user sees the files appear
+        # instead of waiting for the next weekly backup.
+        mirror_backups(new_settings)
+        message = f"Done — spare copies of your backups now go to {mirror}."
+    else:
+        message = (
+            "Done — no new spare copies will be made. The ones already in "
+            "the folder stay until you delete them."
+        )
+    return _page(request, conn, vault, message=message)
 
 
 @router.post("/settings/data-dir")

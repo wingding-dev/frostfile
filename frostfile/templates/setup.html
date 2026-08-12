@@ -25,6 +25,28 @@
 </div>
 {% endif %}
 
+{% if restore %}
+<div class="card">
+  <h3 style="margin-top:0">Your Information Is Not Gone</h3>
+  <p>
+    FrostFile's usual data folder is empty, but a spare backup copy from
+    <strong>{{ restore.date }}</strong> was found in
+    <span class="mono small">{{ restore.folder }}</span>.
+    This happens when a disk cleanup or an uninstall clears the hidden folder
+    where FrostFile works. One click brings everything back — your passphrase
+    stays the same one you have been using.
+  </p>
+  <form method="post" action="/setup/restore">
+    <button type="submit" class="btn">Bring My Data Back</button>
+  </form>
+  <p class="hint" style="margin-top:.6rem">
+    Anything you changed after {{ restore.date }} will need re-entering.
+    Starting fresh below instead is also fine — the spare copies stay where
+    they are.
+  </p>
+</div>
+{% endif %}
+
 <form method="post" action="/setup" class="card">
   <div class="form-row">
     <label for="passphrase">Master passphrase</label>

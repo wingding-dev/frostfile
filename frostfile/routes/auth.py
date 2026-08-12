@@ -9,6 +9,7 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, File, Form, Request, UploadFile
 
 from .. import db
+from ..config import Settings, default_mirror_dir, mirror_backups
 from ..crypto import WrongPassphrase, passphrase_problems
 from ..security import (
     clear_session_cookie,
@@ -36,19 +37,24 @@ def _maybe_auto_backup(request: Request, conn: sqlite3.Connection) -> None:
     settings = request.app.state.settings
     try:
         existing = list(settings.backup_dir.glob("frostfile-*.db"))
-        if existing:
-            newest = max(p.stat().st_mtime for p in existing)
-            if time.time() - newest < AUTO_BACKUP_EVERY_DAYS * 86400:
-                return
-        stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-        db.backup_to(conn, settings.backup_dir / f"frostfile-auto-{stamp}.db")
-        automatic = sorted(settings.backup_dir.glob("frostfile-auto-*.db"))
-        for old in automatic[:-AUTO_BACKUP_KEEP]:
-            old.unlink()
+        fresh = existing and (
+            time.time() - max(p.stat().st_mtime for p in existing)
+            < AUTO_BACKUP_EVERY_DAYS * 86400
+        )
+        if not fresh:
+            stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+            db.backup_to(conn, settings.backup_dir / f"frostfile-auto-{stamp}.db")
+            automatic = sorted(settings.backup_dir.glob("frostfile-auto-*.db"))
+            for old in automatic[:-AUTO_BACKUP_KEEP]:
+                old.unlink()
     except (OSError, sqlite3.Error):
         # A backup failure (full disk, etc.) must never block unlocking. With
         # the atomic backup_to, no partial file is left behind to poison the set.
         pass
+    # Runs even when the weekly check skipped a new backup, so the mirror
+    # catches up whenever it is behind — first run after this feature shipped,
+    # or a user who deleted the folder and changed their mind.
+    mirror_backups(settings)
 
 
 def _safe_next(target: str | None) -> str:
@@ -60,11 +66,48 @@ def _safe_next(target: str | None) -> str:
     return target
 
 
+def _restorable_backups(settings: Settings) -> list:
+    """Backup files that could rescue a vanished vault, newest first.
+
+    Looks in the data directory's own backups folder AND the Documents mirror
+    — the mirror deliberately bypasses the mirror_backups preference here,
+    because files that already exist should still rescue a user who turned
+    future copies off.
+    """
+    folders = [settings.backup_dir]
+    mirror = settings.mirror_dir or default_mirror_dir()
+    if mirror is not None:
+        folders.append(mirror)
+    found = []
+    for folder in folders:
+        try:
+            found.extend(p for p in folder.glob("frostfile-*.db") if p.is_file())
+        except OSError:
+            continue
+    return sorted(found, key=lambda p: p.stat().st_mtime, reverse=True)
+
+
+def _restore_offer(settings: Settings) -> dict | None:
+    candidates = _restorable_backups(settings)
+    if not candidates:
+        return None
+    newest = candidates[0]
+    when = datetime.fromtimestamp(newest.stat().st_mtime)
+    return {
+        "date": f"{when:%B} {when.day}, {when.year}",
+        "folder": str(newest.parent),
+    }
+
+
 @router.get("/setup")
 def setup_form(request: Request, conn: sqlite3.Connection = Depends(get_conn)):
     if db.is_initialized(conn):
         return redirect("/unlock")
-    return render(request, "setup.html", {"errors": []})
+    return render(
+        request,
+        "setup.html",
+        {"errors": [], "restore": _restore_offer(request.app.state.settings)},
+    )
 
 
 @router.post("/setup")
@@ -290,6 +333,57 @@ async def setup_import(
     conn.close()
     scratch.replace(settings.db_path)
     return redirect("/unlock")
+
+
+@router.post("/setup/restore")
+def setup_restore(
+    request: Request,
+    conn: sqlite3.Connection = Depends(get_conn),
+):
+    """Bring back a spare backup copy after the data folder was wiped.
+
+    The file to restore is rediscovered server-side rather than taken from the
+    form — the browser never gets to choose an arbitrary path. Candidates are
+    tried newest first, so one damaged file falls back to the copy behind it.
+    Like /setup/import, this only works while no vault exists here.
+    """
+    if db.is_initialized(conn):
+        return redirect("/unlock")
+
+    settings = request.app.state.settings
+    scratch = settings.db_path.with_suffix(".restore-tmp")
+    for candidate in _restorable_backups(settings):
+        try:
+            data = candidate.read_bytes()
+        except OSError:
+            continue
+        scratch.write_bytes(data)
+        try:
+            check = db.connect(scratch)
+            try:
+                ok = db.is_initialized(check)
+            finally:
+                check.close()
+        except sqlite3.DatabaseError:
+            ok = False
+        if ok:
+            conn.close()
+            scratch.replace(settings.db_path)
+            return redirect("/unlock")
+    scratch.unlink(missing_ok=True)
+    return render(
+        request,
+        "setup.html",
+        {
+            "errors": [
+                "None of the backup copies could be read — they may have been "
+                "damaged. If you have a FrostFile file saved anywhere else (a "
+                "USB stick, an email to yourself), load it below under "
+                "“Moving from Another Computer?”."
+            ],
+            "restore": None,
+        },
+    )
 
 
 @router.get("/unlock")

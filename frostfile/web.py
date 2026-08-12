@@ -72,7 +72,7 @@ _ALLOWED_HOSTS = {"localhost", "127.0.0.1", "::1", ""}
 # guarded by rejecting cross-site requests via the Sec-Fetch-Site header that
 # every modern browser sends. A malicious page's form POST arrives as
 # "cross-site"; a legitimate navigation is "same-origin" or "none".
-_ORIGIN_GUARDED = {"/setup", "/setup/import"}
+_ORIGIN_GUARDED = {"/setup", "/setup/import", "/setup/restore"}
 
 # Keep accepted uploads entirely in memory. Starlette otherwise spools any file
 # part over 1 MB to a cleartext OS temp file — which for a credit-report PDF is
