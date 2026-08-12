@@ -2,10 +2,16 @@
 # All files built from git tag v1.0.1 by GitHub Actions;
 # source repository: https://github.com/wingding-dev/frostfile
 #
+# 2026-08-11: frostfile-1.0.1.tar.gz repacked from the v1.0.1 tag to drop
+# internal working documents that were accidentally included (project
+# trackers, dev tooling, brand source). The application code inside is
+# byte-identical to the previous tarball and to the shipped binaries;
+# only this tarball's hash changed. The binaries are untouched.
+#
 # Verify on Windows:  certutil -hashfile FrostFile-windows.zip SHA256
 # Verify on Mac:      shasum -a 256 FrostFile-mac.zip
 
 6003b94b6c9deae91247b283aa0a911b9d20d9cd5d5cc5c63b33422224dc4439  FrostFile-windows.zip
 7acf12926bc9bce5fb1f3a0d5f3f076df0dc7681c46c116c7ee0718438ed3a9b  FrostFile-mac.zip
-c98625ad0cd4e24ff8a326b05483a6410875a2403cfb66e67a496af799308555  frostfile-1.0.1.tar.gz
+57dd1b0fe4a3912dd08f803b4e309199909660967b023b26ca547725430321e4  frostfile-1.0.1.tar.gz
 36b0d5bcf07fc39c0adfac51a7dc02dfb62298b458f75ff1c4b56c4e11f5a1c8  frostfile-1.0.1-py3-none-any.whl
