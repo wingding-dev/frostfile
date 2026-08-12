@@ -703,7 +703,9 @@ AGENCIES: list[dict[str, Any]] = [
         "category": "gov_control",
         "description": "Locks your SSN against use in E-Verify employment checks.",
         "why_it_matters": (
-            "Stops someone using your SSN to get hired, which otherwise produces "
+            "Stops someone using your SSN to get hired at employers that run "
+            "E-Verify — not every employer does, but a locked SSN fails the "
+            "check at the ones that do. Employment fraud otherwise produces "
             "wage records the IRS attributes to you."
         ),
         "freeze_url": "https://www.e-verify.gov/employees/employee-self-services/mye-verify/self-lock",
@@ -919,7 +921,7 @@ PROTECTS: dict[str, str] = {
     "work_number": "Limits who sees your salary & job history",
     "irs_ip_pin": "Blocks fake tax refunds in your name",
     "ssa_account": "Guards your Social Security record",
-    "everify_self_lock": "Blocks others working under your SSN",
+    "everify_self_lock": "Blocks E-Verify hiring checks as you",
     "usps_informed_delivery": "Guards your incoming mail",
     "optoutprescreen": "Stops pre-approved card offers in your mailbox",
     "carrier_port_lock": "Stops phone-number theft (SIM swap)",
