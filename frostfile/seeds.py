@@ -250,8 +250,9 @@ AGENCIES: list[dict[str, Any]] = [
         ),
         "notes": (
             "General consumer assistance is 1-800-540-2505. Adding a freeze "
-            "also takes up to three business days, and you will get a 10-digit "
-            "PIN to keep with your records. Minor freeze handling "
+            "also takes up to three business days; a confirmation letter with "
+            "your 10-digit Security Freeze PIN then arrives by mail — keep it "
+            "with your records. Minor freeze handling "
             "was not documented on the freeze page — call before mailing anything."
         ),
         "citations": {

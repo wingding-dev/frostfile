@@ -160,7 +160,7 @@ SOURCES: dict[str, Source] = {
         ),
         _s(
             "innovis-freeze-faq",
-            "Security Freeze FAQ (placement and lift timing)",
+            "Security Freeze — Learning Center (placement and lift timing)",
             "https://www.innovis.com/personal/lc_securityFreeze",
             "Innovis",
             "official",
