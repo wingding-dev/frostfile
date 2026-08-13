@@ -5,12 +5,12 @@ the app about what the newest version is.
 """
 import json, re, pathlib
 here = pathlib.Path(__file__).parent
-hero = json.load(open(here / "assets/store-assets.json"))["hero"]
+backdrop = json.load(open(here / "assets/backdrop-assets.json"))["backdrop"]
 logo = json.load(open(here / "assets/logo-assets.json"))
 version = re.search(r'^version = "([^"]+)"',
                     (here.parent / "pyproject.toml").read_text(), re.M).group(1)
 html = (here / "index.template.html").read_text()
-html = (html.replace("__HERO__", hero)
+html = (html.replace("__BACKDROP__", backdrop)
             .replace("__ICON_BLUE__", logo["icon_blue"])
             .replace("__ICON_WHITE__", logo["icon_white"])
             .replace("__WORDMARK_WHITE__", logo["wordmark_white"])

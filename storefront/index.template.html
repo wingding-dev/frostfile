@@ -41,18 +41,35 @@
   }
   .eyebrow::before { content: ""; width: 26px; height: 1px; background: var(--frost-2); }
 
-  /* ---- ambient cryo glow layers ---- */
-  .aurora { position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  /* ---- cryo vault backdrop (photoreal-right, round-1 winner) ---- */
+  .backdrop { position: fixed; inset: 0; z-index: -3; pointer-events: none;
+    background: url("__BACKDROP__") right center / cover no-repeat var(--ground); }
+  .backdrop-dark { position: fixed; inset: 0; z-index: -2; pointer-events: none;
+    background: linear-gradient(90deg, rgba(9,15,21,.88) 0%, rgba(9,15,21,.62) 45%, rgba(9,15,21,.45) 100%); }
+  @media (max-width: 760px){
+    .backdrop { background-position: 68% center; }
+    .backdrop-dark { background: linear-gradient(180deg, rgba(9,15,21,.84), rgba(9,15,21,.68)); }
+  }
+  .aurora { position: fixed; inset: 0; z-index: -1; pointer-events: none;
     background:
       radial-gradient(60% 45% at 50% 0%, rgba(73,154,232,.16), transparent 70%),
       radial-gradient(40% 40% at 85% 20%, rgba(80,150,200,.10), transparent 70%),
-      radial-gradient(50% 50% at 12% 60%, rgba(60,120,170,.10), transparent 70%),
-      var(--ground);
+      radial-gradient(50% 50% at 12% 60%, rgba(60,120,170,.10), transparent 70%);
   }
-  .grain { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .5;
-    background-image: url("__HERO__"); background-size: cover; background-position: center;
-    mix-blend-mode: screen; opacity: .18;
-  }
+  /* cryo steam: cold fog pooling at the bottom edge of the screen, breathing
+     on the 9s compressor cycle. Blurred CSS layers only — canvas fog bands. */
+  .steam { position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    transform-origin: 50% 100%;
+    background:
+      radial-gradient(70% 46% at 16% 104%, rgba(140,190,240,.11), transparent 70%),
+      radial-gradient(58% 38% at 84% 106%, rgba(140,190,240,.09), transparent 70%),
+      radial-gradient(130% 52% at 50% 112%, rgba(140,190,240,.13), transparent 74%),
+      radial-gradient(30% 60% at -6% 88%, rgba(140,190,240,.07), transparent 70%),
+      radial-gradient(30% 60% at 106% 88%, rgba(140,190,240,.07), transparent 70%);
+    filter: blur(16px);
+    animation: steam 9s ease-in-out infinite; }
+  @keyframes steam { 0%,100% { opacity: .5; transform: scale(1); }
+                     50%     { opacity: 1; transform: scale(1.05); } }
 
   /* ---- nav ---- */
   header.nav { position: sticky; top: 0; z-index: 50;
@@ -76,6 +93,25 @@
   .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 0 1px rgba(131,185,255,.6), 0 16px 44px -10px rgba(73,154,232,.9); }
   .btn-ghost { color: var(--text); background: var(--panel); border-color: var(--frost-2); }
   .btn-ghost:hover { background: var(--panel-2); border-color: var(--ice); }
+  /* frost-over button (lab v4): the whole face glazes over on hover; thaw is quicker */
+  .btn-frost { position: relative; overflow: hidden; }
+  .btn-frost::before { content: ""; position: absolute; inset: 0; border-radius: inherit;
+    background:
+      radial-gradient(70px 46px at 0% 0%, rgba(228,246,255,.9), transparent 72%),
+      radial-gradient(76px 50px at 100% 0%, rgba(228,246,255,.75), transparent 72%),
+      radial-gradient(70px 46px at 100% 100%, rgba(228,246,255,.85), transparent 72%),
+      radial-gradient(64px 46px at 0% 100%, rgba(228,246,255,.75), transparent 72%),
+      linear-gradient(180deg, rgba(226,244,255,.5), rgba(186,222,252,.32));
+    opacity: 0; transition: opacity .6s ease; pointer-events: none; }
+  .btn-frost::after { content: ""; position: absolute; top: 0; bottom: 0; width: 40%;
+    left: -60%; transform: skewX(-18deg);
+    background: linear-gradient(90deg, transparent, rgba(234,250,255,.55), transparent);
+    pointer-events: none; }
+  .btn-frost:hover { box-shadow: 0 0 0 1px rgba(210,238,255,.9),
+    inset 0 0 22px rgba(198,232,255,.65), 0 10px 34px -10px rgba(131,185,255,.8);
+    transition: box-shadow 1.6s ease-out; }
+  .btn-frost:hover::before { opacity: 1; transition: opacity 1.6s ease-out; }
+  .btn-frost:hover::after { left: 130%; transition: left 1.3s ease .15s; }
 
   /* ---- hero ---- */
   .hero { position: relative; padding: 86px 0 70px; }
@@ -91,39 +127,6 @@
   .microtrust { margin-top: 20px; color: var(--text-faint); font-size: .86rem; display: flex; gap: 16px; flex-wrap: wrap; }
   @media (max-width: 900px){ .microtrust { justify-content: center; } }
   .microtrust b { color: var(--text-dim); font-weight: 600; }
-
-  /* ---- cryo pod (hero visual) ---- */
-  .pod { position: relative; aspect-ratio: 1; max-width: 460px; margin: 0 auto; display: grid; place-items: center; }
-  .pod::before { content: ""; position: absolute; inset: 6%; border-radius: 50%;
-    background: radial-gradient(circle at 50% 42%, rgba(131,185,255,.22), rgba(22,50,79,.15) 55%, transparent 72%);
-    filter: blur(6px); }
-  .pod .ring { position: absolute; border-radius: 50%; border: 1px solid var(--frost); }
-  .pod .ring.r1 { inset: 0; border-color: var(--frost-2); }
-  .pod .ring.r2 { inset: 9%; }
-  .pod .ring.r3 { inset: 19%; border-style: dashed; border-color: rgba(90,166,238,.14); animation: spin 46s linear infinite; }
-  .pod .glass { position: absolute; inset: 12%; border-radius: 50%;
-    background: linear-gradient(160deg, rgba(255,255,255,.06), rgba(255,255,255,.01));
-    border: 1px solid var(--frost); backdrop-filter: blur(3px);
-    box-shadow: inset 0 1px 30px rgba(131,185,255,.08); }
-  .pod img.seal { position: relative; width: 53%; filter: drop-shadow(0 0 26px rgba(131,185,255,.45)); }
-  /* cryo pulse: frost rings that emanate from the pod and fade, + a soft glow that swells with the seal */
-  .pod .glow { position: absolute; inset: 24%; border-radius: 50%; pointer-events: none;
-    background: radial-gradient(circle, rgba(131,185,255,.45), transparent 70%);
-    filter: blur(14px); opacity: .3; animation: glowpulse 7s ease-in-out infinite; }
-  .pod .pulse { position: absolute; inset: 12%; border-radius: 50%; pointer-events: none;
-    border: 1px solid rgba(131,185,255,.5);
-    box-shadow: 0 0 12px -2px rgba(131,185,255,.35), inset 0 0 12px -4px rgba(131,185,255,.3);
-    opacity: 0; transform: scale(.7); animation: frostring 7s ease-out infinite; }
-  .pod .pulse.p2 { animation-delay: 2.33s; }
-  .pod .pulse.p3 { animation-delay: 4.66s; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  @keyframes glowpulse { 0%,100%{ opacity: .25; transform: scale(.96); } 50%{ opacity: .65; transform: scale(1.05); } }
-  @keyframes frostring {
-    0%   { transform: scale(.7);  opacity: 0; }
-    14%  { opacity: .45; }
-    72%  { transform: scale(1.16); opacity: 0; }
-    100% { transform: scale(1.16); opacity: 0; }
-  }
 
   /* ---- cold-truth strip ---- */
   .strip { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin: 8px 0 12px; }
@@ -144,7 +147,7 @@
   @media (max-width: 900px){ .features { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 600px){ .features { grid-template-columns: 1fr; } }
   .card { border: 1px solid var(--frost); background: var(--panel); border-radius: 16px; padding: 24px;
-    backdrop-filter: blur(8px); transition: border-color .25s, transform .2s, box-shadow .25s; }
+    backdrop-filter: blur(8px); transition: border-color .5s, transform .4s, box-shadow .6s; }
   .card:hover { border-color: var(--frost-2); transform: translateY(-3px); box-shadow: 0 20px 50px -24px rgba(73,154,232,.5); }
   .icon { width: 42px; height: 42px; border-radius: 11px; display: grid; place-items: center; margin-bottom: 16px;
     background: radial-gradient(circle at 40% 30%, rgba(131,185,255,.22), rgba(22,50,79,.4));
@@ -180,6 +183,14 @@
   .li .m { flex: none; width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; font-size: 13px; font-weight: 800; margin-top: 1px; }
   .m.yes { color: var(--ok); background: rgba(116,197,142,.12); }
   .m.no { color: #e79a92; background: rgba(231,154,146,.12); }
+  /* checkmarks draw themselves as the panel reveals (lab v4) */
+  .m.yes svg { width: 13px; height: 13px; stroke: var(--ok); stroke-width: 2.6; fill: none;
+    stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 20; stroke-dashoffset: 20; }
+  .reveal.in .m.yes svg { stroke-dashoffset: 0; transition: stroke-dashoffset .7s ease .1s; }
+  .reveal.in .li:nth-of-type(2) .m.yes svg { transition-delay: .3s; }
+  .reveal.in .li:nth-of-type(3) .m.yes svg { transition-delay: .5s; }
+  .reveal.in .li:nth-of-type(4) .m.yes svg { transition-delay: .7s; }
   .li span { font-size: .98rem; }
   .li span small { display: block; color: var(--text-faint); font-size: .84rem; font-weight: 400; }
 
@@ -238,15 +249,13 @@
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; scroll-behavior: auto; }
     .reveal { opacity: 1; transform: none; transition: none; }
-    .pod .pulse { display: none; }
-    .pod .glow { opacity: .35; transform: none; }
+    .m.yes svg { transition: none !important; stroke-dashoffset: 0; }
+    .btn-frost::before, .btn-frost::after { display: none; }
+    .steam { opacity: .7; }
   }
   :focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 4px; }
 
   /* ---- small-screen pass (desktop untouched) ---- */
-  @media (max-width: 900px){
-    .pod { max-width: 320px; }
-  }
   @media (max-width: 480px){
     .wrap { padding: 0 18px; }
     .nav-in { height: 58px; }
@@ -256,7 +265,6 @@
     .hero { padding: 40px 0 52px; }
     .hero h1 { font-size: clamp(2.05rem, 10.5vw, 2.5rem); }
     .hero-grid { gap: 30px; }
-    .pod { max-width: 250px; }
     .hero-cta { flex-direction: column; align-items: stretch; }
     .hero-cta .btn { justify-content: center; padding: .85em 1.25em; }
     .microtrust { gap: 8px 14px; }
@@ -269,15 +277,17 @@
 </style>
 </head>
 <body>
-<div class="aurora"></div>
-<div class="grain"></div>
+<div class="backdrop" aria-hidden="true"></div>
+<div class="backdrop-dark" aria-hidden="true"></div>
+<div class="aurora" aria-hidden="true"></div>
+<div class="steam" aria-hidden="true"></div>
 
 <header class="nav">
   <div class="wrap nav-in">
     <a class="brand" href="#top"><img src="__ICON_WHITE__" alt=""><img class="wordmark" src="__WORDMARK_WHITE__" alt="FrostFile"></a>
     <div class="nav-right">
       <span class="nav-note">Free · Open source · Newest version: v__VERSION__</span>
-      <a class="btn btn-primary" href="#download">
+      <a class="btn btn-primary btn-frost" href="#download">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 19h16"/></svg>
         Download
       </a>
@@ -293,7 +303,7 @@
         <h1><span class="frostword">Deadbolts</span> beat doorbells.</h1>
         <p class="lede">A credit freeze is a deadbolt — it stops the break-in. Monitoring is a doorbell camera; it only tells you afterward. FrostFile helps your whole family throw the deadbolt — on your own computer, with nothing sent anywhere.</p>
         <div class="hero-cta">
-          <a class="btn btn-primary" href="/download/FrostFile-windows.zip" id="dl-win">
+          <a class="btn btn-primary btn-frost" href="/download/FrostFile-windows.zip" id="dl-win">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5 10.5 4.4v7.1H3zM10.5 12.5v7.1L3 18.5v-6zM11.7 4.2 21 3v8.5h-9.3zM21 12.5V21l-9.3-1.3v-7.2z"/></svg>
             Download for Windows
           </a>
@@ -308,13 +318,6 @@
           <span><b>Nothing</b> leaves your computer.</span>
           <span><b>Open source.</b> Anyone can check it.</span>
         </div>
-      </div>
-      <div class="pod" aria-hidden="true">
-        <span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span>
-        <span class="pulse p1"></span><span class="pulse p2"></span><span class="pulse p3"></span>
-        <span class="glass"></span>
-        <span class="glow"></span>
-        <img class="seal" src="__ICON_WHITE__" alt="">
       </div>
     </div>
   </section>
@@ -349,10 +352,10 @@
         <div class="refuse-grid">
           <div class="refuse-col">
             <h3>What it does for you</h3>
-            <div class="li"><span class="m yes">✓</span><span>Tracks every freeze, PIN, and confirmation number</span></div>
-            <div class="li"><span class="m yes">✓</span><span>Prints the mail-in packets for children's freezes</span></div>
-            <div class="li"><span class="m yes">✓</span><span>Reminds you when yearly tasks come due</span></div>
-            <div class="li"><span class="m yes">✓</span><span>Every fact it prints links to an official source</span></div>
+            <div class="li"><span class="m yes"><svg viewBox="0 0 16 16" aria-hidden="true"><polyline points="2.5,8.5 6.5,12 13.5,4"/></svg></span><span>Tracks every freeze, PIN, and confirmation number</span></div>
+            <div class="li"><span class="m yes"><svg viewBox="0 0 16 16" aria-hidden="true"><polyline points="2.5,8.5 6.5,12 13.5,4"/></svg></span><span>Prints the mail-in packets for children's freezes</span></div>
+            <div class="li"><span class="m yes"><svg viewBox="0 0 16 16" aria-hidden="true"><polyline points="2.5,8.5 6.5,12 13.5,4"/></svg></span><span>Reminds you when yearly tasks come due</span></div>
+            <div class="li"><span class="m yes"><svg viewBox="0 0 16 16" aria-hidden="true"><polyline points="2.5,8.5 6.5,12 13.5,4"/></svg></span><span>Every fact it prints links to an official source</span></div>
           </div>
           <div class="refuse-col">
             <h3>What it refuses to do</h3>
@@ -456,7 +459,7 @@
       <p>Free, open source, and yours to keep. Runs in its own window — no install wizard, no account, nothing sent anywhere.</p>
       <div class="ver-callout">Newest version: <strong>v__VERSION__</strong><span class="ver-note">yours is at the bottom of any FrostFile page — if it says the same thing, you're up to date</span></div>
       <div class="hero-cta">
-        <a class="btn btn-primary" href="/download/FrostFile-windows.zip">
+        <a class="btn btn-primary btn-frost" href="/download/FrostFile-windows.zip">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5 10.5 4.4v7.1H3zM10.5 12.5v7.1L3 18.5v-6zM11.7 4.2 21 3v8.5h-9.3zM21 12.5V21l-9.3-1.3v-7.2z"/></svg>
           Download for Windows
         </a>
@@ -548,9 +551,10 @@
     var mac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
     if (mac) {
       var w = document.getElementById("dl-win"), m = document.getElementById("dl-mac");
-      if (w && m) { w.parentNode.insertBefore(m, w); m.className = "btn btn-primary"; w.className = "btn btn-ghost"; }
+      if (w && m) { w.parentNode.insertBefore(m, w); m.className = "btn btn-primary btn-frost"; w.className = "btn btn-ghost"; }
     }
   })();
+
 </script>
 </body>
 </html>
