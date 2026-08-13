@@ -116,11 +116,15 @@ h3 { font-size: .95rem; margin: 1.2rem 0 .4rem; }
   padding: .6rem 1.4rem;
 }
 /* Inner wrapper shares the content column's max-width, so the header lines up
-   with the page below it instead of hugging the window edge. */
+   with the page below it instead of hugging the window edge. Two decks: the
+   brand row on top, the nav on its own full-width line — nine links plus the
+   brand and controls cannot share one 1080px row without ragged wrapping. */
 .topbar-in {
   max-width: 1080px; margin: 0 auto;
-  display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap;
+  display: flex; flex-direction: column; gap: .55rem;
 }
+.topbar-top { display: flex; align-items: center; gap: 1.2rem; }
+.topbar-top .lock-form { margin-left: auto; }
 .brand { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; }
 .brand img { width: 24px; height: 24px; display: block; }
 .brand img.wordmark { width: auto; height: 17px; }
@@ -129,7 +133,7 @@ h3 { font-size: .95rem; margin: 1.2rem 0 .4rem; }
   .only-light { display: none; }
   .only-dark { display: block; }
 }
-.topbar nav { display: flex; gap: .1rem; flex: 1; flex-wrap: wrap; }
+.topbar nav:not(.nav-history) { display: flex; gap: .1rem; flex-wrap: wrap; }
 .topbar nav a {
   padding: .3rem .6rem; border-radius: var(--radius);
   color: var(--text-dim); text-decoration: none; font-size: .88rem;
@@ -313,7 +317,8 @@ fieldset.subsection legend { font-size: .85rem; font-weight: 550; padding: 0 .35
   transform: perspective(240px) rotateY(24deg); }
 .door-frame.shut { border: 3px solid var(--accent); color: var(--accent); background: var(--accent-soft);
   position: relative; }
-.door-frame.shut::after { content: ""; position: absolute; right: 10px; top: 50%;
+/* The deadbolt sits near the top of the door, clear of the centered label. */
+.door-frame.shut::after { content: ""; position: absolute; right: 10px; top: 16px;
   width: 26px; height: 8px; background: var(--accent); border-radius: 3px; }
 
 details.faq { border-bottom: 1px solid var(--border); padding: .55rem 0; }

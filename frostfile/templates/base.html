@@ -61,13 +61,21 @@
 </script>
 <header class="topbar">
 <div class="topbar-in">
-  <nav class="nav-history" aria-label="History">
-    <button type="button" onclick="history.back()" title="Back to the page you were just on">&#8592;</button>
-    <button type="button" onclick="history.forward()" title="Forward">&#8594;</button>
-  </nav>
-  <a class="brand" href="/"><img src="/static/frostfile-icon.png" alt=""><img
-    class="wordmark only-light" src="/static/frostfile-wordmark.png" alt="FrostFile"><img
-    class="wordmark only-dark" src="/static/frostfile-wordmark-dark.png" alt="FrostFile"></a>
+  <div class="topbar-top">
+    <nav class="nav-history" aria-label="History">
+      <button type="button" onclick="history.back()" title="Back to the page you were just on">&#8592;</button>
+      <button type="button" onclick="history.forward()" title="Forward">&#8594;</button>
+    </nav>
+    <a class="brand" href="/"><img src="/static/frostfile-icon.png" alt=""><img
+      class="wordmark only-light" src="/static/frostfile-wordmark.png" alt="FrostFile"><img
+      class="wordmark only-dark" src="/static/frostfile-wordmark-dark.png" alt="FrostFile"></a>
+    <form method="post" action="/lock" class="lock-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <a href="/help" class="link-quiet {{ 'active' if active == 'help' }}">Help</a>
+      <a href="/settings" class="link-quiet">Settings</a>
+      <button type="submit" class="btn btn-quiet" title="Locks immediately. Auto-locks after {{ lock_minutes }} minutes idle.">Lock</button>
+    </form>
+  </div>
   <nav>
     <a href="/" class="{{ 'active' if active == 'dashboard' }}">Dashboard</a>
     <a href="/matrix" class="{{ 'active' if active == 'matrix' }}">Freezes</a>
@@ -79,12 +87,6 @@
     <a href="/agencies" class="{{ 'active' if active == 'agencies' }}">Directory</a>
     <a href="/learn" class="{{ 'active' if active == 'learn' }}">Learn</a>
   </nav>
-  <form method="post" action="/lock" class="lock-form">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <a href="/help" class="link-quiet {{ 'active' if active == 'help' }}">Help</a>
-    <a href="/settings" class="link-quiet">Settings</a>
-    <button type="submit" class="btn btn-quiet" title="Locks immediately. Auto-locks after {{ lock_minutes }} minutes idle.">Lock</button>
-  </form>
 </div>
 </header>
 {% endif %}
