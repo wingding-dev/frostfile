@@ -30,7 +30,7 @@ COMPILED_ON = "2026-08-03"
 
 # Stamped by a human link-check pass as part of cutting a release.
 # The app itself never checks links at runtime — it makes zero connections.
-LINKS_VERIFIED_ON = "2026-08-06"
+LINKS_VERIFIED_ON = "2026-08-12"
 
 
 @dataclass(frozen=True)
