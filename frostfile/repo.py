@@ -950,3 +950,27 @@ def household_progress(
             if record.is_done:
                 done += 1
     return Progress(done=done, total=total)
+
+
+def person_progress(
+    people: Iterable[Person],
+    agencies: Iterable[Agency],
+    matrix: dict[int, dict[int, FreezeRecord]],
+) -> list[dict]:
+    """Per-person done/total under the exact counting rule of
+    household_progress, so the two sets of numbers can sit side by side
+    without ever disagreeing."""
+    agency_list = [a for a in agencies if not a.is_fyi]
+    rows = []
+    for person in people:
+        cells = matrix.get(person.id, {})
+        done = total = 0
+        for agency in agency_list:
+            record = cells.get(agency.id)
+            if record is not None and record.status == "not_applicable":
+                continue
+            total += 1
+            if record and record.is_done:
+                done += 1
+        rows.append({"person": person, "done": done, "total": total})
+    return rows

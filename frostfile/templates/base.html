@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="dark">
   <title>{% block title %}FrostFile{% endblock %}</title>
   <link rel="stylesheet" href="/static/app.css">
   <link rel="icon" type="image/png" href="/static/frostfile-icon.png">
@@ -66,9 +67,9 @@
       <button type="button" onclick="history.back()" title="Back to the page you were just on">&#8592;</button>
       <button type="button" onclick="history.forward()" title="Forward">&#8594;</button>
     </nav>
+    {# Dark-only vault theme: the header always wears the white wordmark. #}
     <a class="brand" href="/"><img src="/static/frostfile-icon.png" alt=""><img
-      class="wordmark only-light" src="/static/frostfile-wordmark.png" alt="FrostFile"><img
-      class="wordmark only-dark" src="/static/frostfile-wordmark-dark.png" alt="FrostFile"></a>
+      class="wordmark" src="/static/frostfile-wordmark-dark.png" alt="FrostFile"></a>
     <form method="post" action="/lock" class="lock-form">
       <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
       <a href="/help" class="link-quiet {{ 'active' if active == 'help' }}">Help</a>

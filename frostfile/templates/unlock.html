@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Unlock FrostFile{% endblock %}
 {% block main_class %}wrap-narrow{% endblock %}
+{% block body_class %}hall{% endblock %}
 
 {% block content %}
 <h1 style="margin-bottom:.4rem">
-  <img class="only-light" src="/static/frostfile-wordmark.png" alt="FrostFile" style="height:34px;width:auto">
-  <img class="only-dark" src="/static/frostfile-wordmark-dark.png" alt="FrostFile" style="height:34px;width:auto">
+  {# Hero-sized on purpose — this is the front door of the vault. #}
+  <img class="wordmark-hero" src="/static/frostfile-wordmark-dark.png" alt="FrostFile">
 </h1>
 <p class="lede">Locked. Enter your master passphrase to continue.</p>
 

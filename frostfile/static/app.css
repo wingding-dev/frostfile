@@ -1,44 +1,88 @@
-/* FrostFile — deliberately plain. No build step, no framework, no CDN. */
+/* FrostFile — deliberately plain engineering: no build step, no framework,
+   no CDN. Fonts and imagery ship inside the app (static/fonts/, OFL licenses
+   alongside), so nothing here ever touches the network.
 
-:root {
-  /* Palette tuned to the FrostFile logo: bright blue → navy, cool neutrals. */
-  --bg: #f4f8fd;
-  --surface: #ffffff;
-  --surface-2: #e9f1fb;
-  --border: #d3e1f0;
-  --text: #132436;
-  --text-dim: #59697b;
-  --accent: #2a7fd6;         /* FrostFile blue — links, buttons, active nav */
-  --accent-soft: #e6f1fd;    /* pale blue — soft fills, active-nav background */
-  --warn: #8a5a00;
-  --warn-soft: #fdf1dc;
-  --danger: #97231d;
-  --danger-soft: #fbe6e4;
-  --ok: #1f6b3f;
-  --ok-soft: #e2f0e6;
-  --scrollbar: #97a5b1;      /* dark-grey thumb on the light theme */
-  --radius: 7px;
-  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+   THEME: the vault. Dark-only, on purpose — you opened the app, you walked
+   into the cold room where the files are kept. Machined panel surfaces,
+   squared edges, quiet ice-blue instrument glow. The chrome is allowed to be
+   theatrical; the words are not. Body text stays plain, high-contrast
+   IBM Plex Sans — the sci-fi lives in the surfaces, labels, and light. */
+
+/* ------------------------------------------------------------------ fonts */
+/* Bundled, latin subsets only. Chakra Petch carries headings and micro-labels
+   (the "engraved on the panel" voice); IBM Plex Sans carries every sentence a
+   person actually reads; IBM Plex Mono carries PINs, codes, and diffs. */
+
+@font-face {
+  font-family: "Chakra Petch"; font-style: normal; font-weight: 500;
+  src: url("/static/fonts/chakra-petch-500.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Chakra Petch"; font-style: normal; font-weight: 600;
+  src: url("/static/fonts/chakra-petch-600.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Sans"; font-style: normal; font-weight: 400;
+  src: url("/static/fonts/ibm-plex-sans-400.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Sans"; font-style: italic; font-weight: 400;
+  src: url("/static/fonts/ibm-plex-sans-400-italic.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Sans"; font-style: normal; font-weight: 600;
+  src: url("/static/fonts/ibm-plex-sans-600.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono"; font-style: normal; font-weight: 400;
+  src: url("/static/fonts/ibm-plex-mono-400.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono"; font-style: normal; font-weight: 600;
+  src: url("/static/fonts/ibm-plex-mono-600.woff2") format("woff2");
+  font-display: swap;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0b1522;
-    --surface: #12202f;
-    --surface-2: #1a2b3d;
-    --border: #2a3d52;
-    --text: #e8f0f8;
-    --text-dim: #93a6ba;
-    --accent: #5aa6ee;         /* brighter blue reads best on dark */
-    --accent-soft: #16304a;    /* deep navy tint */
-    --scrollbar: #38434e;
-    --warn: #e0ac5a;
-    --warn-soft: #33291a;
-    --danger: #ef8981;
-    --danger-soft: #331e1d;
-    --ok: #74c58e;
-    --ok-soft: #1b2d21;
-  }
+/* ----------------------------------------------------------------- tokens */
+
+:root {
+  color-scheme: dark;              /* native selects, pickers, autofill: dark */
+
+  --bg: #060b12;                   /* the dark of the room */
+  --panel: linear-gradient(180deg, #111b2a 0%, #0c1521 100%);
+  --panel-solid: #0e1725;          /* same family, for flat fills */
+  --well: #09111c;                 /* recessed inputs / inset tracks */
+  --seam: #23374d;                 /* machined joint between plates */
+  --seam-light: rgba(150, 200, 245, .12);  /* light catching a top edge */
+
+  --text: #d9e6f2;
+  --text-dim: #89a0b6;
+
+  --ice: #6fbcf2;                  /* instrument glow — links, controls */
+  --ice-bright: #aadcff;
+  --ice-dim: #5d87ad;              /* glow at rest / secondary labels */
+  --ice-soft: rgba(111, 188, 242, .1);
+  --glow: rgba(96, 176, 240, .3); /* box-shadow color for anything lit */
+
+  --warn: #e6b45f;   --warn-soft: rgba(230, 180, 95, .1);
+  --danger: #ff9088; --danger-soft: rgba(255, 144, 136, .1);
+  --ok: #7fd6a4;     --ok-soft: rgba(127, 214, 164, .1);
+
+  --scrollbar: #2c3f54;
+  --radius: 2px;                   /* machined, not friendly */
+
+  --body-font: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --display: "Chakra Petch", "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* One shared voice for every engraved micro-label. */
+  --label-caps: 600 .72rem/1.4 var(--display);
 }
 
 * { box-sizing: border-box; }
@@ -68,150 +112,262 @@
 /* No scrollbar at all while the splash owns the screen. */
 html.splashing { overflow: hidden; }
 
-/* Everywhere else: thin, theme-dark scrollbar instead of the bright default. */
 html { scrollbar-width: thin; scrollbar-color: var(--scrollbar) transparent; }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 8px; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar); }
 ::-webkit-scrollbar-track { background: transparent; }
+
 @media (prefers-reduced-motion: reduce) {
-  /* Respect the OS "reduce motion" setting: no splash at all. */
+  /* Respect the OS "reduce motion" setting: no splash, no LED pulse. */
   #splash { display: none !important; }
+  .pill-active::before, .pill-thawed::before { animation: none !important; }
 }
+
+::selection { background: rgba(96, 176, 240, .3); color: #eaf5ff; }
 
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font: 15px/1.6 var(--body-font);
 }
 
-/* A whisper of frost fog framing every page — edges only, clean center, so
-   content stays perfectly readable. Fixed layer under everything. */
-body::before {
-  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background: url("/static/frost-light.jpg") center / cover no-repeat;
-  opacity: .75;
+/* The room itself: a machined vault wall framing every page. Detail lives at
+   the screen edges; the center of the image is near-black, so the content
+   column always sits on clean darkness. The SAME image is painted twice,
+   pixel-aligned: once under the page (::before) and once above it (::after)
+   with the center masked away — so the perimeter frame sits IN FRONT and
+   content visibly slides behind the wall as you scroll. The overlay never
+   captures the pointer. */
+body::before,
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none;
+  background: url("/static/vault-wall.jpg") center / cover no-repeat;
 }
-@media (prefers-color-scheme: dark) {
-  body::before { background-image: url("/static/frost-dark.jpg"); opacity: .45; }
+body::before { z-index: -1; }
+body::after {
+  z-index: 900;
+  /* Only the perimeter of the top copy survives; fade is heavier into the
+     corners, gone across the middle where the words live. (Stops >100% are
+     the corner zone — an ellipse farthest-side ray reaches ~141% there.) */
+  -webkit-mask-image: radial-gradient(ellipse farthest-side at center,
+      transparent 80%, rgba(0,0,0,.9) 108%, #000 128%);
+  mask-image: radial-gradient(ellipse farthest-side at center,
+      transparent 80%, rgba(0,0,0,.9) 108%, #000 128%);
 }
-@media print { body::before { display: none; } }
+/* The airlock: unlock/setup/recovery pages stand in the chamber corridor
+   instead — you're outside the vault until the passphrase turns. */
+body.hall::before, body.hall::after { background-image: url("/static/vault-hall.jpg"); }
+/* The header decks and the launch splash ride above the frame — chrome is
+   part of the machine, not cargo behind the glass. */
+.topbar, .version-banner { position: relative; z-index: 950; }
+@media print { body::before, body::after { display: none; } }
 
-a { color: var(--accent); }
-a:hover { text-decoration: underline; }
+a { color: var(--ice); text-decoration-color: rgba(111,188,242,.4); }
+a:hover { color: var(--ice-bright); text-decoration: underline; }
 
-h1 { font-size: 1.55rem; margin: 0 0 .3rem; letter-spacing: -.01em; }
-h2 { font-size: 1.1rem; margin: 1.8rem 0 .6rem; }
-h3 { font-size: .95rem; margin: 1.2rem 0 .4rem; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; }
+h1 { font-size: 1.5rem; margin: 0 0 .35rem; letter-spacing: .015em; }
+/* Every page title carries a lit seam — the one theatrical flourish that
+   repeats everywhere, so the whole app reads as one machine. */
+h1::after {
+  content: ""; display: block; height: 2px; margin-top: .45rem; max-width: 30rem;
+  background: linear-gradient(90deg, var(--ice) 0, rgba(111,188,242,.25) 55%, transparent 100%);
+  /* drop-shadow (not box-shadow) so the glow fades out with the gradient
+     instead of ending in a hard rectangle. */
+  filter: drop-shadow(0 0 6px var(--glow));
+}
+h2 { font-size: 1.02rem; margin: 1.9rem 0 .6rem; letter-spacing: .03em; text-transform: uppercase; color: #bcd6ec; }
+h3 { font-size: .92rem; margin: 1.2rem 0 .4rem; letter-spacing: .02em; }
 
-.wrap { max-width: 1080px; margin: 0 auto; padding: 1.6rem 1.4rem 3rem; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 1.7rem 1.4rem 3rem; }
 .wrap-narrow { max-width: 620px; margin: 0 auto; padding: 3rem 1.4rem; }
 .lede { color: var(--text-dim); margin: 0 0 1.4rem; max-width: 62ch; }
 
 /* ------------------------------------------------------------------ topbar */
-
+/* The header is a fixed dark band in the brand navy family — the same ground
+   as the launch splash — with a lit seam where it meets the page. */
 .topbar {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, #0d1a2b 0%, #0a1420 100%);
+  border-bottom: 1px solid rgba(96, 176, 240, .35);
+  box-shadow: 0 1px 0 rgba(96, 176, 240, .12), 0 8px 24px -18px var(--glow);
   padding: .6rem 1.4rem;
 }
 /* Inner wrapper shares the content column's max-width, so the header lines up
-   with the page below it instead of hugging the window edge. Two decks: the
-   brand row on top, the nav on its own full-width line — nine links plus the
-   brand and controls cannot share one 1080px row without ragged wrapping. */
+   with the page below it. Two decks: brand row, then the nav on its own
+   full-width line — nine links can't share one 1080px row without wrapping. */
 .topbar-in {
   max-width: 1080px; margin: 0 auto;
-  display: flex; flex-direction: column; gap: .55rem;
+  display: flex; flex-direction: column; gap: .5rem;
 }
 .topbar-top { display: flex; align-items: center; gap: 1.2rem; }
 .topbar-top .lock-form { margin-left: auto; }
 .brand { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; }
 .brand img { width: 24px; height: 24px; display: block; }
 .brand img.wordmark { width: auto; height: 17px; }
-.only-dark { display: none; }
-@media (prefers-color-scheme: dark) {
-  .only-light { display: none; }
-  .only-dark { display: block; }
-}
+/* The full-size wordmark on the unlock/setup doors. */
+.wordmark-hero { width: min(100%, 460px); height: auto; display: block; }
+/* Dark-only app: the light-theme asset variants simply never show. */
+.only-light { display: none; }
+.only-dark { display: block; }
+
 .topbar nav:not(.nav-history) { display: flex; gap: .1rem; flex-wrap: wrap; }
 .topbar nav a {
-  padding: .3rem .6rem; border-radius: var(--radius);
-  color: var(--text-dim); text-decoration: none; font-size: .88rem;
+  padding: .34rem .6rem .3rem;
+  font: 500 .8rem/1.4 var(--display);
+  letter-spacing: .07em; text-transform: uppercase;
+  color: #91a9c1; text-decoration: none;
+  border-bottom: 2px solid transparent;
 }
-.topbar nav a:hover { background: var(--surface-2); color: var(--text); text-decoration: none; }
-.topbar nav a.active { background: var(--accent-soft); color: var(--accent); font-weight: 550; }
+.topbar nav a:hover { color: #e6f2fc; text-decoration: none; border-bottom-color: rgba(111,188,242,.35); }
+.topbar nav a.active {
+  color: var(--ice-bright);
+  border-bottom-color: var(--ice);
+  text-shadow: 0 0 12px var(--glow);
+}
 .lock-form { display: flex; align-items: center; gap: .8rem; }
 .nav-history { display: flex; gap: .15rem; }
 .nav-history button {
-  border: 1px solid var(--border); background: var(--surface); color: var(--text-dim);
+  border: 1px solid rgba(96,176,240,.3); background: transparent; color: #91a9c1;
   border-radius: var(--radius); padding: .15rem .5rem; cursor: pointer; font: inherit;
 }
-.nav-history button:hover { background: var(--surface-2); color: var(--text); }
+.nav-history button:hover { background: rgba(111,188,242,.1); color: #e6f2fc; }
 .link-quiet { color: var(--text-dim); font-size: .88rem; text-decoration: none; }
+/* Header utility links share the nav's engraved-caps voice — one register
+   across the whole top deck. */
+.topbar .link-quiet {
+  color: #91a9c1;
+  font: 500 .8rem/1.4 var(--display); letter-spacing: .07em; text-transform: uppercase;
+}
+.topbar .link-quiet:hover, .topbar .link-quiet.active { color: #e6f2fc; }
+.topbar .btn-quiet { background: transparent; border-color: rgba(96,176,240,.45); color: #cfe0f1; }
+.topbar .btn-quiet:hover { background: rgba(111,188,242,.12); color: #fff; }
 
-/* ------------------------------------------------------------------ blocks */
-
+/* ------------------------------------------------------------------ panels */
+/* The old web "card" is now a machined plate: gradient steel, a hairline
+   seam all round, light catching the top edge, and a thin ice conduit down
+   the left side — each block a chamber on the vault wall. */
 .card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--seam);
   border-radius: var(--radius);
   padding: 1.1rem 1.2rem;
   margin-bottom: 1rem;
+  box-shadow: inset 0 1px 0 var(--seam-light),
+              0 14px 34px -24px rgba(0, 0, 0, .9);
+}
+.card::before {
+  content: ""; position: absolute; left: -1px; top: 8px; bottom: 8px; width: 2px;
+  background: linear-gradient(180deg, transparent, rgba(111,188,242,.55), transparent);
 }
 .card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
 .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
 
-.stat { display: flex; align-items: baseline; gap: .5rem; }
-.stat-big { font-size: 2rem; font-weight: 640; letter-spacing: -.02em; }
+/* Readouts: the big number glows like a gauge. */
+.stat { display: flex; align-items: baseline; gap: .6rem; }
+.stat-big {
+  font: 600 2.1rem/1.1 var(--display);
+  font-variant-numeric: tabular-nums;
+  color: var(--ice-bright); text-shadow: 0 0 18px var(--glow);
+}
 .stat-label { color: var(--text-dim); font-size: .88rem; }
 
-.meter { height: 7px; background: var(--surface-2); border-radius: 99px; overflow: hidden; margin: .6rem 0; }
-.meter > span { display: block; height: 100%; background: var(--accent); }
+/* Progress reads as a segmented charge bar in a recessed track. */
+.meter {
+  height: 10px; background: var(--well);
+  border: 1px solid var(--seam); border-radius: var(--radius);
+  overflow: hidden; margin: .6rem 0;
+}
+.meter > span {
+  display: block; height: 100%;
+  background: linear-gradient(90deg, #2c74ad, var(--ice));
+  box-shadow: 0 0 10px var(--glow);
+  /* Segment ticks, engraved over the fill. */
+  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 10px, transparent 10px 12px);
+  mask-image: repeating-linear-gradient(90deg, #000 0 10px, transparent 10px 12px);
+}
+
+/* Status tally: household counts wearing the same LED tags as the tables. */
+.tally { display: flex; gap: .45rem; flex-wrap: wrap; margin: .8rem 0 1rem; }
+
+/* Per-person gauges: one slim charge bar per family member. */
+.person-gauges { border-top: 1px solid rgba(35,55,77,.7); padding-top: .5rem; }
+.person-gauge {
+  display: grid; grid-template-columns: minmax(110px, max-content) 1fr auto;
+  align-items: center; gap: .7rem; padding: .3rem 0;
+}
+.person-gauge .meter { height: 7px; margin: 0; }
+.pg-name { font-size: .88rem; white-space: nowrap; }
+.pg-count {
+  font-family: var(--mono); font-size: .78rem; color: var(--text-dim);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
 
 /* ------------------------------------------------------------------ tables */
 
 .table-scroll { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; font-size: .9rem; }
-th, td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid var(--border); vertical-align: top; }
-th { font-weight: 600; color: var(--text-dim); font-size: .82rem; text-transform: uppercase; letter-spacing: .03em; }
-tbody tr:hover { background: var(--surface-2); }
+th, td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid rgba(35,55,77,.7); vertical-align: top; }
+th { font: var(--label-caps); text-transform: uppercase; letter-spacing: .09em; color: var(--ice-dim); }
+tbody tr:hover { background: rgba(111, 188, 242, .05); }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 
 .matrix th.agency-col { min-width: 210px; }
 .matrix td.cell { text-align: center; padding: .3rem; }
 .matrix .cat-row td {
-  background: var(--surface-2); font-weight: 600; font-size: .8rem;
-  text-transform: uppercase; letter-spacing: .04em; color: var(--text-dim);
+  background: rgba(111,188,242,.06); font: var(--label-caps);
+  text-transform: uppercase; letter-spacing: .09em; color: var(--ice-dim);
 }
 
-/* ------------------------------------------------------------------- pills */
+/* ------------------------------------------------------- status indicators */
+/* Statuses wear engraved tags with an LED: lit ice = frozen/protected,
+   amber = in motion, hollow = not started, unlit = not applicable.
+   The label text does the talking; the LED just makes state legible at a
+   squint across a whole table. */
 
 .pill {
-  display: inline-block; padding: .12rem .5rem; border-radius: 99px;
-  font-size: .78rem; font-weight: 550; white-space: nowrap;
-  border: 1px solid transparent;
+  display: inline-flex; align-items: center; gap: .38em;
+  padding: .16rem .5rem; border-radius: var(--radius);
+  font: var(--label-caps); letter-spacing: .07em; text-transform: uppercase;
+  white-space: nowrap;
+  border: 1px solid var(--seam); background: rgba(9, 17, 28, .6);
+  color: var(--text-dim);
 }
-.pill-not_started   { background: var(--surface-2); color: var(--text-dim); border-color: var(--border); }
-.pill-in_progress   { background: var(--warn-soft); color: var(--warn); }
-.pill-active        { background: var(--ok-soft); color: var(--ok); }
-.pill-thawed        { background: var(--warn-soft); color: var(--warn); }
-.pill-no_file       { background: var(--ok-soft); color: var(--ok); }
-.pill-not_applicable{ background: transparent; color: var(--text-dim); border-color: var(--border); }
+.pill::before {
+  content: ""; width: 7px; height: 7px; border-radius: 50%; flex: none;
+  background: currentColor; box-shadow: 0 0 7px currentColor;
+}
+.pill-active, .pill-no_file {
+  color: #8fd4ff; border-color: rgba(111,188,242,.5);
+  background: var(--ice-soft);
+}
+.pill-active::before, .pill-thawed::before { animation: led 3.2s ease-in-out infinite; }
+@keyframes led { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+.pill-in_progress, .pill-thawed {
+  color: var(--warn); border-color: rgba(230,180,95,.45); background: var(--warn-soft);
+}
+.pill-not_started::before { background: transparent; border: 1px solid currentColor; box-shadow: none; }
+.pill-not_applicable { color: #5c7186; background: transparent; }
+.pill-not_applicable::before { display: none; }
 
-.pill-impact-3 { background: var(--accent-soft); color: var(--accent); font-weight: 650; }
-.pill-impact-2 { background: var(--surface-2); color: var(--text); border-color: var(--border); }
-.pill-impact-1 { background: transparent; color: var(--text-dim); border-color: var(--border); }
+/* Payoff rankings are engraved, not lit — they're editorial, not state. */
+.pill-impact-1::before, .pill-impact-2::before, .pill-impact-3::before { display: none; }
+.pill-impact-3 { color: var(--ice-bright); border-color: rgba(111,188,242,.5); background: var(--ice-soft); }
+.pill-impact-2 { color: var(--text); }
+.pill-impact-1 { color: #5c7186; background: transparent; }
 
-.badge { font-size: .72rem; padding: .08rem .4rem; border-radius: 4px; border: 1px solid var(--border); color: var(--text-dim); }
-.badge-minor { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+.badge {
+  font: var(--label-caps); font-size: .66rem; letter-spacing: .08em; text-transform: uppercase;
+  padding: .1rem .4rem; border-radius: var(--radius);
+  border: 1px solid var(--seam); color: var(--text-dim);
+}
+.badge-minor { color: #8fd4ff; border-color: rgba(111,188,242,.4); background: var(--ice-soft); }
 
 /* --------------------------------------------------------------- citations */
 
 .cite { font-size: .68em; line-height: 1; margin-left: .12em; white-space: nowrap; }
-.cite a {
-  text-decoration: none; padding: 0 .12em;
-  color: var(--accent); font-weight: 600;
-}
+.cite a { text-decoration: none; padding: 0 .12em; color: var(--ice); font-weight: 600; }
 .cite a:hover { text-decoration: underline; }
 .cite-sep { color: var(--text-dim); }
 .cite-missing, .cite-missing-inline {
@@ -221,125 +377,170 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 
 .sources {
   max-width: 1080px; margin: 0 auto; padding: 1.4rem 1.4rem 3rem;
-  border-top: 1px solid var(--border); font-size: .84rem;
+  border-top: 1px solid var(--seam); font-size: .84rem;
 }
-.sources h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-dim); margin: 0 0 .5rem; }
+.sources h2 { font: var(--label-caps); font-size: .74rem; text-transform: uppercase; letter-spacing: .09em; color: var(--ice-dim); margin: 0 0 .5rem; }
 .sources ol { margin: 0; padding-left: 1.4rem; }
 .sources li { margin-bottom: .3rem; }
 .src-pub { color: var(--text-dim); }
 .src-pub::before { content: " · "; }
 .src-tag {
-  font-size: .74rem; padding: .04rem .38rem; border-radius: 4px; margin-left: .35rem;
-  white-space: nowrap; cursor: help;
+  font-size: .74rem; padding: .04rem .38rem; border-radius: var(--radius); margin-left: .35rem;
+  white-space: nowrap; cursor: help; border: 1px solid transparent;
 }
-.src-primary { background: var(--ok-soft); color: var(--ok); }
-.src-listed  { background: var(--warn-soft); color: var(--warn); }
-.src-dead    { background: var(--danger-soft); color: var(--danger); }
+.src-primary { background: var(--ok-soft); color: var(--ok); border-color: rgba(127,214,164,.35); }
+.src-listed  { background: var(--warn-soft); color: var(--warn); border-color: rgba(230,180,95,.35); }
+.src-dead    { background: var(--danger-soft); color: var(--danger); border-color: rgba(255,144,136,.35); }
 /* Deliberately NOT the green "verified" style: a working link is not a
    re-verification of the page's contents. */
-.src-alive   { background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border); }
+.src-alive   { background: var(--well); color: var(--text-dim); border-color: var(--seam); }
 .sources-note { color: var(--text-dim); margin: .8rem 0 0; }
 
 /* ------------------------------------------------------------------- forms */
+/* Inputs are recessed wells cut into the plate; focus lights the rim. */
 
-label { display: block; font-size: .85rem; font-weight: 550; margin-bottom: .25rem; }
+label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: .25rem; }
 .hint { font-size: .8rem; color: var(--text-dim); font-weight: 400; margin: .2rem 0 0; }
 input[type=text], input[type=password], input[type=date], input[type=email],
 input[type=number], select, textarea {
   width: 100%; padding: .45rem .6rem;
-  border: 1px solid var(--border); border-radius: var(--radius);
-  background: var(--surface); color: var(--text); font: inherit; font-size: .92rem;
+  border: 1px solid var(--seam); border-radius: var(--radius);
+  background: var(--well); color: var(--text); font: inherit; font-size: .92rem;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, .35);
 }
 textarea { min-height: 5rem; resize: vertical; }
-input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--ice);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.35), 0 0 0 1px var(--ice), 0 0 12px var(--glow);
+}
+a:focus-visible, button:focus-visible { outline: 2px solid var(--ice); outline-offset: 2px; }
 .form-row { margin-bottom: .9rem; }
 fieldset.subsection {
-  border: 1px solid var(--border); border-radius: var(--radius);
+  border: 1px solid var(--seam); border-radius: var(--radius);
   padding: .8rem 1rem 1rem; margin: 0 0 1rem;
 }
-fieldset.subsection legend { font-size: .85rem; font-weight: 550; padding: 0 .35rem; }
+fieldset.subsection legend { font: var(--label-caps); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ice-dim); padding: 0 .35rem; }
 .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: .9rem; }
 .check { display: flex; gap: .5rem; align-items: flex-start; font-weight: 400; }
 .check input { width: auto; margin-top: .25rem; }
 
+/* Controls read as switchgear: squared, engraved caps, lit when primary. */
 .btn {
-  display: inline-block; padding: .42rem .85rem; border-radius: var(--radius);
-  border: 1px solid var(--accent); background: var(--accent); color: #fff;
-  font: inherit; font-size: .88rem; font-weight: 550; cursor: pointer; text-decoration: none;
+  display: inline-block; padding: .44rem .9rem .4rem; border-radius: var(--radius);
+  border: 1px solid rgba(140, 200, 250, .55);
+  background: linear-gradient(180deg, #1d4e79 0%, #163a5c 100%);
+  color: #eaf5ff;
+  font: 600 .78rem/1.5 var(--display); letter-spacing: .09em; text-transform: uppercase;
+  cursor: pointer; text-decoration: none;
+  box-shadow: inset 0 1px 0 rgba(190,225,255,.25), 0 0 0 transparent;
+  transition: box-shadow .15s ease;
 }
-.btn:hover { filter: brightness(1.08); text-decoration: none; }
-.btn-quiet { background: transparent; color: var(--text-dim); border-color: var(--border); }
-.btn-quiet:hover { color: var(--text); background: var(--surface-2); }
-.btn-danger { background: transparent; color: var(--danger); border-color: var(--danger); }
-.btn-small { padding: .2rem .5rem; font-size: .8rem; }
+.btn:hover {
+  text-decoration: none; color: #fff;
+  box-shadow: inset 0 1px 0 rgba(190,225,255,.25), 0 0 14px var(--glow);
+}
+.btn-quiet { background: transparent; color: var(--text-dim); border-color: var(--seam); box-shadow: none; }
+.btn-quiet:hover { color: var(--text); background: rgba(111,188,242,.08); border-color: rgba(111,188,242,.4); box-shadow: none; }
+.btn-danger { background: transparent; color: var(--danger); border-color: rgba(255,144,136,.5); box-shadow: none; }
+.btn-danger:hover { background: var(--danger-soft); box-shadow: 0 0 12px rgba(255,110,100,.25); }
+.btn-small { padding: .22rem .5rem .18rem; font-size: .7rem; }
 .btn-row { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; margin-top: 1rem; }
 
 /* ----------------------------------------------------------- version strip */
-.version-banner { background: var(--accent-soft); border-bottom: 1px solid var(--border); font-size: .88rem; }
+/* Same dark band family as the topbar below it — one continuous machine. */
+.version-banner { background: #0a1420; color: #91a9c1;
+  border-bottom: 1px solid rgba(96,176,240,.18); font-size: .88rem; }
+.version-banner strong { color: #e6f2fc; }
 .version-banner-in {
   max-width: 1080px; margin: 0 auto; padding: .45rem 1.4rem;
   display: flex; align-items: center; gap: .6rem; flex-wrap: wrap;
 }
-.version-banner a { color: var(--accent); font-weight: 550; }
+.version-banner a { color: var(--ice); font-weight: 600; }
 .version-banner button {
-  margin-left: auto; border: 0; background: none; color: var(--text-dim);
+  margin-left: auto; border: 0; background: none; color: #91a9c1;
   font-size: 1.15rem; line-height: 1; padding: .15rem .45rem;
   border-radius: var(--radius); cursor: pointer;
 }
-.version-banner button:hover { background: var(--surface-2); color: var(--text); }
+.version-banner button:hover { background: rgba(111,188,242,.1); color: #e6f2fc; }
 
-.app-meta { text-align: center; color: var(--text-dim); font-size: .8rem; padding: 1.2rem 1rem 1.6rem; }
+.app-meta { text-align: center; color: #5c7186; font-size: .8rem; padding: 1.2rem 1rem 1.6rem; }
 .app-meta a { color: var(--text-dim); }
 
 /* ------------------------------------------------------------------ notices */
+/* Alerts are lit strips on the panel wall: a colored conduit down the left,
+   quiet dark fill, the message in plain type. */
 
-.notice { padding: .7rem .9rem; border-radius: var(--radius); margin-bottom: 1rem; font-size: .9rem; border: 1px solid transparent; }
-.notice-warn   { background: var(--warn-soft); color: var(--warn); border-color: currentColor; }
-.notice-danger { background: var(--danger-soft); color: var(--danger); border-color: currentColor; }
-.notice-ok     { background: var(--ok-soft); color: var(--ok); border-color: currentColor; }
-.notice-info   { background: var(--surface-2); color: var(--text-dim); border-color: var(--border); }
+.notice {
+  padding: .7rem .9rem; border-radius: var(--radius); margin-bottom: 1rem;
+  font-size: .9rem; background: var(--panel-solid);
+  border: 1px solid var(--seam); border-left: 3px solid var(--text-dim);
+}
+.notice-warn   { border-left-color: var(--warn); background: linear-gradient(90deg, var(--warn-soft), var(--panel-solid) 55%); }
+.notice-danger { border-left-color: var(--danger); background: linear-gradient(90deg, var(--danger-soft), var(--panel-solid) 55%); }
+.notice-ok     { border-left-color: var(--ok); background: linear-gradient(90deg, var(--ok-soft), var(--panel-solid) 55%); }
+.notice-info   { border-left-color: var(--ice-dim); }
+.notice-warn strong { color: var(--warn); }
+.notice-danger strong { color: var(--danger); }
 .notice p:last-child { margin-bottom: 0; }
 .notice p:first-child { margin-top: 0; }
 
 .empty { color: var(--text-dim); font-style: italic; padding: 1.4rem 0; }
 
-.tick { color: var(--ok); font-weight: 700; margin-right: .3rem; }
-.cross { color: var(--danger); font-weight: 700; margin-right: .3rem; }
+/* Leading ✓/✗ marks hang in a fixed gutter so a wrapped second line aligns
+   under the TEXT, not under the mark. */
+.tick, .cross { display: inline-block; width: 1.05rem; margin-right: .25rem;
+  font-weight: 700; text-indent: 0; }
+.tick { color: var(--ok); }
+.cross { color: var(--danger); }
+td:has(> .tick), td:has(> .cross),
+li:has(> .tick), li:has(> .cross) {
+  padding-left: 1.9rem; text-indent: -1.3rem;
+}
 
 /* Learn page: the two-doors diagram for "your cards keep working". */
 .doors { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
 @media (max-width: 560px) { .doors { grid-template-columns: 1fr; } }
-.door { text-align: center; padding: .9rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); }
-.door-title { font-weight: 600; font-size: .85rem; margin-bottom: .5rem; }
-.door-frame { width: 84px; height: 110px; margin: 0 auto .5rem; border-radius: 6px 6px 0 0;
-  display: grid; place-items: center; font-weight: 800; font-size: .8rem; letter-spacing: .08em; }
+.door { text-align: center; padding: .9rem; border: 1px solid var(--seam); border-radius: var(--radius); background: var(--panel-solid); }
+.door-title { font: var(--label-caps); font-size: .78rem; letter-spacing: .07em; text-transform: uppercase; margin-bottom: .5rem; }
+.door-frame { width: 84px; height: 110px; margin: 0 auto .5rem; border-radius: var(--radius);
+  display: grid; place-items: center; font: 600 .74rem/1.4 var(--display); letter-spacing: .08em; }
 .door-frame.open { border: 3px solid var(--ok); color: var(--ok); background: var(--ok-soft);
   transform: perspective(240px) rotateY(24deg); }
-.door-frame.shut { border: 3px solid var(--accent); color: var(--accent); background: var(--accent-soft);
-  position: relative; }
+.door-frame.shut { border: 3px solid var(--ice); color: var(--ice-bright); background: var(--ice-soft);
+  position: relative; box-shadow: 0 0 14px var(--glow); }
 /* The deadbolt sits near the top of the door, clear of the centered label. */
 .door-frame.shut::after { content: ""; position: absolute; right: 10px; top: 16px;
-  width: 26px; height: 8px; background: var(--accent); border-radius: 3px; }
+  width: 26px; height: 8px; background: var(--ice); border-radius: 2px;
+  box-shadow: 0 0 8px var(--glow); }
 
-details.faq { border-bottom: 1px solid var(--border); padding: .55rem 0; }
+details.faq { border-bottom: 1px solid var(--seam); padding: .55rem 0; }
 details.faq:last-child { border-bottom: none; }
-details.faq summary { cursor: pointer; font-weight: 550; font-size: .92rem; }
+details.faq summary { cursor: pointer; font-weight: 600; font-size: .92rem; }
+details.faq summary:hover { color: var(--ice-bright); }
 details.faq p { font-size: .88rem; color: var(--text-dim); margin: .5rem 0 0; }
 
 /* --------------------------------------------------------------- detail bits */
 
-.field { display: grid; grid-template-columns: 160px 1fr; gap: .8rem; padding: .4rem 0; border-bottom: 1px solid var(--border); }
+.field { display: grid; grid-template-columns: 160px 1fr; gap: .8rem; padding: .4rem 0; border-bottom: 1px solid rgba(35,55,77,.7); }
 .field:last-child { border-bottom: none; }
 .field-label { color: var(--text-dim); font-size: .85rem; }
 .field-value { white-space: pre-wrap; overflow-wrap: anywhere; min-width: 0; }
-/* Long URLs (agency freeze links) must wrap inside their cards, not overflow. */
+/* Auxiliary blocks nested inside a value (verification notes, warnings) are
+   ordinary prose — their template line breaks must not render literally. */
+.field-value div { white-space: normal; }
+/* Long URLs (agency freeze links) must wrap inside their panels, not overflow. */
 .card a, td a { overflow-wrap: anywhere; }
 .mono { font-family: var(--mono); font-size: .88em; }
-.secret { font-family: var(--mono); letter-spacing: .04em; }
+/* PINs and recovery codes read like a keypad display. */
+.secret {
+  font-family: var(--mono); letter-spacing: .1em;
+  color: var(--ice-bright); text-shadow: 0 0 10px var(--glow);
+}
 .muted { color: var(--text-dim); }
 .small { font-size: .85rem; }
+.nowrap { white-space: nowrap; }  /* dates and codes must not break at hyphens */
 
-.reveal-btn { border: none; background: none; color: var(--accent); cursor: pointer; font: inherit; font-size: .8rem; padding: 0; text-decoration: underline; }
+.reveal-btn { border: none; background: none; color: var(--ice); cursor: pointer; font: inherit; font-size: .8rem; padding: 0; text-decoration: underline; }
 
 /* --------------------------------------------------------------- diff view */
 
@@ -349,8 +550,9 @@ details.faq p { font-size: .88rem; color: var(--text-dim); margin: .5rem 0 0; }
 .diff-ctx { color: var(--text-dim); display: block; }
 
 /* ------------------------------------------------------------------ print */
+/* Paper stays paper. The vault does not follow the letters out the door. */
 
-.letter { max-width: 6.5in; margin: 0 auto; padding: 1in .75in; background: var(--surface); color: var(--text); }
+.letter { max-width: 6.5in; margin: 0 auto; padding: 1in .75in; background: var(--panel-solid); color: var(--text); }
 .letter-head { display: flex; justify-content: space-between; margin-bottom: 2rem; }
 .letter address { font-style: normal; white-space: pre-line; }
 .checklist { list-style: none; padding: 0; }
@@ -362,8 +564,8 @@ details.faq p { font-size: .88rem; color: var(--text-dim); margin: .5rem 0 0; }
 
 @media print {
   .topbar, .sources, .no-print, .btn-row { display: none !important; }
-  body { background: #fff; color: #000; font-size: 11pt; }
-  .letter { padding: 0; max-width: none; background: #fff; }
+  body { background: #fff; color: #000; font-size: 11pt; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .letter { padding: 0; max-width: none; background: #fff; color: #000; }
   .checklist li::before { border-color: #000; }
   a { color: #000; text-decoration: none; }
   .page-break { page-break-after: always; }

@@ -173,8 +173,16 @@ def create_app(settings: Settings) -> FastAPI:
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "no-referrer"
         # Everything is served from this origin; nothing external is fetched.
+        # style-src needs 'unsafe-inline': the templates position meters and
+        # align table cells with style="" attributes, which no source list can
+        # ever allow ('self' covers only stylesheet FILES — attributes require
+        # 'unsafe-inline'). Without it every such attribute is silently
+        # dropped: meters drew 100% full at any value, and printed letters
+        # lost the line breaks in mailing addresses. Inline scripts are
+        # already allowed above, so this adds no new exposure.
         response.headers["Content-Security-Policy"] = (
-            "default-src 'self'; img-src 'self' data:; style-src 'self'; "
+            "default-src 'self'; img-src 'self' data:; "
+            "style-src 'self' 'unsafe-inline'; "
             "script-src 'self' 'unsafe-inline'; form-action 'self'; "
             "frame-ancestors 'none'; base-uri 'none'"
         )

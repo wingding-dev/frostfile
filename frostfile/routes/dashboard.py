@@ -15,6 +15,7 @@ from ..repo import (
     list_agencies,
     list_people,
     list_reminders,
+    person_progress,
 )
 from ..seeds import STATUS_NOT_APPLICABLE
 from ..web import get_conn, get_vault, render
@@ -53,6 +54,25 @@ def dashboard(
     overdue = [r for r in reminders if r.is_overdue]
     upcoming = [r for r in reminders if not r.is_overdue and r.is_soon]
 
+    # Household status readouts: per-person gauges (same counting rule as the
+    # big meter, via person_progress) and an LED tally by state. "In motion"
+    # is anything requested but not yet confirmed.
+    person_rows = person_progress(people, agencies, matrix)
+    moving = waiting = 0
+    for person in people:
+        for agency in agencies:
+            if agency.is_fyi:
+                continue
+            record = matrix.get(person.id, {}).get(agency.id)
+            if record and record.status == "not_applicable":
+                continue
+            if record and record.is_done:
+                continue
+            if record and record.status in ("in_progress", "thawed"):
+                moving += 1
+            else:
+                waiting += 1
+
     expiring = []
     for person in people:
         for agency in agencies:
@@ -79,6 +99,8 @@ def dashboard(
             "people": people,
             "agencies": agencies,
             "progress": progress,
+            "person_rows": person_rows,
+            "tally": {"moving": moving, "waiting": waiting},
             "next_actions": next_actions,
             "overdue": overdue,
             "upcoming": upcoming,

@@ -68,18 +68,20 @@
   {% if agency.mail_address %}
   <div class="field">
     <div class="field-label">Mailing address</div>
+    {# Whitespace-trimmed tags: stray template newlines render as blank lines
+       inside the whitespace-preserving value. #}
     <div class="field-value">{{ agency.mail_address }}{{ cite_field(citer, agency, 'mail_address') }}
-      {% if agency.address_verified %}
+      {%- if agency.address_verified -%}
         <div class="small" style="margin-top:.4rem">
           <span class="src-tag src-primary">&#10003; verified at a primary source</span>
           <span class="muted">— still compare it with the agency's own site before mailing anything; agencies move.</span>
         </div>
-      {% else %}
+      {%- else -%}
         <div class="notice notice-warn small" style="margin-top:.5rem">
           Nobody has double-checked this address at the source. Look it up on
           the official page before mailing anything.
         </div>
-      {% endif %}
+      {%- endif -%}
     </div>
   </div>
   {% endif %}

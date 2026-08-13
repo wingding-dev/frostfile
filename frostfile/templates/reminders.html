@@ -12,7 +12,7 @@
           {% if reminder.person_name %}<span class="badge">{{ reminder.person_name }}</span>{% endif %}
           {% if reminder.detail %}<div class="small muted">{{ reminder.detail }}</div>{% endif %}
         </td>
-        <td class="small">{{ reminder.due_date }}</td>
+        <td class="small nowrap">{{ reminder.due_date }}</td>
         <td class="small muted">{{ reminder.recurrence if reminder.recurrence != 'none' else 'one-off' }}</td>
         <td style="text-align:right; white-space:nowrap">
           <form method="post" action="/reminders/{{ reminder.id }}/complete" style="display:inline">

@@ -63,6 +63,18 @@ def test_letter_includes_ssn_when_explicitly_stored(unlocked):
     assert "123456789" in page
 
 
+def test_letter_never_prints_none_for_missing_address(unlocked):
+    """Jinja precedence regression: `a or b if c else d` parses as
+    `(a or b) if c else d`, which printed a literal "None" as the minor's
+    address whenever a guardian existed but neither person had an address."""
+    add_person(unlocked, "Dana Guardian")  # no address on file
+    child = add_person(unlocked, "Robin Child", kind="minor")
+    page = unlocked.get(f"/letters/{child}/{_agency_id(unlocked, 'Equifax')}").text
+    row = page[page.index("Minor's address"):][:400]
+    assert "None" not in row
+    assert "______" in row
+
+
 def test_no_packet_for_agency_with_unconfirmed_address(unlocked):
     """The safety property: no envelope unless the address was actually checked."""
     child = add_person(unlocked, "Robin Child", kind="minor")

@@ -127,7 +127,10 @@ _______________________________
       <tr><td style="width:38%"><strong>Minor's full name</strong></td><td>{{ person.display_name }}</td></tr>
       <tr><td><strong>Minor's date of birth</strong></td><td>{{ person.birth_date or '__________________' }}</td></tr>
       <tr><td><strong>Minor's Social Security number</strong></td><td class="mono">{{ person.ssn or '_______ - _____ - __________' }}</td></tr>
-      <tr><td><strong>Minor's address</strong></td><td style="white-space:pre-line">{{ person.address or guardian.address if guardian else '__________________' }}</td></tr>
+      {# Parenthesized: Jinja's `x if y else z` binds looser than `or`, so the
+         unparenthesized form printed a literal "None" when a guardian existed
+         but neither person had an address on file. #}
+      <tr><td><strong>Minor's address</strong></td><td style="white-space:pre-line">{{ person.address or (guardian.address if guardian else None) or '__________________' }}</td></tr>
       <tr><td><strong>Parent or guardian</strong></td><td>{{ guardian.display_name if guardian else '__________________' }}</td></tr>
       <tr><td><strong>Guardian's date of birth</strong></td><td>{{ guardian.birth_date if guardian and guardian.birth_date else '__________________' }}</td></tr>
       <tr><td><strong>Guardian's Social Security number</strong></td><td class="mono">{{ guardian.ssn if guardian and guardian.ssn else '_______ - _____ - __________' }}</td></tr>

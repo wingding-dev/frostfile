@@ -19,6 +19,20 @@
       <span class="stat-label">{{ progress.done }} of {{ progress.total }} controls in place</span>
     </div>
     <div class="meter"><span style="width: {{ progress.percent }}%"></span></div>
+    <div class="tally">
+      <span class="pill pill-active">{{ progress.done }} in place</span>
+      <span class="pill pill-in_progress">{{ tally.moving }} in motion</span>
+      <span class="pill pill-not_started">{{ tally.waiting }} not started</span>
+    </div>
+    <div class="person-gauges">
+      {% for row in person_rows %}
+      <div class="person-gauge">
+        <span class="pg-name">{{ row.person.display_name }} {{ person_badge(row.person) }}</span>
+        <div class="meter"><span style="width: {{ (100 * row.done / row.total)|round|int if row.total else 0 }}%"></span></div>
+        <span class="pg-count">{{ row.done }}/{{ row.total }}</span>
+      </div>
+      {% endfor %}
+    </div>
     <p class="small muted">
       Across {{ people|length }} {{ 'person' if people|length == 1 else 'people' }}
       and {{ agencies|length }} agencies and controls.

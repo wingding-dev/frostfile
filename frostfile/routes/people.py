@@ -15,6 +15,7 @@ from ..repo import (
     get_person,
     list_agencies,
     list_people,
+    person_progress,
     update_person,
 )
 from ..security import Session, verify_csrf
@@ -72,23 +73,8 @@ def people_index(
     vault: Vault = Depends(get_vault),
 ):
     people = list_people(conn, vault)
-    # Count only actionable agencies, and exclude records marked "not
-    # applicable" from the denominator — same rule as the dashboard meter, so
-    # the two never disagree and the count is actually reachable.
-    agencies = [a for a in list_agencies(conn) if not a.is_fyi]
     matrix = freeze_matrix(conn, vault)
-    rows = []
-    for person in people:
-        cells = matrix.get(person.id, {})
-        done = total = 0
-        for agency in agencies:
-            record = cells.get(agency.id)
-            if record is not None and record.status == "not_applicable":
-                continue
-            total += 1
-            if record and record.is_done:
-                done += 1
-        rows.append({"person": person, "done": done, "total": total})
+    rows = person_progress(people, list_agencies(conn), matrix)
     return render(request, "people_list.html", {"active": "people", "rows": rows})
 
 

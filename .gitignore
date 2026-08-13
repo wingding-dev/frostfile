@@ -27,3 +27,10 @@ dist/
 /brand/
 /tools/
 /splash--splash-d_cropped.svg
+
+# Ad-hoc user<->assistant exchange material (screenshots, notes) — never published
+/exchange/
+
+# Business/ops records (invoices, receipts, vendor paperwork) — contain the
+# maintainer's name and address; never published
+/OPS/
