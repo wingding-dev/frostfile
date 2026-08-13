@@ -270,6 +270,23 @@ fieldset.subsection legend { font-size: .85rem; font-weight: 550; padding: 0 .35
 .btn-small { padding: .2rem .5rem; font-size: .8rem; }
 .btn-row { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; margin-top: 1rem; }
 
+/* ----------------------------------------------------------- version strip */
+.version-banner { background: var(--accent-soft); border-bottom: 1px solid var(--border); font-size: .88rem; }
+.version-banner-in {
+  max-width: 1080px; margin: 0 auto; padding: .45rem 1.4rem;
+  display: flex; align-items: center; gap: .6rem; flex-wrap: wrap;
+}
+.version-banner a { color: var(--accent); font-weight: 550; }
+.version-banner button {
+  margin-left: auto; border: 0; background: none; color: var(--text-dim);
+  font-size: 1.15rem; line-height: 1; padding: .15rem .45rem;
+  border-radius: var(--radius); cursor: pointer;
+}
+.version-banner button:hover { background: var(--surface-2); color: var(--text); }
+
+.app-meta { text-align: center; color: var(--text-dim); font-size: .8rem; padding: 1.2rem 1rem 1.6rem; }
+.app-meta a { color: var(--text-dim); }
+
 /* ------------------------------------------------------------------ notices */
 
 .notice { padding: .7rem .9rem; border-radius: var(--radius); margin-bottom: 1rem; font-size: .9rem; border: 1px solid transparent; }

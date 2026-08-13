@@ -207,6 +207,14 @@
   .final p { color: var(--text-dim); margin: 16px auto 32px; max-width: 46ch; }
   .final .hero-cta { justify-content: center; }
   .req { margin-top: 22px; color: var(--text-faint); font-size: .84rem; font-family: var(--mono); }
+  .ver-callout {
+    display: inline-flex; flex-direction: column; gap: 4px; margin: 0 auto 28px;
+    padding: 12px 22px; border: 1px solid var(--frost); border-radius: 12px;
+    font-size: 1.05rem; color: var(--text);
+    background: rgba(73,154,232,.10);
+  }
+  .ver-callout strong { color: var(--ice); font-family: var(--mono); }
+  .ver-callout .ver-note { color: var(--text-dim); font-size: .82rem; max-width: 46ch; }
 
   /* ---- footer ---- */
   footer { border-top: 1px solid var(--frost); padding: 44px 0; color: var(--text-faint); font-size: .9rem; }
@@ -268,7 +276,7 @@
   <div class="wrap nav-in">
     <a class="brand" href="#top"><img src="__ICON_WHITE__" alt=""><img class="wordmark" src="__WORDMARK_WHITE__" alt="FrostFile"></a>
     <div class="nav-right">
-      <span class="nav-note">Free · Open source · Runs on your computer</span>
+      <span class="nav-note">Free · Open source · Newest version: v__VERSION__</span>
       <a class="btn btn-primary" href="#download">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 19h16"/></svg>
         Download
@@ -446,6 +454,7 @@
       <span class="eyebrow" style="justify-content:center">Download</span>
       <h2 style="margin-top:16px">Lock it down this weekend.</h2>
       <p>Free, open source, and yours to keep. Runs in its own window — no install wizard, no account, nothing sent anywhere.</p>
+      <div class="ver-callout">Newest version: <strong>v__VERSION__</strong><span class="ver-note">yours is at the bottom of any FrostFile page — if it says the same thing, you're up to date</span></div>
       <div class="hero-cta">
         <a class="btn btn-primary" href="/download/FrostFile-windows.zip">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5 10.5 4.4v7.1H3zM10.5 12.5v7.1L3 18.5v-6zM11.7 4.2 21 3v8.5h-9.3zM21 12.5V21l-9.3-1.3v-7.2z"/></svg>
@@ -457,7 +466,7 @@
         </a>
       </div>
       <div class="req">Windows 10+ · macOS 11+ · about 30 MB · unzip once, then it opens in its own window</div>
-      <div class="req">Version 1.0.1 · August 2026</div>
+      <div class="req">Version __VERSION__ · August 2026</div>
       <div class="req" style="max-width:560px; margin-left:auto; margin-right:auto;">Reference material and record-keeping, not legal or financial advice — every fact links to its source, and the agency's own page is always the final word. Provided as-is, no warranty.</div>
       <div class="req"><a href="/privacy" style="color:var(--text-dim)">Privacy</a> &nbsp;·&nbsp; <a href="/download/SHA256SUMS.txt" style="color:var(--text-dim)">Checksums</a> &nbsp;·&nbsp; <a href="https://github.com/wingding-dev/frostfile" target="_blank" rel="noopener noreferrer" style="color:var(--text-dim)">Source</a></div>
       <div class="whysize"><a href="#why-40mb">Why is it about 30 MB?</a> &nbsp;·&nbsp; <a href="#av-warning">My browser or antivirus warned me — is this safe?</a></div>

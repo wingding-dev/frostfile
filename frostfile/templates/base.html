@@ -31,6 +31,34 @@
 </script>
 
 {% if session %}
+<div id="version-banner" class="version-banner" hidden>
+  <div class="version-banner-in">
+    <span>You&rsquo;re running FrostFile <strong>v{{ app_version }}</strong>.</span>
+    <a href="https://frostfile.org" target="_blank" rel="noopener noreferrer"
+       title="Just a link — it opens frostfile.org in your own browser, the same as typing the address. FrostFile itself never touches the internet.">See
+       the newest version at frostfile.org &#8599;</a>
+    <button type="button" id="version-banner-close"
+      aria-label="Hide this until the next time you open FrostFile"
+      title="Hide this until the next time you open FrostFile">&times;</button>
+  </div>
+</div>
+<script>
+  // Shown until dismissed, then stays hidden for the rest of this app-window
+  // session — same sessionStorage lifetime as the launch splash, so it comes
+  // back the next time the app is opened.
+  (function () {
+    var b = document.getElementById("version-banner");
+    if (!b) return;
+    var dismissed = false;
+    try { dismissed = !!sessionStorage.getItem("ff_version_banner_hidden"); } catch (e) {}
+    if (dismissed) { b.parentNode.removeChild(b); return; }
+    b.hidden = false;
+    document.getElementById("version-banner-close").addEventListener("click", function () {
+      try { sessionStorage.setItem("ff_version_banner_hidden", "1"); } catch (e) {}
+      b.parentNode.removeChild(b);
+    });
+  })();
+</script>
 <header class="topbar">
 <div class="topbar-in">
   <nav class="nav-history" aria-label="History">
@@ -89,6 +117,12 @@
   </p>
 </footer>
 {% endif %}
+
+<footer class="app-meta">
+  FrostFile v{{ app_version }} &middot;
+  <a href="https://frostfile.org" target="_blank" rel="noopener noreferrer">frostfile.org</a>
+  always lists the newest version
+</footer>
 
 {% block scripts %}{% endblock %}
 </body>
