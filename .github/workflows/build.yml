@@ -24,6 +24,14 @@ jobs:
             artifact: FrostFile-macos
             binary: dist/FrostFile-mac.zip
     runs-on: ${{ matrix.os }}
+    # The `release` environment exists for Azure OIDC: a federated credential
+    # cannot wildcard tag refs (each vX.Y.Z would need its own), but a
+    # credential bound to repo+environment matches every run of this job.
+    # The environment has no protection rules; it is an identity anchor only.
+    environment: release
+    permissions:
+      contents: read
+      id-token: write # lets azure/login mint an OIDC token; no stored secrets
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -78,6 +86,58 @@ jobs:
 
           echo "OK: signature valid and symlinks intact after packaging."
           rm -rf _verify
+      # Azure Artifact Signing, before zipping. Signs every PE in the onedir
+      # folder, not just FrostFile.exe — Smart App Control evaluates each
+      # binary in the folder individually, so an unsigned pyd undoes the work.
+      # Gated on the repo variable so forks and pre-setup builds still produce
+      # an (unsigned) zip instead of failing. Publisher reads "ARVENT LLC".
+      - if: runner.os == 'Windows' && vars.AZURE_SIGNING_ACCOUNT != ''
+        name: Azure login (OIDC)
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - if: runner.os == 'Windows' && vars.AZURE_SIGNING_ACCOUNT != ''
+        name: Sign Windows binaries
+        uses: azure/artifact-signing-action@v2
+        with:
+          endpoint: ${{ vars.AZURE_SIGNING_ENDPOINT }}
+          signing-account-name: ${{ vars.AZURE_SIGNING_ACCOUNT }}
+          certificate-profile-name: ${{ vars.AZURE_SIGNING_PROFILE }}
+          files-folder: ${{ github.workspace }}/dist/FrostFile
+          files-folder-filter: exe,dll,pyd
+          files-folder-recurse: true
+          file-digest: SHA256
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
+          description: FrostFile
+          description-url: https://frostfile.org
+      # Azure certs live ~72 hours, so an untimestamped signature would die
+      # within days of the build. Verify Valid + our subject + a countersigner
+      # on the exe before it can be packaged — same round-trip philosophy as
+      # the Mac check above.
+      - if: runner.os == 'Windows' && vars.AZURE_SIGNING_ACCOUNT != ''
+        name: Verify the signature before packaging
+        shell: pwsh
+        run: |
+          $sig = Get-AuthenticodeSignature dist/FrostFile/FrostFile.exe
+          if ($sig.Status -ne 'Valid') {
+            throw "FAIL: FrostFile.exe signature status is '$($sig.Status)', not Valid."
+          }
+          if ($sig.SignerCertificate.Subject -notmatch 'ARVENT LLC') {
+            throw "FAIL: unexpected signer subject: $($sig.SignerCertificate.Subject)"
+          }
+          if (-not $sig.TimeStamperCertificate) {
+            throw "FAIL: no timestamp countersignature — signature dies with the 72h cert."
+          }
+          $unsigned = Get-ChildItem dist/FrostFile -Recurse -Include *.exe,*.dll,*.pyd |
+            Get-AuthenticodeSignature | Where-Object Status -ne 'Valid'
+          if ($unsigned) {
+            $unsigned | ForEach-Object { Write-Host "unsigned: $($_.Path) [$($_.Status)]" }
+            throw "FAIL: $(@($unsigned).Count) PE file(s) left unsigned in the folder."
+          }
+          Write-Host "OK: all PE files signed by ARVENT LLC and timestamped."
       - if: runner.os == 'Windows'
         shell: pwsh
         run: Compress-Archive -Path dist/FrostFile -DestinationPath dist/FrostFile-windows.zip
