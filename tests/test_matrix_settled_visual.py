@@ -89,3 +89,34 @@ def test_legend_explains_the_mark(unlocked, settings):
     add_person(unlocked, "Dana Guardian")
     body = unlocked.get("/matrix").text
     assert "settled" in body
+
+
+ROW = "row-frosted"
+
+
+def test_row_frosts_only_when_every_person_is_settled(unlocked, settings):
+    p1 = add_person(unlocked, "Dana Guardian")
+    p2 = add_person(unlocked, "Riley Guardian", kind="minor")
+    equifax = agency_id(settings, "equifax")
+
+    set_status(settings, p1, equifax, STATUS_ACTIVE)
+    assert ROW not in unlocked.get("/matrix").text  # half a household isn't done
+
+    set_status(settings, p2, equifax, STATUS_NO_FILE)
+    assert unlocked.get("/matrix").text.count(ROW) == 1
+
+
+def test_not_applicable_completes_a_row_but_cannot_carry_it(unlocked, settings):
+    p1 = add_person(unlocked, "Dana Guardian")
+    p2 = add_person(unlocked, "Riley Guardian", kind="minor")
+    equifax = agency_id(settings, "equifax")
+    innovis = agency_id(settings, "innovis")
+
+    # frozen + N/A → the line is done for this household
+    set_status(settings, p1, equifax, STATUS_ACTIVE)
+    set_status(settings, p2, equifax, STATUS_NOT_APPLICABLE)
+    # N/A + N/A → shelved, not settled; no frost earned
+    set_status(settings, p1, innovis, STATUS_NOT_APPLICABLE)
+    set_status(settings, p2, innovis, STATUS_NOT_APPLICABLE)
+
+    assert unlocked.get("/matrix").text.count(ROW) == 1

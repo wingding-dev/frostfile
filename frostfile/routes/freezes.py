@@ -19,7 +19,13 @@ from ..repo import (
     update_freeze_record,
 )
 from ..security import Session, verify_csrf
-from ..seeds import FREEZE_CATEGORIES, STATUS_ORDER
+from ..seeds import (
+    FREEZE_CATEGORIES,
+    STATUS_ACTIVE,
+    STATUS_NO_FILE,
+    STATUS_NOT_APPLICABLE,
+    STATUS_ORDER,
+)
 from ..web import get_conn, get_session, get_vault, redirect, render
 
 router = APIRouter()
@@ -43,6 +49,28 @@ def matrix_view(
             continue
         grouped.setdefault(agency.category, []).append(agency)
 
+    # A row settled for every person frosts as a whole line. "Settled" per
+    # cell means frozen/enrolled or confirmed no-file; "not applicable" cells
+    # don't break the line but can't carry it alone — a row the household
+    # opted out of entirely is shelved, not done.
+    done = {STATUS_ACTIVE, STATUS_NO_FILE}
+    settled_rows = set()
+    if people:
+        for agency in agencies:
+            if agency.is_fyi:
+                continue
+            statuses = [
+                record.status
+                for person in people
+                if (record := matrix.get(person.id, {}).get(agency.id))
+            ]
+            if (
+                len(statuses) == len(people)
+                and all(s in done | {STATUS_NOT_APPLICABLE} for s in statuses)
+                and any(s in done for s in statuses)
+            ):
+                settled_rows.add(agency.id)
+
     return render(
         request,
         "matrix.html",
@@ -51,6 +79,7 @@ def matrix_view(
             "people": people,
             "grouped": grouped,
             "matrix": matrix,
+            "settled_rows": settled_rows,
             "fyi_agencies": [a for a in agencies if a.is_fyi],
         },
     )

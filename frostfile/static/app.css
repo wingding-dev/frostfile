@@ -320,22 +320,40 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   text-transform: uppercase; letter-spacing: .09em; color: var(--ice-dim);
 }
 
-/* Settled cells frost over: a faint ice wash plus a small ❄ in the corner.
+/* Settled cells frost over: crystalline patches creep in from the top
+   corners, the select itself turns to ice, and a ❄ glows in the corner.
    The snowflake is the non-color cue (never rely on tint alone) but stays
    aria-hidden — the select's own text is what a screen reader should hear.
    "Not applicable" recedes instead of celebrating; it is settled, not won. */
 .matrix td.cell-settled {
-  background: linear-gradient(180deg, rgba(111,188,242,.09), rgba(111,188,242,.02));
-  box-shadow: inset 0 1px 0 var(--seam-light);
+  background:
+    radial-gradient(90px 46px at 0 0, rgba(111,188,242,.15), transparent 70%),
+    radial-gradient(90px 46px at 100% 0, rgba(111,188,242,.10), transparent 70%),
+    linear-gradient(180deg, rgba(111,188,242,.12), rgba(111,188,242,.03));
+  box-shadow: inset 0 1px 0 var(--seam-light), inset 0 0 18px rgba(96,176,240,.07);
 }
-.matrix td.cell-settled select { border-color: rgba(111,188,242,.45); }
+.matrix td.cell-settled select {
+  border-color: rgba(111,188,242,.55);
+  background: rgba(111,188,242,.08);
+  color: var(--ice-bright);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.35), 0 0 10px rgba(96,176,240,.18);
+}
 .cell-frost {
-  position: absolute; top: .12rem; right: .28rem;
-  font-size: .68rem; line-height: 1; color: var(--ice-bright);
-  text-shadow: 0 0 6px var(--glow);
+  position: absolute; top: .1rem; right: .3rem;
+  font-size: .8rem; line-height: 1; color: var(--ice-bright);
+  text-shadow: 0 0 8px var(--glow), 0 0 18px var(--glow);
 }
 .matrix td.cell-na { opacity: .55; }
 .matrix td.cell-na:focus-within { opacity: 1; }
+
+/* A row settled for every person in the house frosts as a line: faint ice
+   across all its cells and a solid ice stripe on the leading edge. Rows of
+   nothing but "not applicable" don't earn it — at least one cell must be
+   genuinely frozen/enrolled/no-file. */
+.matrix tr.row-frosted > td { background-color: rgba(111,188,242,.045); }
+.matrix tr.row-frosted > td:first-child {
+  box-shadow: inset 2px 0 0 rgba(111,188,242,.55);
+}
 
 /* ------------------------------------------------------- status indicators */
 /* Statuses wear engraved tags with an LED: lit ice = frozen/protected,

@@ -28,7 +28,7 @@
     {% for category, agencies in grouped.items() %}
       <tr class="cat-row"><td colspan="{{ people|length + 1 }}">{{ category_labels.get(category, category) }}</td></tr>
       {% for agency in agencies %}
-      <tr>
+      <tr{{ ' class=row-frosted'|safe if agency.id in settled_rows }}>
         <td>
           <a href="/agencies/{{ agency.id }}">{{ agency.name }}</a>
           {% if agency.freeze_url %}
@@ -73,7 +73,8 @@
 <p class="small muted">
   &#10052; means that cell is settled — frozen, enrolled, or confirmed &ldquo;no
   file exists&rdquo; (for a child, that answer is the goal). Faded cells are
-  marked not applicable.
+  marked not applicable. A row washed in ice with a stripe on its left edge
+  is settled for everyone in the house.
   &#128273; means a freeze PIN is stored for that record.
   A <span class="cite cite-missing-inline">?</span> next to a link means the app
   has no captured source for that value.
