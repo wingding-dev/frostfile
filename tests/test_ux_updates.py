@@ -56,16 +56,17 @@ def test_fyi_agencies_are_off_the_grid_but_in_the_directory(unlocked):
 def test_fyi_agencies_do_not_count_toward_progress(unlocked):
     add_person(unlocked, "Progress Person")
     page = unlocked.get("/").text
-    # 26 agencies seeded, 2 are FYI-only → 24 controls for one adult.
-    assert "0 of 24 controls in place" in page
+    # 28 agencies seeded, 2 are FYI-only → 26 controls for one adult
+    # (the two SSA blocks joined in v2.1).
+    assert "0 of 26 controls in place" in page
 
 
 def test_family_page_count_matches_dashboard_denominator(unlocked):
     add_person(unlocked, "Counted Person")
-    # The Family page must use the same 24 (FYI excluded), not len(all agencies).
+    # The Family page must use the same 26 (FYI excluded), not len(all agencies).
     family = unlocked.get("/people").text
-    assert "0 / 24" in family
-    assert "0 / 26" not in family
+    assert "0 / 26" in family
+    assert "0 / 28" not in family
 
 
 def test_lock_timeout_is_adjustable_from_settings(unlocked, settings):

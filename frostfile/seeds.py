@@ -839,6 +839,92 @@ AGENCIES: list[dict[str, Any]] = [
         ),
         "sort_order": 4,
     },
+    # The two SSA blocks. Distinct protections, requested the same way, and
+    # deliberately NOT claim_first: both are judgment calls placed after the
+    # basics, not steps in the race. Sorted 80/81 so they stay in the
+    # Government Controls group without outranking the freezes.
+    {
+        "slug": "ssa_dd_block",
+        "name": "Social Security direct deposit block",
+        "category": "gov_control",
+        "description": "Freezes how your Social Security payments are delivered.",
+        "why_it_matters": (
+            "Stops anyone from enrolling you in direct deposit or redirecting "
+            "where benefits are paid — including “auto-enrollment” "
+            "changes started through a bank rather than through SSA, a route "
+            "that never touches your Social Security login. While the block is "
+            "on, direct deposit changes can only be made in person."
+        ),
+        "freeze_url": "",
+        "phone": "1-800-772-1213",
+        "mail_address": "",
+        "address_verified": False,
+        "source_url": "https://secure.ssa.gov/poms.nsf/lnx/0202402005",
+        "supports_online": False,
+        "supports_minor": False,
+        "minor_mail_only": True,
+        "thaw_procedure": (
+            "Ask SSA to lift the block when you genuinely need to change "
+            "banks. Until then, a phoned-in change to your direct deposit is "
+            "refused outright — that refusal is the protection working."
+        ),
+        "notes": (
+            "You do not have to be a fraud victim first: “Preventive "
+            "Measure” is one of the two reasons SSA's own block screen "
+            "accepts, alongside “Fraud Alleged.” Request it by "
+            "phone or at an office. The honest cost: while the block is on, "
+            "every future payment change means an in-person visit."
+        ),
+        "citations": {
+            "why_it_matters": ["poms-gn-02402-005", "ssa-ddfp-screens"],
+            "thaw_procedure": ["poms-gn-02402-085"],
+            "notes": ["ssa-ddfp-screens"],
+            "phone": ["ssa-en-05-10093"],
+        },
+        "sort_order": 80,
+    },
+    {
+        "slug": "ssa_eservices_block",
+        "name": "Social Security electronic access block",
+        "category": "gov_control",
+        "description": "Blocks all electronic access to your Social Security record.",
+        "why_it_matters": (
+            "Once blocked, no one — including you — can see or change your "
+            "record online or through SSA's automated phone service. It shuts "
+            "the door a scammer with your SSN would use, and SSA will place it "
+            "for any reason you choose."
+        ),
+        "freeze_url": "https://www.ssa.gov/hlp/block-access.htm",
+        "phone": "1-800-772-1213",
+        "mail_address": "",
+        "address_verified": False,
+        "source_url": "https://www.ssa.gov/hlp/block-access.htm",
+        "supports_online": False,
+        "supports_minor": False,
+        "minor_mail_only": True,
+        "thaw_procedure": (
+            "Changed your mind? Contact SSA, prove your identity, and ask "
+            "them to unblock the record."
+        ),
+        "notes": (
+            "The block applies to you too: your my Social Security account "
+            "stops working online and business with SSA becomes a person on "
+            "the phone or an office visit. That trade is easy for someone "
+            "actively being impersonated and heavy for everyone else — "
+            "deciding against it and marking this “Not "
+            "applicable” is a legitimate answer. Claiming the online "
+            "account (step 2) is not undone by blocking: the claim stops an "
+            "imposter registering; the block stops the record being touched "
+            "at all."
+        ),
+        "citations": {
+            "why_it_matters": ["ssa-block-access", "ssa-en-05-10093"],
+            "freeze_url": ["ssa-block-access"],
+            "thaw_procedure": ["ssa-en-05-10093"],
+            "phone": ["ssa-en-05-10093"],
+        },
+        "sort_order": 81,
+    },
     # -------------------------------------------------------- other controls
     {
         "slug": "optoutprescreen",
@@ -1007,6 +1093,8 @@ PROTECTS: dict[str, str] = {
     "ssa_account": "Guards your Social Security record",
     "everify_self_lock": "Blocks E-Verify hiring checks as you",
     "usps_informed_delivery": "Guards your incoming mail",
+    "ssa_dd_block": "Stops benefit payments being redirected",
+    "ssa_eservices_block": "Locks all online access to your SSA record",
     "optoutprescreen": "Stops pre-approved card offers in your mailbox",
     "carrier_port_lock": "Stops phone-number theft (SIM swap)",
     "data_broker_optout": "Gets your info off people-search sites",
@@ -1038,6 +1126,8 @@ IMPACT: dict[str, int] = {
     "ssa_account": 2,
     "everify_self_lock": 2,
     "usps_informed_delivery": 1,
+    "ssa_dd_block": 2,
+    "ssa_eservices_block": 1,
     "optoutprescreen": 1,
     "carrier_port_lock": 3,
     "data_broker_optout": 1,
