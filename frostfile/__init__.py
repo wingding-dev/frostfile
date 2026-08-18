@@ -11,4 +11,4 @@ never checks them itself.
 Do not add an outbound call, however benign. It erodes the core promise.
 """
 
-__version__ = "2.0.0"
+__version__ = "2.1.0"
