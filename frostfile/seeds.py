@@ -798,9 +798,24 @@ AGENCIES: list[dict[str, Any]] = [
         "supports_online": True,
         "supports_minor": False,
         "minor_mail_only": True,
-        "thaw_procedure": "Unlock yourself before starting a new job.",
-        "notes": "Remember to unlock before a legitimate employer runs E-Verify on you.",
-        "citations": {"freeze_url": ["everify-self-lock"]},
+        "thaw_procedure": (
+            "About to start a new job with an E-Verify employer? Log in and "
+            "unlock your SSN first — you can lock it again after."
+        ),
+        "notes": (
+            "The lock stays active as long as your myE-Verify account stays "
+            "valid and you haven't unlocked it — there is no yearly renewal. "
+            "Locking means choosing three challenge questions: pick ones you "
+            "can answer again years later, because they are how you prove "
+            "it's you if the lock ever trips a mismatch. Worth doing even "
+            "when nobody in the house is job-hunting."
+        ),
+        "citations": {
+            "freeze_url": ["everify-self-lock"],
+            "why_it_matters": ["everify-self-lock"],
+            "thaw_procedure": ["everify-self-lock"],
+            "notes": ["everify-self-lock"],
+        },
         "action_kind": "claim_first",
         "action_note": (
             "Claiming comes before freezing — enrolling runs an identity "

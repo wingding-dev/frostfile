@@ -418,13 +418,16 @@ SOURCES: dict[str, Source] = {
             "fetched",
             retrieved="2026-08-17",
         ),
+        # e-verify.gov 403s automated fetch; page retrieved and read by a
+        # human (Dan) on the date shown. Page's own "last updated": 09/15/2022.
         _s(
             "everify-self-lock",
             "Self Lock",
             "https://www.e-verify.gov/employees/employee-self-services/mye-verify/self-lock",
             "E-Verify (USCIS)",
             "government",
-            "listed",
+            "fetched",
+            retrieved="2026-08-17",
         ),
         _s(
             "usps-informed-delivery",
