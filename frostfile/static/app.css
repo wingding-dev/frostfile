@@ -314,11 +314,28 @@ tbody tr:hover { background: rgba(111, 188, 242, .05); }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 
 .matrix th.agency-col { min-width: 210px; }
-.matrix td.cell { text-align: center; padding: .3rem; }
+.matrix td.cell { text-align: center; padding: .3rem; position: relative; }
 .matrix .cat-row td {
   background: rgba(111,188,242,.06); font: var(--label-caps);
   text-transform: uppercase; letter-spacing: .09em; color: var(--ice-dim);
 }
+
+/* Settled cells frost over: a faint ice wash plus a small ❄ in the corner.
+   The snowflake is the non-color cue (never rely on tint alone) but stays
+   aria-hidden — the select's own text is what a screen reader should hear.
+   "Not applicable" recedes instead of celebrating; it is settled, not won. */
+.matrix td.cell-settled {
+  background: linear-gradient(180deg, rgba(111,188,242,.09), rgba(111,188,242,.02));
+  box-shadow: inset 0 1px 0 var(--seam-light);
+}
+.matrix td.cell-settled select { border-color: rgba(111,188,242,.45); }
+.cell-frost {
+  position: absolute; top: .12rem; right: .28rem;
+  font-size: .68rem; line-height: 1; color: var(--ice-bright);
+  text-shadow: 0 0 6px var(--glow);
+}
+.matrix td.cell-na { opacity: .55; }
+.matrix td.cell-na:focus-within { opacity: 1; }
 
 /* ------------------------------------------------------- status indicators */
 /* Statuses wear engraved tags with an LED: lit ice = frozen/protected,

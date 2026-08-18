@@ -40,7 +40,10 @@
         </td>
         {% for person in people %}
           {% set record = matrix.get(person.id, {}).get(agency.id) %}
-          <td class="cell">
+          {% set settled = record and record.status in ('active', 'no_file') %}
+          {% set shelved = record and record.status == 'not_applicable' %}
+          <td class="cell{{ ' cell-settled' if settled }}{{ ' cell-na' if shelved }}">
+            {% if settled %}<span class="cell-frost" aria-hidden="true">&#10052;</span>{% endif %}
             <form method="post" action="/matrix/quick">
               <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
               <input type="hidden" name="person_id" value="{{ person.id }}">
@@ -68,6 +71,9 @@
 </div>
 
 <p class="small muted">
+  &#10052; means that cell is settled — frozen, enrolled, or confirmed &ldquo;no
+  file exists&rdquo; (for a child, that answer is the goal). Faded cells are
+  marked not applicable.
   &#128273; means a freeze PIN is stored for that record.
   A <span class="cite cite-missing-inline">?</span> next to a link means the app
   has no captured source for that value.
