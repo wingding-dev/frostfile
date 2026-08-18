@@ -14,11 +14,12 @@ from ..repo import (
     get_person,
     list_agencies,
     list_people,
+    pending_claim_first,
     set_freeze_status,
     update_freeze_record,
 )
 from ..security import Session, verify_csrf
-from ..seeds import STATUS_ORDER
+from ..seeds import FREEZE_CATEGORIES, STATUS_ORDER
 from ..web import get_conn, get_session, get_vault, redirect, render
 
 router = APIRouter()
@@ -86,6 +87,14 @@ def freeze_detail(
     if person is None or agency is None:
         raise HTTPException(status_code=404, detail="No such freeze record.")
     record = get_freeze_record(conn, vault, person_id, agency_id)
+    # Warn on freeze pages while claim-first accounts are still open: those
+    # sign-ups run an identity check a freeze can break, so the order matters.
+    # Once the accounts are claimed the warning has nothing to say and hides.
+    claim_first_pending = (
+        pending_claim_first(conn, person_id)
+        if agency.category in FREEZE_CATEGORIES and agency.action_kind == "act"
+        else []
+    )
     return render(
         request,
         "freeze_detail.html",
@@ -94,6 +103,7 @@ def freeze_detail(
             "person": person,
             "agency": agency,
             "record": record,
+            "claim_first_pending": claim_first_pending,
         },
     )
 

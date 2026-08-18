@@ -11,6 +11,21 @@
   {% if agency.protects %}<br><strong>{{ agency.protects }}</strong>{% endif %}
 </p>
 
+{% if claim_first_pending %}
+<div class="notice notice-warn">
+  <p style="margin:0">
+    <strong>Worth doing first:</strong> {{ person.display_name }} still has
+    {{ claim_first_pending|length }} &ldquo;claim first&rdquo;
+    account{{ 's' if claim_first_pending|length != 1 }} to set up —
+    {% for a in claim_first_pending %}<a href="/freeze/{{ person.id }}/{{ a.id }}">{{ a.name }}</a>{{ ", " if not loop.last }}{% endfor %}.
+    Signing up for those runs an identity check, and a credit freeze can make
+    it fail — so claiming them before freezing is the smooth path. Already
+    frozen, or a sign-up failed anyway? Nothing is lost: temporarily lift the
+    freeze, finish the sign-up, then freeze again.
+  </p>
+</div>
+{% endif %}
+
 <div class="grid-2">
   <div class="card">
     <h3 style="margin-top:0">Record</h3>

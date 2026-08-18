@@ -19,6 +19,7 @@ from .db import context_for, utcnow
 from .seeds import (
     REMINDER_TEMPLATES,
     STATUS_ACTIVE,
+    STATUS_NOT_APPLICABLE,
     STATUS_NOT_STARTED,
     status_label,
 )
@@ -471,6 +472,29 @@ def get_freeze_record(
         (person_id, agency_id),
     ).fetchone()
     return _row_to_freeze(vault, row) if row else None
+
+
+def pending_claim_first(conn: sqlite3.Connection, person_id: int) -> list[Agency]:
+    """Claim-first agencies this person has not finished yet.
+
+    Finished means enrolled (active) or explicitly not applicable; anything
+    else — untouched, in progress, a missing placeholder row — still counts.
+    The freeze pages use this to warn while the warning can still help, and
+    to fall silent once the accounts are claimed.
+    """
+    rows = conn.execute(
+        """
+        SELECT a.* FROM agencies a
+        LEFT JOIN freeze_records f
+          ON f.agency_id = a.id AND f.person_id = ?
+        WHERE a.is_active = 1
+          AND a.action_kind = 'claim_first'
+          AND COALESCE(f.status, ?) NOT IN (?, ?)
+        ORDER BY a.sort_order, a.name
+        """,
+        (person_id, STATUS_NOT_STARTED, STATUS_ACTIVE, STATUS_NOT_APPLICABLE),
+    ).fetchall()
+    return [_row_to_agency(row) for row in rows]
 
 
 def freeze_matrix(
