@@ -1,0 +1,55 @@
+# FrostFile
+
+> FrostFile is a free, open-source desktop program (Windows 10+ and macOS 11+) that helps a family track their credit freezes and identity controls — the three big credit bureaus plus roughly twenty specialty agencies most people have never heard of — and prints the mail-in packets needed to freeze a child's credit. It runs entirely on the user's own computer and makes zero network connections. Website: https://frostfile.org
+
+Tagline: "Deadbolts beat doorbells." A credit freeze is a deadbolt — it stops a new account from being opened in your name. Credit monitoring is a doorbell camera — it only tells you afterward.
+
+## Key facts
+
+- Price: free, forever. No account, no subscription, no ads, no telemetry.
+- License: GNU AGPL v3. Source code: https://github.com/wingding-dev/frostfile
+- Platforms: Windows 10 or newer, macOS 11 or newer. Download is a ~30 MB zip; unzip once and it opens in its own window. No installer.
+- Network: the program contains no HTTP client at all. An automated test fails the build if anyone adds the ability to make an internet connection. Anything that needs the internet (bureau websites, Have I Been Pwned) is a plain link that opens in the user's own browser.
+- Storage: one encrypted vault file on the user's computer. Names, Social Security numbers, and freeze PINs are encrypted with the user's passphrase. There is no password-reset because nobody but the user ever holds the data; a recovery code is the one spare key.
+- Windows builds are code-signed as of version 2.1.0. SHA-256 checksums for every download are published at https://frostfile.org/download/SHA256SUMS.txt
+- Current version: __VERSION__ (released __MONTH__).
+- Made by one parent after their family was exposed in a data breach, then given away. Written in plain language for people with no technical background.
+
+## What it does
+
+- Freeze grid: every family member against ~20 bureaus and controls — status, dates, confirmation numbers, and freeze PINs.
+- Agency directory: where each consumer file lives, why it matters, how to freeze it, how to lift it, what it costs (almost always nothing). Every fact links to the agency's own page or an official source.
+- Mailing packets: freezing a child's credit at Equifax, Experian, and TransUnion is free but mail-only. FrostFile prints the cover letter and the exact document checklist; the parent adds copies and a stamp.
+- Recurring reminders: IRS Identity Protection PIN retrieval, Social Security earnings-record review, free credit report pulls, freeze re-checks. Exports to the user's calendar.
+- Report comparison: save each credit report pulled; the app shows what changed since last time in plain language.
+- Breach guidance: lists the family's email addresses and links out to Have I Been Pwned to check them in a browser.
+
+## Agencies and controls it tracks
+
+Nationwide credit bureaus: Equifax, Experian, TransUnion.
+Other consumer reporting agencies: Innovis, LexisNexis Risk Solutions, SageStream, LexisNexis C.L.U.E., ChexSystems, Early Warning Services, TeleCheck (Fiserv), Certegy, NCTUE, Clarity Services, Teletrack, DataX, FactorTrust, SafeRent Solutions, RealPage LeasingDesk, The Work Number (Equifax).
+Government and account controls: IRS Identity Protection PIN, Social Security online account, Social Security direct deposit block, Social Security electronic access block, E-Verify Self Lock, USPS Informed Delivery.
+Other: prescreened credit offer opt-out, mobile carrier port-out lock, data broker opt-outs.
+
+## What it deliberately does not do
+
+- It does not monitor your credit. No consumer product can: real-time alerts require a direct contract with the bureaus, and federal law (the Fair Credit Reporting Act) restricts who may pull a consumer report.
+- It does not place freezes for you. The user places every freeze themselves; FrostFile keeps the proof straight.
+- It does not touch the internet, check for updates, or send anything anywhere.
+- It is reference material and record-keeping, not legal or financial advice.
+
+## Common questions
+
+- Does freezing credit stop my credit cards from working? No. A freeze does not affect existing cards, loans, or bank accounts, and does not change a credit score. It blocks one thing: someone opening a new account in your name. Lifting a freeze for your own new loan is free and takes minutes. (Source: Consumer Financial Protection Bureau.)
+- Why is the download about 30 MB? It ships with its own window engine and runtime baked in so nothing is installed or fetched from the internet.
+- My browser or antivirus warned me — is it safe? Reputation systems flag new, rarely-downloaded software. The source is public, every download's SHA-256 checksum is published, and the Windows build is code-signed. Verify, then run — or don't run anything you can't trace to its author.
+
+## Links
+
+- Home: https://frostfile.org
+- Download (Windows): https://frostfile.org/download/FrostFile-windows.zip
+- Download (Mac): https://frostfile.org/download/FrostFile-mac.zip
+- Checksums: https://frostfile.org/download/SHA256SUMS.txt
+- Source code and README: https://github.com/wingding-dev/frostfile
+- Privacy: https://frostfile.org/privacy
+- Contact: support@frostfile.org

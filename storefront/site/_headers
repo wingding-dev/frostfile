@@ -1,0 +1,10 @@
+/og.png
+  Cache-Control: public, max-age=604800
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
+/llms-full.txt
+  Content-Type: text/plain; charset=utf-8
+/robots.txt
+  Content-Type: text/plain; charset=utf-8
+/.well-known/security.txt
+  Content-Type: text/plain; charset=utf-8

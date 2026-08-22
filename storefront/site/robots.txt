@@ -1,0 +1,48 @@
+# frostfile.org — a free, offline credit-freeze tracker. Index away.
+# NOTE: Cloudflare can prepend a managed "AI crawler" block above this file.
+# If you see Disallow lines for GPTBot/ClaudeBot here, that toggle is on
+# (Cloudflare dashboard → AI Crawl Control → manage robots.txt) — see docs/SEO-GEO.md.
+
+User-agent: *
+Allow: /
+Disallow: /api/
+
+# Search engines and AI assistants are explicitly welcome to read and cite this site.
+User-agent: Googlebot
+Allow: /
+User-agent: Bingbot
+Allow: /
+User-agent: GPTBot
+Allow: /
+User-agent: OAI-SearchBot
+Allow: /
+User-agent: ChatGPT-User
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: Claude-SearchBot
+Allow: /
+User-agent: Claude-User
+Allow: /
+User-agent: anthropic-ai
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Perplexity-User
+Allow: /
+User-agent: Google-Extended
+Allow: /
+User-agent: Applebot
+Allow: /
+User-agent: Applebot-Extended
+Allow: /
+User-agent: DuckAssistBot
+Allow: /
+User-agent: CCBot
+Allow: /
+User-agent: meta-externalagent
+Allow: /
+User-agent: Amazonbot
+Allow: /
+
+Sitemap: https://frostfile.org/sitemap.xml

@@ -3,9 +3,114 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FrostFile — Freeze your family's credit. Keep it on your own computer.</title>
-<meta name="description" content="A free program for tracking your family's credit freezes — the big three bureaus and the specialty agencies most people never hear of — and printing the mail-in forms for kids. Everything stays on your computer.">
+<title>FrostFile — Free family credit freeze tracker. Runs offline on your own computer.</title>
+<meta name="description" content="Free, open-source tracker for your family's credit freezes — the big three plus ~20 agencies you've never heard of. Prints kids' mail-in forms. Zero internet connections.">
+<link rel="canonical" href="https://frostfile.org/">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="FrostFile">
+<meta name="theme-color" content="#090f15">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="FrostFile">
+<meta property="og:url" content="https://frostfile.org/">
+<meta property="og:title" content="FrostFile — Deadbolts beat doorbells.">
+<meta property="og:description" content="Free tracker for your whole family's credit freezes. Runs on your own computer, sends nothing anywhere. Windows &amp; Mac, open source.">
+<meta property="og:image" content="https://frostfile.org/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="FrostFile — Deadbolts beat doorbells. Free tracker for your family's credit freezes.">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="FrostFile — Deadbolts beat doorbells.">
+<meta name="twitter:description" content="Free tracker for your whole family's credit freezes. Runs on your own computer, sends nothing anywhere.">
+<meta name="twitter:image" content="https://frostfile.org/og.png">
 <link rel="icon" href="__ICON_BLUE__">
+<link rel="alternate" type="text/plain" href="https://frostfile.org/llms.txt" title="FrostFile for AI assistants">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://frostfile.org/#org",
+      "name": "FrostFile",
+      "url": "https://frostfile.org/",
+      "logo": "https://frostfile.org/og.png",
+      "email": "support@frostfile.org",
+      "sameAs": ["https://github.com/wingding-dev/frostfile"]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://frostfile.org/#website",
+      "url": "https://frostfile.org/",
+      "name": "FrostFile",
+      "publisher": {"@id": "https://frostfile.org/#org"},
+      "inLanguage": "en-US"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://frostfile.org/#app",
+      "name": "FrostFile",
+      "alternateName": "FrostFile credit freeze tracker",
+      "url": "https://frostfile.org/",
+      "image": "https://frostfile.org/og.png",
+      "description": "A free, open-source program that tracks a family's credit freezes across the three big bureaus and about twenty specialty agencies, prints the mail-in packets for children's freezes, and makes zero network connections. Everything stays on the user's own computer.",
+      "slogan": "Deadbolts beat doorbells.",
+      "applicationCategory": "SecurityApplication",
+      "applicationSubCategory": "Identity protection",
+      "operatingSystem": "Windows 10 or later, macOS 11 or later",
+      "softwareVersion": "__VERSION__",
+      "datePublished": "2026-08-08",
+      "isAccessibleForFree": true,
+      "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+      "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+      "downloadUrl": ["https://frostfile.org/download/FrostFile-windows.zip", "https://frostfile.org/download/FrostFile-mac.zip"],
+      "installUrl": "https://frostfile.org/#download",
+      "fileSize": "30MB",
+      "softwareHelp": {"@type": "CreativeWork", "url": "https://github.com/wingding-dev/frostfile#readme"},
+      "featureList": [
+        "Freeze grid: every family member against ~20 bureaus and identity controls",
+        "Printable mail-in packets for children's credit freezes",
+        "Recurring reminders for IRS IP PIN, Social Security review, and freeze re-checks",
+        "Plain-language comparison of saved credit reports",
+        "Encrypted local vault; no account, no cloud, no telemetry, no network connections"
+      ],
+      "author": {"@id": "https://frostfile.org/#org"},
+      "publisher": {"@id": "https://frostfile.org/#org"}
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://frostfile.org/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Does freezing my credit stop my credit cards from working?",
+          "acceptedAnswer": {"@type": "Answer", "text": "No. A freeze doesn't touch anything you already have — cards, loans, bank accounts all work exactly as before, and your credit score is untouched. It blocks one thing: someone opening a new account in your name. Unlocking for your own new loan is free and takes minutes."}
+        },
+        {
+          "@type": "Question",
+          "name": "Does FrostFile connect to the internet?",
+          "acceptedAnswer": {"@type": "Answer", "text": "No. Zero connections — no cloud, no account, no tracking, not even an update check. Anything online is a link that opens in your own browser. Turn off your Wi-Fi and it works the same."}
+        },
+        {
+          "@type": "Question",
+          "name": "Why is the download about 30 MB?",
+          "acceptedAnswer": {"@type": "Answer", "text": "At heart it's a checklist, but it ships with everything it needs baked in, including its own private window engine and runtime. That means nothing to install, no extra pieces, and nothing fetched from the internet, ever."}
+        },
+        {
+          "@type": "Question",
+          "name": "My browser or antivirus warned me. Is FrostFile safe?",
+          "acceptedAnswer": {"@type": "Answer", "text": "Browsers and antivirus programs judge new software by reputation, and FrostFile is new and free, so warnings on it are those tools doing their job rather than a virus detection. The complete source code is public on GitHub, every download's SHA-256 fingerprint is published in SHA256SUMS.txt, the Windows build is signed with a publisher certificate, and the program makes zero internet connections — which you can prove yourself by turning off Wi-Fi."}
+        },
+        {
+          "@type": "Question",
+          "name": "Is FrostFile free?",
+          "acceptedAnswer": {"@type": "Answer", "text": "Yes — free forever, open source, no account, no data to hand over, no subscription to cancel."}
+        }
+      ]
+    }
+  ]
+}
+</script>
 <style>
   :root {
     --ground: #090f15;
@@ -494,7 +599,7 @@
       </div>
       <div class="faq-note reveal" id="av-warning" style="margin-top:22px">
         <h3>My browser or antivirus warned me. Is this safe?</h3>
-        <p>Here's the honest version. Browsers and antivirus programs judge new software by reputation: has it been downloaded a million times, and did a company pay for a publisher certificate? FrostFile is weeks old and free, so it has neither — and warnings on brand-new, uncertified software are those tools doing their job. It is <em>not</em> a virus detection; it's a "we don't know this one yet."</p>
+        <p>Here's the honest version. Browsers and antivirus programs judge new software by reputation: has it been downloaded a million times, and for how long has its publisher certificate been around? FrostFile is weeks old and free, so it has very little reputation yet — and warnings on brand-new software are those tools doing their job. It is <em>not</em> a virus detection; it's a "we don't know this one yet." The Windows download is signed with a publisher certificate, so the prompt should show the publisher's name, <strong>ARVENT LLC</strong>, rather than "Unknown publisher" — if it says anything else, don't run it.</p>
         <p>What you don't have to take on faith: the complete source code is public at <a href="https://github.com/wingding-dev/frostfile" target="_blank" rel="noopener noreferrer" style="color:var(--cyan)">github.com/wingding-dev/frostfile</a>, every download's fingerprint is published in <a href="/download/SHA256SUMS.txt" style="color:var(--cyan)">SHA256SUMS.txt</a> so anyone can verify their copy is untampered, and the program makes zero internet connections — which you can prove yourself by turning off Wi-Fi and watching everything still work. If a warning appears, "Keep" / "More info → Run anyway" is you telling your computer you trust the person who gave you this. If you don't know who that is, don't run it — that rule protects you everywhere, not just here.</p>
       </div>
     </div>
