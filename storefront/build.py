@@ -47,7 +47,10 @@ for src in (here / "site").rglob("*"):
         continue
     dst = dist / src.relative_to(here / "site")
     dst.parent.mkdir(parents=True, exist_ok=True)
-    dst.write_text(fill(src.read_text()))  # everything in site/ is text
+    if src.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp", ".ico", ".pdf", ".woff2"}:
+        shutil.copy(src, dst)
+    else:
+        dst.write_text(fill(src.read_text()))
 
 # sitemap: privacy's lastmod is its last git change; the home page moves every build
 import subprocess
@@ -56,7 +59,8 @@ def git_date(path):
                          capture_output=True, text=True, cwd=here.parent).stdout.strip()
     return out or today.isoformat()
 pages = [("https://frostfile.org/", today.isoformat(), "1.0"),
-         ("https://frostfile.org/privacy", git_date(here / "privacy.html"), "0.3")]
+         ("https://frostfile.org/privacy", git_date(here / "privacy.html"), "0.3"),
+         ("https://frostfile.org/press/", git_date(here / "site/press/index.html"), "0.5")]
 (dist / "sitemap.xml").write_text(
     '<?xml version="1.0" encoding="UTF-8"?>\n'
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
